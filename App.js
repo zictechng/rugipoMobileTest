@@ -8,7 +8,7 @@ import * as SplashScreen from 'expo-splash-screen';
 
 import { UserContext } from './components/UserContext';
 import AsyncStorage from '@react-native-async-storage/async-storage';
-import { NavigationContainer} from '@react-navigation/native';
+import { NavigationContainer } from '@react-navigation/native';
 import { createBottomTabNavigator } from '@react-navigation/bottom-tabs';
 import { createStackNavigator } from '@react-navigation/stack';
 import LoginScreen from './screens/loginScreen';
@@ -22,59 +22,58 @@ import MainRootScreen from './navigation/mainRoots';
 export default function App() {
 
   // get the font library here
-  
-  // const fontsLoaded = useCustomFonts();
-  // if (!fontsLoaded) {
-  //   return null;
-  // }
-  const [isLoading, setIsLoading]= useState(true);
+
+  const fontsLoaded = useCustomFonts();
+
+  const [isLoading, setIsLoading] = useState(true);
   const initialLoginState = {
     userName: null,
     userToken: null,
-}
+  }
 
   const [userLoggedToken, setUserLoggedToken] = useState(null);
   const [userLogToken, setUserLogToken] = useState(null);
 
   // get user information from local storage here
- _getUserLocalInfo = async () =>{
-  try {
-    const UserInfo = await AsyncStorage.getItem('USER_LOCAL_INFO');
-    if (UserInfo !== null) {
-      setUserData(UserInfo);
-     //console.log("Local User Info from App ", userData);
+  _getUserLocalInfo = async () => {
+    try {
+      const UserInfo = await AsyncStorage.getItem('USER_LOCAL_INFO');
+      if (UserInfo !== null) {
+        setUserData(UserInfo);
+        //console.log("Local User Info from App ", userData);
+      }
+    } catch (error) {
+      // Error retrieving data
+      //console.log("Local error here ", error.message);
     }
-  } catch (error) {
-    // Error retrieving data
-    //console.log("Local error here ", error.message);
   }
- }
- _getUserTokenInfo = async () =>{
-  try {
-    const userToken = await AsyncStorage.getItem('USER_TOKEN');
-    if (userToken !== null) {
-      setUserLogToken(userToken);
-      console.log("User Token in App ", userToken);
+  _getUserTokenInfo = async () => {
+    try {
+      const userToken = await AsyncStorage.getItem('USER_TOKEN');
+      if (userToken !== null) {
+        setUserLogToken(userToken);
+        console.log("User Token in App ", userToken);
+      }
+    } catch (error) {
+      // Error retrieving data
+      console.log("Local error here ", error.message);
     }
-  } catch (error) {
-    // Error retrieving data
-    console.log("Local error here ", error.message);
   }
- }
 
-useEffect(() =>{
+  useEffect(() => {
     setIsLoading(false);
     _getUserLocalInfo();
     _getUserTokenInfo()
-}, []);
-
-
+  }, []);
+  if (!fontsLoaded) {
+    return null;
+  }
   return (
 
     <AlertNotificationRoot>
-       
-          <UserContext.Provider value={[userLoggedToken, setUserLoggedToken]}>
-                {/* <NavigationContainer>
+
+      <UserContext.Provider value={[userLoggedToken, setUserLoggedToken]}>
+        {/* <NavigationContainer>
                          {userLoggedToken !== null || userLogToken !== null ? (
                    <BottomTab />
                   ) : 
@@ -82,16 +81,17 @@ useEffect(() =>{
                   }
                </NavigationContainer> */}
 
-                  <NavigationContainer>
-                        
-                   <BottomTab />
-                 
-               </NavigationContainer>
+        <NavigationContainer>
 
-               
-            </UserContext.Provider>
-       
-      </AlertNotificationRoot>
+          <BottomTab />
+          {/* <LoginScreen /> */}
+
+        </NavigationContainer>
+
+
+      </UserContext.Provider>
+
+    </AlertNotificationRoot>
     // <View style={styles.container}>
     //   <Text style={{ fontFamily: '_bold', fontSize: 30, }}>Rugipo Finance Mobile Application System!</Text>
     //   <Text style={{ fontFamily: '_regular', fontSize: 20, }}>This application is for user to be able to access their account on the go without needing to go to the office</Text>

@@ -13,7 +13,7 @@ const AccountScreen = ({navigation}) => {
       <SafeAreaView />
       <Text> This is Account Screen</Text>
 
-      <Text onPress={() => navigation.navigate('contact')} style={{fontFamily: '_bold', fontSize: 30}}>Go to contact Page</Text>
+      <Text onPress={() => navigation.navigate('contact')} style={{fontFamily: '_semiBold', fontSize: 30}}>Go to contact Page</Text>
      </View>
   );
 }
