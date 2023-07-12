@@ -2,6 +2,7 @@ import React from 'react';
 import { StyleSheet, Text, View, Image, TouchableOpacity } from 'react-native';
 
 import { createBottomTabNavigator } from '@react-navigation/bottom-tabs';
+import { createStackNavigator } from '@react-navigation/stack';
 import Ionicons from '@expo/vector-icons/Ionicons';
 
 // screen imports goes here
@@ -10,8 +11,12 @@ import HistoryScreen from '../screens/historyScreen';
 import ProfileScreen from '../screens/profileScreen';
 import AccountScreen from '../screens/accountScreen';
 import SendMoneyScreen from '../screens/sendMoneyScreen';
+import ContactScreen from '../screens/contact';
 
 const Tab = createBottomTabNavigator();
+const Stack = createStackNavigator();
+
+
 
 const CustomTabBarButton = ({children, onPress}) =>(
     <TouchableOpacity
@@ -107,6 +112,7 @@ const BottomTab = () => {
                 )
             }}
             />
+
             <Tab.Screen name="SendMoney" component={SendMoneyScreen} 
             options = {{
                 tabBarIcon: ({ focused }) =>(
@@ -129,6 +135,7 @@ const BottomTab = () => {
                     )
             }}
             />
+
             <Tab.Screen name="History" component={HistoryScreen} options = {{
                 tabBarIcon: ({ focused }) =>(
                     <View style={{alignItems:'center', justifyContent:'center', top:10}}>
@@ -154,6 +161,7 @@ const BottomTab = () => {
                     </View>
                 )
             }} />
+
             <Tab.Screen name="Profile" component={ProfileScreen} options = {{
                 tabBarIcon: ({ focused }) =>(
                     <View style={{alignItems:'center', justifyContent:'center', top:10}}>
@@ -179,7 +187,7 @@ const BottomTab = () => {
                     </View>
                 )
             }}/>
-            
+             
         </Tab.Navigator>
   );
 }

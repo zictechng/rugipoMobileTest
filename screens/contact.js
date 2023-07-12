@@ -1,19 +1,11 @@
 import React from 'react';
 import {StyleSheet, View, Text } from 'react-native';
-import { StatusBar } from 'expo-status-bar';
 
-import { gs, colors } from '../styles'
-import { SafeAreaView } from 'react-native-safe-area-context';
-
-const AccountScreen = ({navigation}) => {
-  
+const ContactScreen = ({navigation}) => {
   return (
     <View>
-      <StatusBar backgroundColor={colors.secondaryColor2} style="light" />
-      <SafeAreaView />
-      <Text> This is Account Screen</Text>
-
-      <Text onPress={() => navigation.navigate('contact')} style={{fontFamily: '_bold', fontSize: 30}}>Go to contact Page</Text>
+      <Text>Contact Screen</Text>
+      <Text onPress={() => navigation.navigate('Home')}>Go Home Page</Text>
      </View>
   );
 }
@@ -35,4 +27,4 @@ const styles = StyleSheet.create({
     },
 })
 
-export default AccountScreen;
+export default ContactScreen;

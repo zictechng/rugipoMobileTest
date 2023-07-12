@@ -1,7 +1,6 @@
 import React, { useContext, useEffect, useState, useCallback } from 'react';
 import { useCustomFonts } from './useCustomFonts';
 import { ALERT_TYPE, Dialog, AlertNotificationRoot, Toast } from 'react-native-alert-notification';
-import { StatusBar } from 'expo-status-bar';
 import { StyleSheet, Text, View } from 'react-native';
 
 //import { useFonts } from 'expo-font';
@@ -10,23 +9,24 @@ import * as SplashScreen from 'expo-splash-screen';
 import { UserContext } from './components/UserContext';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { NavigationContainer} from '@react-navigation/native';
-import { createStackNavigator } from '@react-navigation/stack';
 import { createBottomTabNavigator } from '@react-navigation/bottom-tabs';
-
-
+import { createStackNavigator } from '@react-navigation/stack';
 import LoginScreen from './screens/loginScreen';
 import SignUpScreen from './screens/signUpScreen';
 import BottomTab from './navigation/bottomTabs';
 import GeneralRootScreen from './navigation/generalRootScreen';
+import ContactScreen from './screens/contact';
+import MainRootScreen from './navigation/mainRoots';
+
 
 export default function App() {
 
   // get the font library here
   
-  const fontsLoaded = useCustomFonts();
-  if (!fontsLoaded) {
-    return null;
-  }
+  // const fontsLoaded = useCustomFonts();
+  // if (!fontsLoaded) {
+  //   return null;
+  // }
   const [isLoading, setIsLoading]= useState(true);
   const initialLoginState = {
     userName: null,
@@ -58,7 +58,7 @@ export default function App() {
     }
   } catch (error) {
     // Error retrieving data
-    //console.log("Local error here ", error.message);
+    console.log("Local error here ", error.message);
   }
  }
 
@@ -74,14 +74,21 @@ useEffect(() =>{
     <AlertNotificationRoot>
        
           <UserContext.Provider value={[userLoggedToken, setUserLoggedToken]}>
-                <NavigationContainer>
+                {/* <NavigationContainer>
                          {userLoggedToken !== null || userLogToken !== null ? (
                    <BottomTab />
                   ) : 
                   <GeneralRootScreen />
                   }
+               </NavigationContainer> */}
+
+                  <NavigationContainer>
+                        
+                   <BottomTab />
+                 
                </NavigationContainer>
-                
+
+               
             </UserContext.Provider>
        
       </AlertNotificationRoot>
