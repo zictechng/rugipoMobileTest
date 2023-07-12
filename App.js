@@ -23,10 +23,10 @@ export default function App() {
 
   // get the font library here
   
-  // const fontsLoaded = useCustomFonts();
-  // if (!fontsLoaded) {
-  //   return null;
-  // }
+  const fontsLoaded = useCustomFonts();
+  if (!fontsLoaded) {
+    return null;
+  }
   const [isLoading, setIsLoading]= useState(true);
   const initialLoginState = {
     userName: null,
