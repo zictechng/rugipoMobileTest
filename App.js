@@ -15,8 +15,7 @@ import LoginScreen from './screens/loginScreen';
 import SignUpScreen from './screens/signUpScreen';
 import BottomTab from './navigation/bottomTabs';
 import GeneralRootScreen from './navigation/generalRootScreen';
-import ContactScreen from './screens/contact';
-import MainRootScreen from './navigation/mainRoots';
+import MainRootNavigation from './navigation/mainRootNavigation';
 
 
 export default function App() {
@@ -33,6 +32,7 @@ export default function App() {
 
   const [userLoggedToken, setUserLoggedToken] = useState(null);
   const [userLogToken, setUserLogToken] = useState(null);
+  const [appLoading, setAppLoading] = useState(false);
 
   // get user information from local storage here
   _getUserLocalInfo = async () => {
@@ -47,24 +47,12 @@ export default function App() {
       //console.log("Local error here ", error.message);
     }
   }
-  _getUserTokenInfo = async () => {
-    try {
-      const userToken = await AsyncStorage.getItem('USER_TOKEN');
-      if (userToken !== null) {
-        setUserLogToken(userToken);
-        console.log("User Token in App ", userToken);
-      }
-    } catch (error) {
-      // Error retrieving data
-      console.log("Local error here ", error.message);
-    }
-  }
-
+  
   useEffect(() => {
     setIsLoading(false);
     _getUserLocalInfo();
-    _getUserTokenInfo()
   }, []);
+
   if (!fontsLoaded) {
     return null;
   }
@@ -72,22 +60,20 @@ export default function App() {
 
     <AlertNotificationRoot>
 
-      <UserContext.Provider value={[userLoggedToken, setUserLoggedToken]}>
-        {/* <NavigationContainer>
-                         {userLoggedToken !== null || userLogToken !== null ? (
-                   <BottomTab />
-                  ) : 
-                  <GeneralRootScreen />
-                  }
-               </NavigationContainer> */}
-
+      <UserContext.Provider value={[userLoggedToken, setUserLoggedToken, appLoading, setAppLoading]}>
         <NavigationContainer>
+              
+              <MainRootNavigation />
+              
+          </NavigationContainer>
 
-          <BottomTab />
-          {/* <LoginScreen /> */}
+          {/* <NavigationContainer>
 
-        </NavigationContainer>
-
+                   <BottomTab />
+                  
+                  <GeneralRootScreen />
+                 
+          </NavigationContainer> */}
 
       </UserContext.Provider>
 

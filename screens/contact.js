@@ -5,7 +5,11 @@ const ContactScreen = ({navigation}) => {
   return (
     <View>
       <Text>Contact Screen</Text>
-      <Text onPress={() => navigation.navigate('Home')}>Go Home Page</Text>
+      <Text onPress={() => navigation.navigate('Home')} style={{fontSize: 20,
+        fontFamily: '_semiBold',}}>Go Home Page</Text>
+
+      <Text style={{fontSize: 30,
+        fontFamily: '_semiBold',}}>Logout</Text>
      </View>
   );
 }

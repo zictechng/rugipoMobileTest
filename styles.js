@@ -19,6 +19,8 @@ export const colors = {
     
     text: "#fff",
     textSec: "#aaa",
+    textColor1:"#05375a",
+    
     dividerColor: "#595957",
 };
 

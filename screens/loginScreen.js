@@ -194,7 +194,7 @@ const LoginScreen = ({navigation}) => {
 
     <View style={styles.header}>
         <Text style={styles.text_header}>Welcome</Text>
-        <Text style={styles.text_header_section}>Login to continue...</Text>
+        <Text style={styles.text_header_section}>Login to access your account...</Text>
     </View>
 
     
@@ -301,7 +301,7 @@ const LoginScreen = ({navigation}) => {
             }]}
             >
                 <Text style={[styles.textSign, {
-                    color:colors.blackColor2,
+                    color:colors.secondaryColor2,
                 }]}>Sign Up</Text>
             </TouchableOpacity>
         </View>
@@ -336,17 +336,19 @@ const styles = StyleSheet.create({
     },
     text_header: {
         color: '#fff',
-        fontWeight: 'bold',
+        fontFamily: '_semiBold',
         fontSize: 30
     },
     text_header_section: {
-        color: '#fff',
-        fontSize: 25,
-        opacity: 0.4,
+        color: '#333',
+        fontSize: 18,
+        fontFamily: '_regular',
+        opacity: 0.9,
     },
     text_footer: {
-        color: '#05375a',
-        fontSize: 18
+        color: colors.textColor1,
+        fontSize: 18,
+        fontFamily: '_semiBold',
     },
     action: {
         flexDirection: 'row',
@@ -367,10 +369,12 @@ const styles = StyleSheet.create({
         marginTop: Platform.OS === 'ios' ? 0 : -12,
         paddingLeft: 10,
         color: '#05375a',
+        fontFamily: '_regular',
     },
     errorMsg: {
         color: '#FF0000',
         fontSize: 14,
+        fontFamily: '_regular',
     },
     button: {
         alignItems: 'center',
@@ -385,7 +389,8 @@ const styles = StyleSheet.create({
     },
     textSign: {
         fontSize: 18,
-        fontWeight: 'bold'
+        fontFamily: '_semiBold',
+       
     }
   });
 
