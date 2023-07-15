@@ -1,12 +1,13 @@
 import React , {useContext, useEffect, useState} from 'react';
-import { ALERT_TYPE, Dialog, AlertNotificationRoot, Toast } from 'react-native-alert-notification';
-import AsyncStorage from '@react-native-async-storage/async-storage';
-import { UserContext } from '../components/UserContext'; 
-
-import { StatusBar } from 'expo-status-bar';
 import {  Alert, StyleSheet, Text, TextInput, View, Image, Dimensions,
     Button, TouchableOpacity,
 Platform } from 'react-native';
+
+import { UserContext } from '../components/UserContext';
+import { ALERT_TYPE, Dialog, AlertNotificationRoot, Toast } from 'react-native-alert-notification';
+import AsyncStorage from '@react-native-async-storage/async-storage';
+ 
+import { StatusBar } from 'expo-status-bar';
 
 import * as Animatable from 'react-native-animatable'
 import { LinearGradient } from 'expo-linear-gradient';
@@ -30,30 +31,28 @@ const LoginScreen = ({navigation}) => {
         isValidPassword: true,
     });
     
-    const [userLoggedToken, setUserLoggedToken] = useContext(UserContext);
-    
-    const [localState, setLocalState] = useState('');
-    const [localUserInfo, setLocalUserInfo] = useState('');
+    const [loginState, setLoginState, isLoading, setIsLoading] = useContext(UserContext);
 
-    //console.log("User Token from login Page ", userLoggedToken);
-   
-    // get local storage variable here...
-    _retrieveData = async () => {
-        try {
-          const value = await AsyncStorage.getItem('alreadyLaunch');
-          if (value !== null) {
-            setLocalState(value);
-           // console.log(value);
-          }
-        } catch (error) {
-          // Error retrieving data
-          //console.log("Local error here ", error.message);
-        }
-      };
-    // here we call the function into action by using useEffect hook
-      useEffect(() =>{
-        _retrieveData()
-       })
+    const [userData, setUserData]= useState({});
+
+    // get user information from local storage here
+  _getUserLocalInfo = async () => {
+    try {
+      const UserInfo = await AsyncStorage.getItem('USER_LOCAL_INFO');
+
+      if (UserInfo !== null) {
+        const storageUser = JSON.parse(UserInfo);
+            setUserData(storageUser);
+         }
+    } catch (error) {
+      // Error retrieving data
+      console.log("Local error here ", error.message);
+    }
+  }
+  
+  useEffect(() => {
+    _getUserLocalInfo();
+  }, []);
 
     // function to determine when to show the check icon in the input field
     const textInputChange = (val) => {
@@ -143,10 +142,8 @@ const LoginScreen = ({navigation}) => {
                       });
                  AsyncStorage.setItem('USER_LOCAL_INFO', JSON.stringify(res.data.userData))
                  AsyncStorage.setItem('USER_TOKEN', JSON.stringify(res.data.token))
-                 setDataInLocalStorage('USER_DATA', JSON.stringify(res.data.userData))
-                 
-                 setLocalUserInfo(res.data.userData)
-                 setUserLoggedToken(res.data.token)
+                 setDataInLocalStorage('USER_TOKEN', JSON.stringify(res.data.token))
+                 setLoginState(res.data.token)
               
                 //  Alert.alert("Successful", "Account authenticated!",[
                         
@@ -193,8 +190,9 @@ const LoginScreen = ({navigation}) => {
     <StatusBar backgroundColor={colors.secondaryColor2} style="light" />
 
     <View style={styles.header}>
-        <Text style={styles.text_header}>Welcome</Text>
+        <Text style={styles.text_header}>Welcome,<Text style={{fontSize: 25}}> { userData.surname}</Text></Text>
         <Text style={styles.text_header_section}>Login to access your account...</Text>
+        
     </View>
 
     

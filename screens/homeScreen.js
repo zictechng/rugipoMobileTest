@@ -1,10 +1,16 @@
-import React from 'react';
-import { StyleSheet, View, Text } from 'react-native';
+import React, {useContext, useEffect, useState} from 'react';
+import { ActivityIndicator, StyleSheet, View, Text } from 'react-native';
+
+
+
 
 const HomeScreen = () => {
+
   return (
     <View>
       <Text style={{fontFamily: '_bold',}}>Home Screen</Text>
+
+      <Text style={{fontFamily: '_bold',}}></Text>
      </View>
   );
 }

@@ -3,10 +3,7 @@ import { useCustomFonts } from './useCustomFonts';
 import { ALERT_TYPE, Dialog, AlertNotificationRoot, Toast } from 'react-native-alert-notification';
 import { StyleSheet, Text, View } from 'react-native';
 
-//import { useFonts } from 'expo-font';
-import * as SplashScreen from 'expo-splash-screen';
-
-import { UserContext } from './components/UserContext';
+import UserProvider from './components/UserProvider';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { NavigationContainer } from '@react-navigation/native';
 import MainRootNavigation from './navigation/mainRootNavigation';
@@ -14,19 +11,9 @@ import MainRootNavigation from './navigation/mainRootNavigation';
 
 export default function App() {
 
-  // get the font library here
-
   const fontsLoaded = useCustomFonts();
 
-  const [isLoading, setIsLoading] = useState(true);
-  const initialLoginState = {
-    userName: null,
-    userToken: null,
-  }
-
-  const [userLoggedToken, setUserLoggedToken] = useState(null);
-  const [userLogToken, setUserLogToken] = useState(null);
-  const [appLoading, setAppLoading] = useState(false);
+  const [userData, setUserData]= useState({});
 
   // get user information from local storage here
   _getUserLocalInfo = async () => {
@@ -34,42 +21,35 @@ export default function App() {
       const UserInfo = await AsyncStorage.getItem('USER_LOCAL_INFO');
       if (UserInfo !== null) {
         setUserData(UserInfo);
-        //console.log("Local User Info from App ", userData);
       }
     } catch (error) {
       // Error retrieving data
-      //console.log("Local error here ", error.message);
+      console.log("Local error here ", error.message);
     }
   }
   
   useEffect(() => {
-    setIsLoading(false);
     _getUserLocalInfo();
   }, []);
+
+  console.log("Local User Info from App ", userData);
 
   if (!fontsLoaded) {
     return null;
   }
+
   return (
 
     <AlertNotificationRoot>
 
-      <UserContext.Provider value={[userLoggedToken, setUserLoggedToken, appLoading, setAppLoading]}>
+      <UserProvider>
         <NavigationContainer>
               
               <MainRootNavigation />
               
           </NavigationContainer>
 
-          {/* <NavigationContainer>
-
-                   <BottomTab />
-                  
-                  <GeneralRootScreen />
-                 
-          </NavigationContainer> */}
-
-      </UserContext.Provider>
+        </UserProvider>
 
     </AlertNotificationRoot>
   );
