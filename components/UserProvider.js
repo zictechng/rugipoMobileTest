@@ -5,7 +5,7 @@ import { UserContext } from './UserContext';
 const UserProvider = ({ children }) => {
     const [loginState, setLoginState] = useState('');
     const [isLoading, setIsLoading] = useState(true);
-    const [myDetails, setMyDetails] = useState(true);
+    const [myDetails, setMyDetails] = useState({});
   
     // const updateState = (newValue) => {
     //   setMyState(newValue);

@@ -68,7 +68,7 @@ const BottomTab = () => {
       }
       setIsLoading(false);
 
-    }, 6000)
+    }, 4000)
     console.log(" My local Data TabMenu: ", userData)
   }, []);
 

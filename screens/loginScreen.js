@@ -33,7 +33,7 @@ const LoginScreen = ({navigation}) => {
     
     const [loginState, setLoginState, isLoading, setIsLoading] = useContext(UserContext);
 
-    const [userData, setUserData]= useState({});
+    const [userData, setUserData]= useState('');
 
     // get user information from local storage here
   _getUserLocalInfo = async () => {
@@ -52,7 +52,7 @@ const LoginScreen = ({navigation}) => {
   
   useEffect(() => {
     _getUserLocalInfo();
-  }, []);
+  }, [userData]);
 
     // function to determine when to show the check icon in the input field
     const textInputChange = (val) => {
@@ -190,7 +190,8 @@ const LoginScreen = ({navigation}) => {
     <StatusBar backgroundColor={colors.secondaryColor2} style="light" />
 
     <View style={styles.header}>
-        <Text style={styles.text_header}>Welcome,<Text style={{fontSize: 25}}> { userData.surname}</Text></Text>
+        {userData != '' ? <Text style={styles.text_header}>Welcome,<Text style={{fontSize: 25}}> { userData.surname}</Text></Text>:
+        <Text style={styles.text_header}>Welcome</Text>}
         <Text style={styles.text_header_section}>Login to access your account...</Text>
         
     </View>
@@ -338,10 +339,10 @@ const styles = StyleSheet.create({
         fontSize: 30
     },
     text_header_section: {
-        color: '#333',
+        color: '#cccac6',
         fontSize: 18,
         fontFamily: '_regular',
-        opacity: 0.9,
+        opacity: 1.9,
     },
     text_footer: {
         color: colors.textColor1,

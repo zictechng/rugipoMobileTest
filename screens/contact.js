@@ -10,7 +10,7 @@ const ContactScreen = ({navigation}) => {
   const [loginState, setLoginState, isLoading, setIsLoading] = useContext(UserContext);
 
   const logout =() =>{
-    AsyncStorage.clear()
+    AsyncStorage.removeItem('USER_TOKEN')
   .then(() => {
     console.log('AsyncStorage cleared successfully.');
     setLoginState('')
