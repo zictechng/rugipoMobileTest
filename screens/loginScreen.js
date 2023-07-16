@@ -346,7 +346,8 @@ const styles = StyleSheet.create({
     },
     text_footer: {
         color: '#05375a',
-        fontSize: 18
+        fontSize: 18,
+        fontFamily:'_semiBold'
     },
     action: {
         flexDirection: 'row',

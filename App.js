@@ -83,8 +83,8 @@ export default function App() {
 
         <NavigationContainer>
 
-          <BottomTab />
-          {/* <LoginScreen /> */}
+          {/* <BottomTab /> */}
+          <LoginScreen />
 
         </NavigationContainer>
 
