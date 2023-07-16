@@ -1,11 +1,32 @@
-import React from 'react';
+import React, {useContext, useEffect, useState} from 'react';
 import {StyleSheet, View, Text } from 'react-native';
+import { UserContext } from '../components/UserContext';
+import AsyncStorage from '@react-native-async-storage/async-storage';
+
+
 
 const ContactScreen = ({navigation}) => {
+
+  const [loginState, setLoginState, isLoading, setIsLoading] = useContext(UserContext);
+
+  const logout =() =>{
+    AsyncStorage.removeItem('USER_TOKEN')
+  .then(() => {
+    console.log('AsyncStorage cleared successfully.');
+    setLoginState('')
+  })
+  .catch((error) => {
+    console.log('Failed to clear AsyncStorage:', error);
+  });
+  }
   return (
     <View>
       <Text>Contact Screen</Text>
-      <Text onPress={() => navigation.navigate('Home')}>Go Home Page</Text>
+      <Text onPress={() => navigation.navigate('Home')} style={{fontSize: 20,
+        fontFamily: '_semiBold',}}>Go Home Page</Text>
+
+      <Text style={{fontSize: 30,
+        fontFamily: '_semiBold',}} onPress={() => logout()}>Logout</Text>
      </View>
   );
 }

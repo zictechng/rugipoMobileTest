@@ -137,6 +137,12 @@ const SignUpScreen = ({navigation}) =>
             phone: data.phone,
             password: data.password,
         }
+        if(data.first_name.length == 0 || data.email.length == 0 || data.phone.length || data.username.length ){
+            Alert.alert("Error!", "Required fields are missing",[
+                {text: "Okay"}
+            ]);
+        return
+        }
         try {
             //console.log('Signup Data ', newData);
             
@@ -435,7 +441,7 @@ const SignUpScreen = ({navigation}) =>
                     }]}
                     >
                         <Text style={[styles.textSign, {
-                            color:colors.blackColor2,
+                            color:colors.secondaryColor2,
                         }]}>Sign In</Text>
                     </TouchableOpacity>
                 </View>
@@ -470,12 +476,13 @@ const styles = StyleSheet.create({
     },
     text_header: {
         color: '#fff',
-        fontWeight: 'bold',
+        fontFamily: '_bold',
         fontSize: 30
     },
     text_footer: {
-        color: colors.blackColor2,
-        fontSize: 18
+        color: colors.textColor1,
+        fontSize: 15,
+        fontFamily: '_semiBold',
     },
     action: {
         flexDirection: 'row',
@@ -496,10 +503,12 @@ const styles = StyleSheet.create({
         marginTop: Platform.OS === 'ios' ? 0 : -12,
         paddingLeft: 10,
         color: '#05375a',
+        fontFamily: '_regular',
     },
     errorMsg: {
         color: '#FF0000',
-        fontSize: 14,
+        fontSize: 12,
+        fontFamily: '_regular',
     },
     button: {
         alignItems: 'center',
@@ -510,10 +519,11 @@ const styles = StyleSheet.create({
         height: 50,
         justifyContent: 'center',
         alignItems: 'center',
-        borderRadius: 10
+        borderRadius: 10,
+        fontFamily: '_semiBold',
     },
     textSign: {
         fontSize: 18,
-        fontWeight: 'bold'
+        fontFamily: '_semiBold',
     }
   });

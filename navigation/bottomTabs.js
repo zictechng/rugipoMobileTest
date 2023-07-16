@@ -1,6 +1,8 @@
-import React from 'react';
-import { StyleSheet, Text, View, Image, TouchableOpacity } from 'react-native';
-
+import React, {useContext, useEffect, useState} from 'react';
+import { ActivityIndicator, StyleSheet, Text, View, Image, TouchableOpacity } from 'react-native';
+import { UserContext } from '../components/UserContext';
+import AsyncStorage from '@react-native-async-storage/async-storage';
+import { getDataInLocalStorage } from '../components/localData';
 import { createBottomTabNavigator } from '@react-navigation/bottom-tabs';
 import { createStackNavigator } from '@react-navigation/stack';
 import Ionicons from '@expo/vector-icons/Ionicons';
@@ -12,10 +14,10 @@ import ProfileScreen from '../screens/profileScreen';
 import AccountScreen from '../screens/accountScreen';
 import SendMoneyScreen from '../screens/sendMoneyScreen';
 import ContactScreen from '../screens/contact';
+import CustomSplash from '../screens/customSplash';
 
 const Tab = createBottomTabNavigator();
 const Stack = createStackNavigator();
-
 
 
 const CustomTabBarButton = ({children, onPress}) =>(
@@ -40,7 +42,50 @@ const CustomTabBarButton = ({children, onPress}) =>(
 )
 
 const BottomTab = () => {
+
+    const [loginState, setLoginState, isLoading, setIsLoading] = useContext(UserContext);
+    const [userData, setUserData]= useState({});
+
+    // get user information from local storage here
+  useEffect(() => {
+    (async()=>{
+        const savedUser = await AsyncStorage.getItem("USER_LOCAL_INFO");
+        const currentUser = JSON.parse(savedUser);
+        setUserData(currentUser);
+         //console.log('useEffect', currentUser)
+    })();
+
+    setTimeout(async() =>{
+      let userLogInToken;
+      userLogInToken = null;
+      try{
+        userLogInToken = await AsyncStorage.getItem('USER_LOCAL_INFO')
+        console.log("User Details in Main TabMenu 2 ", userLogInToken);
+        
+        console.log(" Login Status TabMenu: ", loginState)
+      }catch (e){
+        console.log(e);
+      }
+      setIsLoading(false);
+
+    }, 4000)
+    console.log(" My local Data TabMenu: ", userData)
+  }, []);
+
+  if(isLoading){
+    return <CustomSplash />
+      {/* <ActivityIndicator size='large' color="#00ff00" /> */}
+     
+  }
+
   return (
+    // {/* {isLoading ? (
+    //     <Stack.Screen
+    //       name="CustomSplash"
+    //       component={CustomSplash}
+    //       options={{ headerShown: false }}
+    //     />
+    //   ) : '' }}
     <Tab.Navigator 
             tabBarOptions={{
                 showLabel: false,

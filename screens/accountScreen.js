@@ -11,7 +11,7 @@ const AccountScreen = ({navigation}) => {
     <View>
       <StatusBar backgroundColor={colors.secondaryColor2} style="light" />
       <SafeAreaView />
-      <Text> This is Account Screen</Text>
+      <Text style={{fontFamily: '_think', fontSize: 20}}> This is Account Screen</Text>
 
       <Text onPress={() => navigation.navigate('contact')} style={{fontFamily: '_semiBold', fontSize: 30}}>Go to contact Page</Text>
      </View>
