@@ -137,7 +137,7 @@ const SignUpScreen = ({navigation}) =>
             phone: data.phone,
             password: data.password,
         }
-        if(data.first_name.length == 0 || data.email.length == 0 || data.phone.length || data.username.length ){
+        if(data.first_name.length == 0 || data.email.length == 0 || data.phone.length== 0 || data.username.length== 0 ){
             Alert.alert("Error!", "Required fields are missing",[
                 {text: "Okay"}
             ]);
