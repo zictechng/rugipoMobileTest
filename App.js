@@ -11,7 +11,7 @@ import MainRootNavigation from './navigation/mainRootNavigation';
 
 export default function App() {
 
-  const fontsLoaded = useCustomFonts();
+  const {fontsLoaded }= useCustomFonts();
 
   const [userData, setUserData]= useState({});
 
@@ -34,7 +34,7 @@ export default function App() {
 
   console.log("Local User Info from App ", userData);
 
-  if (!fontsLoaded) {
+  if (fontsLoaded) {
     return null;
   }
 

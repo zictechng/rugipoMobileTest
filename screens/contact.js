@@ -13,7 +13,7 @@ const ContactScreen = ({navigation}) => {
     AsyncStorage.removeItem('USER_TOKEN')
   .then(() => {
     console.log('AsyncStorage cleared successfully.');
-    setLoginState('')
+    setLoginState(null)
   })
   .catch((error) => {
     console.log('Failed to clear AsyncStorage:', error);
