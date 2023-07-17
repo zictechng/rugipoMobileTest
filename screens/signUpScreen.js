@@ -11,7 +11,9 @@ import Feather from 'react-native-vector-icons/Feather';
 import { ALERT_TYPE, Dialog, AlertNotificationRoot, Toast } from 'react-native-alert-notification';
 
 import client from '../api/client'; 
-import { gs, colors } from '../styles'
+import { gs, colors } from '../styles';
+import Loader from '../components/Loader';
+
 
 const SignUpScreen = ({navigation}) =>
 {
@@ -29,7 +31,9 @@ const SignUpScreen = ({navigation}) =>
         secureTextEntry: true,
         confirm_secureTextEntry: true,
 
-    })
+    });
+
+    const [btnRegLoading, setBtnRegLoading] = useState(false);
 
     // function to determine when to show the check icon in the input field
     const textInputChange = (val) => {
@@ -157,7 +161,7 @@ const SignUpScreen = ({navigation}) =>
         }
         try {
             //console.log('Signup Data ', newData);
-            
+            setBtnRegLoading(true);
             const res = await client.post('/api/register', {
             first_name: data.first_name,
             email: data.email,
@@ -177,6 +181,7 @@ const SignUpScreen = ({navigation}) =>
                     // Alert.alert("Successful", "Account created successfully!",[
                     //     {text: "Okay"}
                     // ]);
+                    setBtnRegLoading(false);
                 } else if(res.data.status == '400') {
                     Toast.show({
                         type: ALERT_TYPE.DANGER,
@@ -214,6 +219,8 @@ const SignUpScreen = ({navigation}) =>
                         textBody: 'Sorry, Something went wrong',
                        })
                     }
+
+            setBtnRegLoading(false)
             });
         } catch (error) {
             console.log(error.message)
@@ -228,7 +235,7 @@ const SignUpScreen = ({navigation}) =>
             <View style={styles.header}>
                 <Text style={styles.text_header}>Open An Account</Text>
             </View>
-            
+             {btnRegLoading ? <Loader loading={btnRegLoading} /> : ''}
             <Animatable.View 
             animation='fadeInUpBig'
             style={styles.footer}>
