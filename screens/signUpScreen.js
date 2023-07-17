@@ -143,6 +143,18 @@ const SignUpScreen = ({navigation}) =>
             ]);
         return
         }
+
+        if(data.password !== data.confirm_password){
+            // Alert.alert("Error!", "Password not matched",[
+            //     {text: "Okay"}
+            // ]);
+            Toast.show({
+                type: ALERT_TYPE.DANGER,
+                title: 'Error',
+                textBody: 'Password do not match',
+                 });
+        return
+        }
         try {
             //console.log('Signup Data ', newData);
             
