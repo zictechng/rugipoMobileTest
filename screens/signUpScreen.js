@@ -1,6 +1,6 @@
 import React, { useState } from "react";
 import { StatusBar } from 'expo-status-bar';
-import { Alert, StyleSheet, Text, TextInput, View, Image, ScrollView, Dimensions,
+import { Alert, StyleSheet, Text, TextInput, TouchableWithoutFeedback, Keyboard, View, Image, ScrollView, Dimensions,
     Button, TouchableOpacity,
 Platform } from 'react-native';
 import * as Animatable from 'react-native-animatable';
@@ -17,6 +17,11 @@ import Loader from '../components/Loader';
 
 const SignUpScreen = ({navigation}) =>
 {
+    // function to dismiss the keyboard when clicking out the input field
+    dismissKeyboard = () => {
+        Keyboard.dismiss();
+      };
+
     const [data, setData] = useState({
         email: '',
         password: '',
@@ -132,7 +137,20 @@ const SignUpScreen = ({navigation}) =>
         })
     }
 
-    
+    // check if email input is valid email format
+    const isValidEmail = (email) => {
+        // Regular expression pattern for validating email
+        const emailPattern = /^[A-Z0-9._%+-]+@[A-Z0-9.-]+\.[A-Z]{2,}$/i;
+      
+        return emailPattern.test(email);
+      };
+      // check if phone number is valid 
+      const isValidPhoneNumber = (phoneNumber) => {
+        // Regular expression pattern for validating phone number
+        const phonePattern = /^\d{11}$/;
+      
+        return phonePattern.test(phoneNumber);
+      };
     // sign up function here....
     const signUp = async ()=>{
         const newData = {
@@ -149,9 +167,6 @@ const SignUpScreen = ({navigation}) =>
         }
 
         if(data.password !== data.confirm_password){
-            // Alert.alert("Error!", "Password not matched",[
-            //     {text: "Okay"}
-            // ]);
             Toast.show({
                 type: ALERT_TYPE.DANGER,
                 title: 'Error',
@@ -159,6 +174,25 @@ const SignUpScreen = ({navigation}) =>
                  });
         return
         }
+        if (!isValidPhoneNumber(data.phone)) 
+            {
+                Toast.show({
+                type: ALERT_TYPE.DANGER,
+                title: 'Invalid phone number',
+                textBody: 'Please enter a valid phone number 11 digits.',
+                 });
+             return
+            }
+        if (!isValidEmail(data.email)) 
+            {
+            Toast.show({
+                type: ALERT_TYPE.DANGER,
+                title: 'Invalid email',
+                textBody: 'Please enter a valid email format.',
+                 });
+            return
+          }
+ 
         try {
             //console.log('Signup Data ', newData);
             setBtnRegLoading(true);
@@ -177,10 +211,8 @@ const SignUpScreen = ({navigation}) =>
                         title: 'Success',
                         textBody: 'Congrats! Account created successfully',
                         button: 'close',
-                      })
-                    // Alert.alert("Successful", "Account created successfully!",[
-                    //     {text: "Okay"}
-                    // ]);
+                      });
+
                     setBtnRegLoading(false);
                 } else if(res.data.status == '400') {
                     Toast.show({
@@ -188,30 +220,21 @@ const SignUpScreen = ({navigation}) =>
                         title: 'Error',
                         textBody: 'All fields required',
                          })
-                    // Alert.alert("Failed", "All fields required",[
-                    //     {text: "Okay"}
-                    // ]);
-                }
+                    }
                 else if(res.data.status == '409'){
                     Toast.show({
                         type: ALERT_TYPE.DANGER,
                         title: 'Error',
                         textBody: 'Username already taken',
                        })
-                    // Alert.alert("Failed", "Username already taken",[
-                    //     borderRadius =50,
-                    //     {text: "Okay"}
-                    // ]);
+                  
                 } else if(res.data.status == '401') {
                     Toast.show({
                         type: ALERT_TYPE.DANGER,
                         title: 'Failed',
                         textBody: 'Invalid user details',
                       })
-                    // Alert.alert("Failed", "Invalid user details",[
-                    //     {text: "Okay"}
-                    // ]);
-                }
+                 }
                 else {
                     Toast.show({
                         type: ALERT_TYPE.DANGER,
@@ -229,12 +252,14 @@ const SignUpScreen = ({navigation}) =>
      }
 
     return (
-        <View style={styles.container}>
-            <StatusBar backgroundColor={colors.secondaryColor2} style="light" />
 
-            <View style={styles.header}>
-                <Text style={styles.text_header}>Open An Account</Text>
-            </View>
+        <TouchableWithoutFeedback onPress={dismissKeyboard}>
+            <View style={styles.container}>
+                <StatusBar backgroundColor={colors.secondaryColor2} style="light" />
+
+                <View style={styles.header}>
+                    <Text style={styles.text_header}>Open An Account</Text>
+                </View>
              {btnRegLoading ? <Loader loading={btnRegLoading} /> : ''}
             <Animatable.View 
             animation='fadeInUpBig'
@@ -286,6 +311,7 @@ const SignUpScreen = ({navigation}) =>
                     autoCapitalize="none"
                     onChangeText={(val) => 
                         phoneTextInputChange(val)}
+                    keyboardType="numeric"
                     />
                     {/* now use iteration to determine the display of the icon */}
                     {data.check_phoneTextInputChange ?
@@ -467,7 +493,9 @@ const SignUpScreen = ({navigation}) =>
                  </ScrollView>
                
             </Animatable.View>
-    </View>
+            </View>
+        </TouchableWithoutFeedback>
+        
     )
 
 };

@@ -1,5 +1,5 @@
 import React , {useContext, useEffect, useState} from 'react';
-import {  Alert, ActivityIndicator, StyleSheet, Text, TextInput, View, Image, Dimensions,
+import {  Alert, ActivityIndicator, StyleSheet, Text, TextInput, TouchableWithoutFeedback, Keyboard, View, Image, Dimensions,
     Button, TouchableOpacity,
 Platform } from 'react-native';
 
@@ -21,6 +21,11 @@ import { gs, colors } from '../styles';
 import Loader from '../components/Loader';
 
 const LoginScreen = ({navigation}) => {
+
+     // function to dismiss the keyboard when clicking out the input field
+     dismissKeyboard = () => {
+        Keyboard.dismiss();
+      };
 
     const [data, setData] = React.useState({
         username: '',
@@ -152,11 +157,10 @@ const LoginScreen = ({navigation}) => {
                  AsyncStorage.setItem('USER_TOKEN', JSON.stringify(res.data.token))
                  setDataInLocalStorage('USER_TOKEN', JSON.stringify(res.data.token))
                  setLoginState(res.data.token)
-              
-                //  Alert.alert("Successful", "Account authenticated!",[
-                        
-                //         {text: "Okay"}
-                //     ]);
+                // clear input fields
+                data.username = '',
+                data.password = '',
+
                 setIsMyLoading(false);
                 setLogBtnDisabled(false);
                 setIsLoginBtn(false)
@@ -200,20 +204,22 @@ const LoginScreen = ({navigation}) => {
     }
 
   return (
-    <View style={styles.container}>
-    <StatusBar backgroundColor={colors.secondaryColor2} style="light" />
+    
+    <TouchableWithoutFeedback onPress={dismissKeyboard}>
+        <View style={styles.container}>
+            <StatusBar backgroundColor={colors.secondaryColor2} style="light" />
        
-    <View style={styles.header}>
-        {userData != '' ? <Text style={styles.text_header}>Welcome,<Text style={{fontSize: 25}}> { userData.surname}</Text></Text>:
-        <Text style={styles.text_header}>Welcome</Text>}
-        <Text style={styles.text_header_section}>Login to access your account...</Text>
-        
-    </View>
+            <View style={styles.header}>
+                {userData != '' ? <Text style={styles.text_header}>Welcome,<Text style={{fontSize: 25}}> { userData.surname}</Text></Text>:
+                <Text style={styles.text_header}>Welcome</Text>}
+                <Text style={styles.text_header_section}>Login to access your account...</Text>
+                
+            </View>
     
     <Animatable.View 
     animation='fadeInUpBig'
     style={styles.footer}>
-    <ScrollView>
+    <ScrollView showsVerticalScrollIndicator={false}>
     <Text style={styles.text_footer}>Username</Text>
         <View style={styles.action}>
             <FontAwesome 
@@ -301,7 +307,7 @@ const LoginScreen = ({navigation}) => {
             >
                 <Text style={[styles.textSign,{
                     color:'#fff'
-                }]}>Sign In </Text>
+                }]}>{isloginBtn ? '' : "Sign In"} </Text>
                 {isloginBtn && <ActivityIndicator color='#fff' size={25}/>}
             </LinearGradient>
             </TouchableOpacity>
@@ -322,7 +328,11 @@ const LoginScreen = ({navigation}) => {
     </ScrollView>
     </Animatable.View>
    
-</View>
+    </View>
+    </TouchableWithoutFeedback>
+    
+    
+   
   );
 }
 
