@@ -4,7 +4,7 @@ import { gs, colors } from '../styles';
 
 const Loader = (props) => {
 
-    const {loading} = props;
+    const {loading, textInfo} = props;
 
   return (
     <Modal transparent={true} animationType={'none'} visible={loading}>
@@ -13,7 +13,7 @@ const Loader = (props) => {
             <View style={styles.ActivityIndicatorWraper}>
                 
                 <ActivityIndicator animating={loading} size='large' color={colors.secondaryColor1} />
-                <Text style={{fontSize:15, alignItems:'center', justifyContent:'center', fontFamily: '_regular'}}>Please Wait...</Text>
+                <Text style={{fontSize:15, alignItems:'center', justifyContent:'center', fontFamily: '_regular'}}>{textInfo}</Text>
                 
             </View>
 
@@ -35,8 +35,8 @@ const styles = StyleSheet.create({
     },
     ActivityIndicatorWraper:{
         backgroundColor:'#fff',
-        height: 90,
-        width: 200,
+        height: 100,
+        width: '80%',
         alignItems: 'center',
         justifyContent: 'center',
         borderRadius: 10,

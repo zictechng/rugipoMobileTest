@@ -7,7 +7,7 @@ import { createStackNavigator } from '@react-navigation/stack';
 import BottomTab from './bottomTabs';
 import GeneralRootScreen from './generalRootScreen';
 import ContactScreen from '../screens/contact';
-import CustomSplash from '../screens/customSplash';
+import VerifyAccount from '../screens/verifyAccount';
 
 
 

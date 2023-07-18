@@ -1,5 +1,5 @@
 import React , {useContext, useEffect, useState} from 'react';
-import {  Alert, ActivityIndicator, StyleSheet, Text, TextInput, TouchableWithoutFeedback, Keyboard, View, Image, Dimensions,
+import {  Alert, ActivityIndicator, StyleSheet, Text, TextInput, TouchableWithoutFeedback, Keyboard, View, Image, ImageBackground, Dimensions,
     Button, TouchableOpacity,
 Platform } from 'react-native';
 
@@ -37,7 +37,7 @@ const LoginScreen = ({navigation}) => {
         isValidPassword: true,
     });
     
-    const [loginState, setLoginState, isLoading, setIsLoading] = useContext(UserContext);
+    const [loginState, setLoginState, isLoading, setIsLoading, userRegCode, setUserRegCode] = useContext(UserContext);
 
     const [userData, setUserData]= useState('');
     const [isMyLoading, setIsMyLoading] = useState(false);
@@ -145,7 +145,6 @@ const LoginScreen = ({navigation}) => {
              })
             .then(res => {
                 //console.log('result from backend ', res.data)
-
                 if(res.data.msg =='200'){
                     Dialog.show({
                         type: ALERT_TYPE.SUCCESS,
@@ -157,9 +156,7 @@ const LoginScreen = ({navigation}) => {
                  AsyncStorage.setItem('USER_TOKEN', JSON.stringify(res.data.token))
                  setDataInLocalStorage('USER_TOKEN', JSON.stringify(res.data.token))
                  setLoginState(res.data.token)
-                // clear input fields
-                data.username = '',
-                data.password = '',
+               
 
                 setIsMyLoading(false);
                 setLogBtnDisabled(false);
@@ -206,10 +203,13 @@ const LoginScreen = ({navigation}) => {
   return (
     
     <TouchableWithoutFeedback onPress={dismissKeyboard}>
-        <View style={styles.container}>
+        
+        <View style={styles.container} >
+            {/* <Image style={styles.bgImage} source={require('../assets/bg5.png')}/> */}
             <StatusBar backgroundColor={colors.secondaryColor2} style="light" />
-       
+            
             <View style={styles.header}>
+            
                 {userData != '' ? <Text style={styles.text_header}>Welcome,<Text style={{fontSize: 25}}> { userData.surname}</Text></Text>:
                 <Text style={styles.text_header}>Welcome</Text>}
                 <Text style={styles.text_header_section}>Login to access your account...</Text>
@@ -342,8 +342,9 @@ export default LoginScreen;
 const styles = StyleSheet.create({
     container: {
       flex: 1, 
-      backgroundColor: colors.secondaryColor2,
-    },
+       backgroundColor: colors.secondaryColor2,
+      },
+      
     disabledStyle: {
     opacity: 1.9,
     },
@@ -407,6 +408,12 @@ const styles = StyleSheet.create({
         alignItems: 'center',
         marginTop: 50
     },
+    bgImage:{
+        position: 'absolute',
+        bottom: -6,
+        right: 20,
+       },
+
     signIn: {
         width: '100%',
         height: 50,
