@@ -1,5 +1,5 @@
 import React , {useContext, useEffect, useState} from 'react';
-import {  Alert, StyleSheet, Text, TextInput, View, Image, Dimensions,
+import {  Alert, ActivityIndicator, StyleSheet, Text, TextInput, TouchableWithoutFeedback, Keyboard, View, Image, ImageBackground, Dimensions,
     Button, TouchableOpacity,
 Platform } from 'react-native';
 
@@ -17,9 +17,15 @@ import { ScrollView } from 'react-native-gesture-handler';
 import client from '../api/client';
 
 import { setDataInLocalStorage } from '../components/localData';
-import { gs, colors } from '../styles'
+import { gs, colors } from '../styles';
+import Loader from '../components/Loader';
 
 const LoginScreen = ({navigation}) => {
+
+     // function to dismiss the keyboard when clicking out the input field
+     dismissKeyboard = () => {
+        Keyboard.dismiss();
+      };
 
     const [data, setData] = React.useState({
         username: '',
@@ -31,9 +37,13 @@ const LoginScreen = ({navigation}) => {
         isValidPassword: true,
     });
     
-    const [loginState, setLoginState, isLoading, setIsLoading] = useContext(UserContext);
+    const [loginState, setLoginState, isLoading, setIsLoading, userRegCode, setUserRegCode] = useContext(UserContext);
 
     const [userData, setUserData]= useState('');
+    const [isMyLoading, setIsMyLoading] = useState(false);
+    const [isloginBtn, setIsLoginBtn] = useState(false);
+    const [logBtnDisabled, setLogBtnDisabled] = useState(false);
+    
 
     // get user information from local storage here
   _getUserLocalInfo = async () => {
@@ -125,6 +135,9 @@ const LoginScreen = ({navigation}) => {
         }
 
         try {
+            //setIsMyLoading(true);
+            setLogBtnDisabled(true)
+            setIsLoginBtn(true)
             //console.log('Login Data ', newData);
             const res = await client.post('/api/login', {
             username: data.username,
@@ -132,7 +145,6 @@ const LoginScreen = ({navigation}) => {
              })
             .then(res => {
                 //console.log('result from backend ', res.data)
-
                 if(res.data.msg =='200'){
                     Dialog.show({
                         type: ALERT_TYPE.SUCCESS,
@@ -144,11 +156,11 @@ const LoginScreen = ({navigation}) => {
                  AsyncStorage.setItem('USER_TOKEN', JSON.stringify(res.data.token))
                  setDataInLocalStorage('USER_TOKEN', JSON.stringify(res.data.token))
                  setLoginState(res.data.token)
-              
-                //  Alert.alert("Successful", "Account authenticated!",[
-                        
-                //         {text: "Okay"}
-                //     ]);
+               
+
+                setIsMyLoading(false);
+                setLogBtnDisabled(false);
+                setIsLoginBtn(false)
                 } else if(res.data.status == '401') {
                     Toast.show({
                         type: ALERT_TYPE.DANGER,
@@ -179,6 +191,9 @@ const LoginScreen = ({navigation}) => {
                     // ]);
                 }
              //console.log('My username from backend ', res.data.userData)
+             setIsMyLoading(false);
+             setLogBtnDisabled(false);
+             setIsLoginBtn(false);
             });
         } catch (error) {
             console.log(error.message)
@@ -186,21 +201,25 @@ const LoginScreen = ({navigation}) => {
     }
 
   return (
-    <View style={styles.container}>
-    <StatusBar backgroundColor={colors.secondaryColor2} style="light" />
-
-    <View style={styles.header}>
-        {userData != '' ? <Text style={styles.text_header}>Welcome,<Text style={{fontSize: 25}}> { userData.surname}</Text></Text>:
-        <Text style={styles.text_header}>Welcome</Text>}
-        <Text style={styles.text_header_section}>Login to access your account...</Text>
+    
+    <TouchableWithoutFeedback onPress={dismissKeyboard}>
         
-    </View>
-
+        <View style={styles.container} >
+            {/* <Image style={styles.bgImage} source={require('../assets/bg5.png')}/> */}
+            <StatusBar backgroundColor={colors.secondaryColor2} style="light" />
+            
+            <View style={styles.header}>
+            
+                {userData != '' ? <Text style={styles.text_header}>Welcome,<Text style={{fontSize: 25}}> { userData.surname}</Text></Text>:
+                <Text style={styles.text_header}>Welcome</Text>}
+                <Text style={styles.text_header_section}>Login to access your account...</Text>
+                
+            </View>
     
     <Animatable.View 
     animation='fadeInUpBig'
     style={styles.footer}>
-    <ScrollView>
+    <ScrollView showsVerticalScrollIndicator={false}>
     <Text style={styles.text_footer}>Username</Text>
         <View style={styles.action}>
             <FontAwesome 
@@ -278,16 +297,18 @@ const LoginScreen = ({navigation}) => {
         }
 
         <View style={styles.button}>
-            <TouchableOpacity style={styles.signIn}
+            <TouchableOpacity  style={[styles.signIn, logBtnDisabled? styles.signInDisable: '']}
                 onPress={() =>{loginAction(data.username, data.password)}}
+                disabled={logBtnDisabled}
             > 
             <LinearGradient
             colors={[colors.secondaryColor1, colors.secondaryColor1]}
             style={styles.signIn}
             >
-                <Text style={[styles.textSign, {
+                <Text style={[styles.textSign,{
                     color:'#fff'
-                }]}>Sign In</Text>
+                }]}>{isloginBtn ? '' : "Sign In"} </Text>
+                {isloginBtn && <ActivityIndicator color='#fff' size={25}/>}
             </LinearGradient>
             </TouchableOpacity>
 
@@ -307,7 +328,11 @@ const LoginScreen = ({navigation}) => {
     </ScrollView>
     </Animatable.View>
    
-</View>
+    </View>
+    </TouchableWithoutFeedback>
+    
+    
+   
   );
 }
 
@@ -317,7 +342,11 @@ export default LoginScreen;
 const styles = StyleSheet.create({
     container: {
       flex: 1, 
-      backgroundColor: colors.secondaryColor2,
+       backgroundColor: colors.secondaryColor2,
+      },
+      
+    disabledStyle: {
+    opacity: 1.9,
     },
     header: {
         flex: 1,
@@ -379,12 +408,28 @@ const styles = StyleSheet.create({
         alignItems: 'center',
         marginTop: 50
     },
+    bgImage:{
+        position: 'absolute',
+        bottom: -6,
+        right: 20,
+       },
+
     signIn: {
         width: '100%',
         height: 50,
         justifyContent: 'center',
         alignItems: 'center',
-        borderRadius: 10
+        borderRadius: 10,
+        flexDirection: 'row',
+    },
+    signInDisable: {
+        width: '100%',
+        height: 50,
+        justifyContent: 'center',
+        alignItems: 'center',
+        borderRadius: 10,
+        flexDirection: 'row',
+        opacity: 0.7
     },
     textSign: {
         fontSize: 18,
