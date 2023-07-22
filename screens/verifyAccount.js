@@ -33,7 +33,7 @@ const VerifyAccount = ({ navigation }) => {
     const [copiedText, setCopiedText] = useState('');
     const [enterCode, setEnterCode] = useState('');
 
-    const [loginState, setLoginState, isLoading, setIsLoading, myDetails, setMyDetails, userRegCode, setUserRegCode] = useContext(UserContext);
+    const [{userRegCode}] = useContext(UserContext);
 
     const ConfirmCode = () => {
         Alert.alert("Confirm Code", enterCode);

@@ -13,8 +13,8 @@ const UserProvider = ({ children }) => {
     // };
   
     return (
-      <UserContext.Provider value={[ loginState, setLoginState, isLoading, setIsLoading, myDetails, setMyDetails,
-        userRegCode, setUserRegCode ]}>
+      <UserContext.Provider value={[ {loginState, setLoginState, isLoading, setIsLoading, myDetails, setMyDetails,
+        userRegCode, setUserRegCode }]}>
         {children}
       </UserContext.Provider>
     );
