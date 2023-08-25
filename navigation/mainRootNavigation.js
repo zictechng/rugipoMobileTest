@@ -1,5 +1,4 @@
 import React, {useContext, useEffect, useState} from 'react';
-import { ActivityIndicator, View } from 'react-native';
 import { UserContext } from '../components/UserContext';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { getDataInLocalStorage } from '../components/localData';
@@ -7,10 +6,6 @@ import { createStackNavigator } from '@react-navigation/stack';
 import BottomTab from './bottomTabs';
 import GeneralRootScreen from './generalRootScreen';
 import ContactScreen from '../screens/contact';
-import VerifyAccount from '../screens/verifyAccount';
-
-
-
 
 // import other screens/page here
 
@@ -18,8 +13,7 @@ const Stack = createStackNavigator();
 
 const MainRootNavigation = ({navigation}) =>{
 
-    
-    const [loginState, setLoginState, isLoading, setIsLoading] = useContext(UserContext);
+    const [loginState, setLoginState, isLoading, setIsLoading, myDetails, setMyDetails] = useContext(UserContext);
 
     const [userLogToken, setUserLogToken] = useState(null);
     const [appLoading, setAppLoading] = useState(true);
@@ -27,8 +21,6 @@ const MainRootNavigation = ({navigation}) =>{
     const [userData, setUserData]= useState({});
     const [userInfoData, setUserInfoData]= useState(null);
 
-   
-    
      // get user information from local storage here
 
       useEffect(() => {
@@ -42,6 +34,7 @@ const MainRootNavigation = ({navigation}) =>{
       }, []);
 
       console.log("my login State MainVa ", loginState)
+      console.log(" My details MainVa ", myDetails)
 
     return (
         <Stack.Navigator headerMode='none'>

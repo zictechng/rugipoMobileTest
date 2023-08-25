@@ -13,7 +13,7 @@ const Loader = (props) => {
             <View style={styles.ActivityIndicatorWraper}>
                 
                 <ActivityIndicator animating={loading} size='large' color={colors.secondaryColor1} />
-                <Text style={{fontSize:15, alignItems:'center', justifyContent:'center', fontFamily: '_regular'}}>{textInfo}</Text>
+                <Text style={{fontSize:12, alignItems:'center', justifyContent:'center', fontFamily: '_regular'}}>{textInfo}</Text>
                 
             </View>
 

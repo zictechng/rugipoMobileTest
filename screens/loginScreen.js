@@ -4,7 +4,7 @@ import {  Alert, ActivityIndicator, StyleSheet, Text, TextInput, TouchableWithou
 Platform } from 'react-native';
 
 import { UserContext } from '../components/UserContext';
-import { ALERT_TYPE, Dialog, AlertNotificationRoot, Toast } from 'react-native-alert-notification';
+import { ALERT_TYPE, Dialog, Toast } from 'react-native-alert-notification';
 import AsyncStorage from '@react-native-async-storage/async-storage';
  
 import { StatusBar } from 'expo-status-bar';
@@ -128,14 +128,20 @@ const LoginScreen = ({navigation}) => {
     const loginAction = async () =>{
         
         if(data.username.length == 0 || data.password.length == 0){
-            Alert.alert("Error!", "Username and password required",[
-                {text: "Okay"}
-            ]);
+            Toast.show({
+                type: ALERT_TYPE.DANGER,
+                title: 'Error',
+                textBody: 'Username and password required',
+                titleStyle: {fontFamily: '_semiBold', fontSize: 18},
+                textBodyStyle: {fontFamily: '_regular', fontSize: 14,},
+                })
+            // Alert.alert("Error!", "Username and password required",[
+            //     {text: "Okay"}
+            // ]);
             return
         }
 
         try {
-            //setIsMyLoading(true);
             setLogBtnDisabled(true)
             setIsLoginBtn(true)
             //console.log('Login Data ', newData);
@@ -143,15 +149,14 @@ const LoginScreen = ({navigation}) => {
             username: data.username,
             password: data.password,
              })
-            .then(res => {
-                //console.log('result from backend ', res.data)
-                if(res.data.msg =='200'){
-                    Dialog.show({
-                        type: ALERT_TYPE.SUCCESS,
-                        title: 'Success',
-                        textBody: 'Congrats! account authenticated',
-                        button: 'close',
-                      });
+            //.then(res => {
+                    if(res.data.msg =='200'){
+                    // Dialog.show({
+                    //     type: ALERT_TYPE.SUCCESS,
+                    //     title: 'Success',
+                    //     textBody: 'Congrats! account authenticated',
+                    //     button: 'close',
+                    //   });
                  AsyncStorage.setItem('USER_LOCAL_INFO', JSON.stringify(res.data.userData))
                  AsyncStorage.setItem('USER_TOKEN', JSON.stringify(res.data.token))
                  setDataInLocalStorage('USER_TOKEN', JSON.stringify(res.data.token))
@@ -166,37 +171,54 @@ const LoginScreen = ({navigation}) => {
                         type: ALERT_TYPE.DANGER,
                         title: 'Failed',
                         textBody: 'No user found.',
+                        titleStyle: {fontFamily: '_semiBold', fontSize: 18},
+                        textBodyStyle: {fontFamily: '_regular', fontSize: 14,},
                         })
-                    // Alert.alert("Login failed", "No user found",[
-                    //     {text: "Okay"}
-                    // ]);
-                }
+                     }
                 else if(res.data.status == '404'){
                     Toast.show({
                         type: ALERT_TYPE.DANGER,
                         title: 'Failed',
                         textBody: 'Username or Password incorrect.',
+                        titleStyle: {fontFamily: '_semiBold', fontSize: 18},
+                        textBodyStyle: {fontFamily: '_regular', fontSize: 14,},
                         })
                     // Alert.alert("Login failed", "Username or Password incorrect",[
                     //     {text: "Okay"}
                     // ]);
-                } else {
+                } 
+                else if(res.data.status == '402'){
+                    Toast.show({
+                        type: ALERT_TYPE.DANGER,
+                        title: 'Failed',
+                        textBody: 'Account not active',
+                        titleStyle: {fontFamily: '_semiBold', fontSize: 18},
+                        textBodyStyle: {fontFamily: '_regular', fontSize: 14,},
+                        })
+                    // Alert.alert("Login failed", "Username or Password incorrect",[
+                    //     {text: "Okay"}
+                    // ]);
+                } 
+                else {
                     Toast.show({
                         type: ALERT_TYPE.DANGER,
                         title: 'Error',
                         textBody: 'Sorry, Something went wrong.',
+                        titleStyle: {fontFamily: '_semiBold', fontSize: 18},
+                        textBodyStyle: {fontFamily: '_regular', fontSize: 14,},
                         })
                     // Alert.alert("Error", "Something went wrong",[
                     //     {text: "Okay"}
                     // ]);
                 }
-             //console.log('My username from backend ', res.data.userData)
-             setIsMyLoading(false);
-             setLogBtnDisabled(false);
-             setIsLoginBtn(false);
-            });
+             //});
         } catch (error) {
             console.log(error.message)
+            }
+            finally {
+            setIsMyLoading(false);
+            setLogBtnDisabled(false);
+            setIsLoginBtn(false);
             }
     }
 
@@ -213,7 +235,7 @@ const LoginScreen = ({navigation}) => {
                 {userData != '' ? <Text style={styles.text_header}>Welcome,<Text style={{fontSize: 25}}> { userData.surname}</Text></Text>:
                 <Text style={styles.text_header}>Welcome</Text>}
                 <Text style={styles.text_header_section}>Login to access your account...</Text>
-                
+                {/* <Text style={styles.text_header_section} onPress={() =>navigation.navigate('Verify')}>Verify...</Text> */}
             </View>
     
     <Animatable.View 

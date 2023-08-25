@@ -32,7 +32,7 @@ export default function App() {
     _getUserLocalInfo();
   }, []);
 
-  console.log("Local User Info from App ", userData);
+  //console.log("Local User Info from App ", userData);
 
   if (fontsLoaded) {
     return null;

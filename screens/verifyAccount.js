@@ -1,17 +1,35 @@
 
-import React, {useRef, useState, useContext} from 'react';
+import React, {useRef, useState, useContext, useEffect} from 'react';
 import OTPInputView from '@twotalltotems/react-native-otp-input';
 
-import { View, Text, TextInput, StyleSheet, KeyboardAvoidingView, Platform, TouchableOpacity, Alert, ScrollView } from 'react-native';
-import { UserContext } from '../components/UserContext';
+import { View, Text, TextInput, StyleSheet, KeyboardAvoidingView, Platform, TouchableOpacity, Alert, ScrollView,
+    ActivityIndicator } from 'react-native';
 
+import { useNavigation } from '@react-navigation/native';
+import { UserContext } from '../components/UserContext';
+import { ALERT_TYPE, Dialog, Toast } from 'react-native-alert-notification';
 import { Ionicons, Entypo, SimpleLineIcons, FontAwesome, FontAwesome5} from '@expo/vector-icons'
 import { SafeAreaView } from 'react-native-safe-area-context';
 import Icons from 'react-native-vector-icons/FontAwesome';
 import { gs, colors } from '../styles';
 import { LinearGradient } from 'expo-linear-gradient';
+import client from '../api/client';
+import Loader from '../components/Loader';
 
- const VerifyAccount = ({navigation}) =>{
+ const VerifyAccount = () =>{
+    const navigation = useNavigation();
+ 
+    const [loginState, setLoginState, 
+        isLoading, setIsLoading, 
+        userRegCode, setUserRegCode,
+        userRegEmail, setUserRegEmail] = useContext(UserContext);
+    
+    const [username, setUsername] = useState('');
+    const [domain, setDomain] = useState('');
+    const [btnVerifyLoading, setBtnVerifyLoading] = useState(false);
+
+    const [name, domainPart] = userRegEmail.split('@');
+
     // Option/Method two variables here
     const pin1Ref = useRef(null)
     const pin2Ref = useRef(null)
@@ -23,35 +41,187 @@ import { LinearGradient } from 'expo-linear-gradient';
     const [pin3, setPin3] = useState("");
     const [pin4, setPin4] = useState("");
 
-    const [data, setState] = useState({
-        pin1: "",
-        pin2: "",
-        pin3: "",
-        pin4: ""
-      })
+    // const [data, setState] = useState({
+    //     pin1: "",
+    //     pin2: "",
+    //     pin3: "",
+    //     pin4: ""
+    //   })
 
     const [copiedText, setCopiedText] = useState('');
+    const [copiedTextOTP, setCopiedTextOtp] = useState('');
     const [enterCode, setEnterCode] = useState('');
-    
-    const [loginState, setLoginState, isLoading, setIsLoading, userRegCode, setUserRegCode] = useContext(UserContext);
 
-      const  ConfirmCode = () =>{
-        Alert.alert("Confirm Code", enterCode);
+    useEffect(() => {
+        setUsername(name);
+        setDomain(domainPart);
+        }, [name, domainPart]);
+        // get first 3 letters of the email
+        const displayEmail = name.substring(0, 3);
+    
+      const  ConfirmCode = async () =>{
+        if(enterCode.length != 4){
+            Toast.show({
+                type: ALERT_TYPE.DANGER,
+                title: 'Error!',
+                textBody: 'OTP code required 4 characters',
+                textBodyStyle: { fontFamily: '_regular', fontSize: 16 },
+                titleStyle: { fontFamily: '_bold', fontSize: 20 },
+                })
+            return
+        }
+        setBtnVerifyLoading(true)
+        //console.log('Auto Send Press', enterCode);
+        try{
+            const res = await client.post('/api/otp_verify', {
+                otp_code: enterCode,
+                user_email: userRegEmail,
+            })
+            if(res.data.msg =='200'){
+                Dialog.show({
+                    type: ALERT_TYPE.SUCCESS,
+                    textBodyStyle: { fontFamily: '_regular', fontSize: 16 },
+                    titleStyle: { fontFamily: '_bold', fontSize: 20 },
+                    title: 'Success',
+                    textBody: 'Account verified successfully',
+                    button: 'Okay',
+                   });
+                
+            navigation.navigate('Login');
+            } else if(res.data.status == '401') {
+                Toast.show({
+                    type: ALERT_TYPE.DANGER,
+                    title: 'Failed',
+                    textBody: 'No user found.',
+                    textBodyStyle: { fontFamily: '_regular', fontSize: 16 },
+                    titleStyle: { fontFamily: '_bold', fontSize: 20 },
+                    })
+                // Alert.alert("Login failed", "No user found",[
+                //     {text: "Okay"}
+                // ]);
+            }
+            else if(res.data.status == '403'){
+                Toast.show({
+                    type: ALERT_TYPE.DANGER,
+                    title: 'Error',
+                    textBody: 'Sorry, Try again.',
+                    textBodyStyle: { fontFamily: '_regular', fontSize: 16 },
+                    titleStyle: { fontFamily: '_bold', fontSize: 20 },
+                    })
+               
+            }
+            else if(res.data.status == '404'){
+                Toast.show({
+                    type: ALERT_TYPE.DANGER,
+                    title: 'Failed',
+                    textBody: 'Invalid OTP code.',
+                    textBodyStyle: { fontFamily: '_regular', fontSize: 16 },
+                    titleStyle: { fontFamily: '_bold', fontSize: 20 },
+                    })
+            }
+            else if(res.data.status == '500'){
+                Toast.show({
+                    type: ALERT_TYPE.DANGER,
+                    title: 'Sorry',
+                    textBody: 'Something went wrong!.',
+                    textBodyStyle: { fontFamily: '_regular', fontSize: 16 },
+                    titleStyle: { fontFamily: '_bold', fontSize: 20 },
+                    })
+            }
+             else {
+                Toast.show({
+                    type: ALERT_TYPE.DANGER,
+                    title: 'Error',
+                    textBody: 'Sorry, Something went wrong.',
+                    textBodyStyle: { fontFamily: '_regular', fontSize: 16 },
+                    titleStyle: { fontFamily: '_bold', fontSize: 20 },
+                    })
+                }
+        }
+        catch (error) {
+            console.log(error.message)
+        }
+        finally {
+            setBtnVerifyLoading(false)
+        }
       };
 
-
-      // send request to api call here
-    const processConfirm = () =>{
-        const newData = {
-            pin_code1: pin1,
-            pin_code2: pin2,
-            pin_code3: pin3,
-            pin_code4: pin4,
+      // automatically call verify function once OTP code is entered
+      const  confirmCodeAuto = async (useCode, useEmail) =>{
+       setBtnVerifyLoading(true)
+        try{
+            const res = await client.post('/api/otp_verify', {
+                otp_code: useCode,
+                user_email: useEmail,
+            })
+            if(res.data.msg =='200'){
+                Dialog.show({
+                    type: ALERT_TYPE.SUCCESS,
+                    textBodyStyle: { fontFamily: '_regular', fontSize: 16 },
+                    titleStyle: { fontFamily: '_bold', fontSize: 20 },
+                    title: 'Success',
+                    textBody: 'Account verified successfully',
+                    button: 'Okay',
+                   });
+                
+            navigation.navigate('Login');
+            } else if(res.data.status == '401') {
+                Toast.show({
+                    type: ALERT_TYPE.DANGER,
+                    title: 'Failed',
+                    textBody: 'No user found.',
+                    textBodyStyle: { fontFamily: '_regular', fontSize: 16 },
+                    titleStyle: { fontFamily: '_bold', fontSize: 20 },
+                    })
+                // Alert.alert("Login failed", "No user found",[
+                //     {text: "Okay"}
+                // ]);
+            }
+            else if(res.data.status == '403'){
+                Toast.show({
+                    type: ALERT_TYPE.DANGER,
+                    title: 'Error',
+                    textBody: 'Sorry, Try again.',
+                    textBodyStyle: { fontFamily: '_regular', fontSize: 16 },
+                    titleStyle: { fontFamily: '_bold', fontSize: 20 },
+                    })
+            }
+            else if(res.data.status == '404'){
+                Toast.show({
+                    type: ALERT_TYPE.DANGER,
+                    title: 'Failed',
+                    textBody: 'Invalid OTP code.',
+                    textBodyStyle: { fontFamily: '_regular', fontSize: 16 },
+                    titleStyle: { fontFamily: '_bold', fontSize: 20 },
+                    })
+            }
+            else if(res.data.status == '500'){
+                Toast.show({
+                    type: ALERT_TYPE.DANGER,
+                    title: 'Sorry',
+                    textBody: 'Something went wrong!.',
+                    textBodyStyle: { fontFamily: '_regular', fontSize: 16 },
+                    titleStyle: { fontFamily: '_bold', fontSize: 20 },
+                    })
+            }
+             else {
+                Toast.show({
+                    type: ALERT_TYPE.DANGER,
+                    title: 'Error',
+                    textBody: 'Sorry, Something went wrong.',
+                    textBodyStyle: { fontFamily: '_regular', fontSize: 16 },
+                    titleStyle: { fontFamily: '_bold', fontSize: 20 },
+                    })
+                }
         }
-        console.log('Code Pin Data ', newData);
-        
-    }
-
+        catch (error) {
+            console.log(error.message)
+        }
+        finally {
+            setBtnVerifyLoading(false)
+        }
+      };
+      
   return (
     <SafeAreaView style={{flex: 1}}>
 
@@ -70,12 +240,16 @@ import { LinearGradient } from 'expo-linear-gradient';
                             style={styles.button}  
                             onPress={() => navigation.goBack()}
                             >
-                            <Icons name="arrow-circle-left" size={24} color="#fff" />
+                            <Icons name="arrow-circle-left" size={20} color="#fff" />
                             </TouchableOpacity>
                         
                         </View>
-                    
-                </View>
+                        
+                        <TouchableOpacity
+                            onPress={() => navigation.replace('Login')}>
+                        <Ionicons name="close" size={25} color={colors.secondaryColor1} />
+                        </TouchableOpacity>
+                  </View>
         <ScrollView>
         
         <KeyboardAvoidingView behavior={Platform.OS == 'ios' ? "padding" : ""}
@@ -91,11 +265,14 @@ import { LinearGradient } from 'expo-linear-gradient';
                 </Text> */}
             
 
-                <Text style={{fontSize: 20, color: "#111", marginTop: 50, fontFamily: '_bold'}}>Confirm Account</Text>
+                <Text style={{fontSize: 25, color: "#222", marginTop: 50, fontFamily: '_bold'}}>Verify Account</Text>
+                
+                {btnVerifyLoading ? <Loader loading={btnVerifyLoading} textInfo={'Verifying wait...'} style={{fontSize: 25, fontFamily: '_regular'}} /> : ''}
 
-                <Text style={{fontSize: 15, color: "#aaa", fontFamily: '_regular'}}>Enter the code sent to your phone/email to verify your account</Text>
+                <Text style={{fontSize: 14, color: "#aaa", fontFamily: '_regular'}}>Enter the code sent to your phone/email to verify your account</Text>
                 <Text style={{fontSize: 16, color: "#111", marginTop: 12, fontFamily: '_semiBold'}}>
-                    {userRegCode}
+                <Text style={{fontSize: 14, color: "#aaa", fontFamily: '_regular'}}>We send OTP code to </Text>
+                    { displayEmail }{'......'}{ '@' }{ domain }
                  </Text>
 
                  <View style={{width: "100%", paddingHorizontal: 22}}>
@@ -103,16 +280,16 @@ import { LinearGradient } from 'expo-linear-gradient';
                     <OTPInputView 
                         style={{width: "100%", height: 100, paddingHorizontal:32}}
                         pinCount={4}
-                        //autoFocusOnLoad
+                        autoFocusOnLoad
                         codeInputFieldStyle={{
-                            width: 40,
+                            width: 45,
                             height: 40,
-                             borderRadius: 5,
-                             borderWidth: 2,
+                            borderRadius: 5,
+                            borderWidth: 2,
                             borderColor: "#aaa",
-                            color: "#f4a135",
-                            borderBottomWidth: 3,
-                            borderBottomColor: "#aaa",
+                            color: colors.blackColor2,
+                            //borderBottomWidth: 10,
+                            //borderBottomColor: "#aaa",
                         }}
                         keyboardType={'number-pad'}
                         // codeInputFieldStyle={[styles.underlineStyleBase,  {borderColor: "#2ab12f",
@@ -123,16 +300,18 @@ import { LinearGradient } from 'expo-linear-gradient';
                         returnKeyType={'done'}
                         
                         //onCodeChanged = {code => { setCopiedText({code})}}
+                        onCodeChanged = {code => { setEnterCode(`${code}`)}}
+                        
                         onCodeFilled={
                             (code) =>{
                                 setEnterCode(`${code}`);
-                                console.log(`Entered code here ${code}`)
-                            }
+                                setCopiedText(`${code}`)
+                                confirmCodeAuto(`${code}`, userRegEmail)
+                             }
                         }
                     />
-
-                    <Text style={{fontSize: 25, color: 'red', fontWeight: '700',
-                    alignContent:'center', alignItems:'center'}}>{enterCode}</Text>
+                    {/* <Text style={{fontSize: 25, color: 'red', fontWeight: '700',
+                    alignContent:'center', alignItems:'center'}}>{enterCode}</Text> */}
                     
                     <TouchableOpacity
                     style={{
@@ -141,6 +320,7 @@ import { LinearGradient } from 'expo-linear-gradient';
                         alignItems: "center",
                         justifyContent: "center",
                         borderRadius: 8,
+                        marginTop: 50,
                      }} 
                     onPress={() =>ConfirmCode()}
                     >
@@ -148,7 +328,8 @@ import { LinearGradient } from 'expo-linear-gradient';
                             color: "white",
                             fontFamily: '_semiBold',
                             fontSize: 18,
-                         }}>Submit</Text>
+                         }}>{btnVerifyLoading ? 'Wait...' : "Verify"} </Text>
+                         
                     </TouchableOpacity>
 
                     <View 
@@ -156,8 +337,8 @@ import { LinearGradient } from 'expo-linear-gradient';
                         width: "100%", 
                         flexDirection: "row", 
                         justifyContent:"center",
-                        paddingTop: 10}}>
-                    <Text style={{fontFamily: '_regular', fontSize: 16}}>Wrong Number/ Email ?</Text>
+                        paddingTop: 20}}>
+                    <Text style={{fontFamily: '_regular', fontSize: 17, color:'#aaa'}}>Wrong Number/Email ?</Text>
 
                     <TouchableOpacity
                         onPress={() => navigation.goBack()}>

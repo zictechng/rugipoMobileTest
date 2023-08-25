@@ -1,4 +1,4 @@
-import React, {useContext, useEffect, useState} from 'react';
+import React, {useContext, useEffect, useRef, useState} from 'react';
 import { ActivityIndicator, StyleSheet, Text, View, Image, TouchableOpacity } from 'react-native';
 import { UserContext } from '../components/UserContext';
 import AsyncStorage from '@react-native-async-storage/async-storage';
@@ -6,7 +6,8 @@ import { getDataInLocalStorage } from '../components/localData';
 import { createBottomTabNavigator } from '@react-navigation/bottom-tabs';
 import { createStackNavigator } from '@react-navigation/stack';
 import Ionicons from '@expo/vector-icons/Ionicons';
-
+import ActionSheet from '@alessiocancian/react-native-actionsheet';
+import { useNavigation } from '@react-navigation/native';
 // screen imports goes here
 import HomeScreen from '../screens/homeScreen';
 import HistoryScreen from '../screens/historyScreen';
@@ -42,40 +43,41 @@ const CustomTabBarButton = ({children, onPress}) =>(
 )
 
 const BottomTab = () => {
-
-    const [loginState, setLoginState, isLoading, setIsLoading] = useContext(UserContext);
+    const navigation = useNavigation();
+    const [loginState, setLoginState, isLoading, setIsLoading, myDetails, setMyDetails] = useContext(UserContext);
     const [userData, setUserData]= useState({});
+
+    let actionSheet = useRef();
+   
+   var optionArray = [
+    'Wire Transfer', 'Inter-Bank Transfer', 'Local Transfer', 'cancel', 
+   ];
 
     // get user information from local storage here
   useEffect(() => {
-    (async()=>{
-        const savedUser = await AsyncStorage.getItem("USER_LOCAL_INFO");
-        const currentUser = JSON.parse(savedUser);
-        setUserData(currentUser);
-         //console.log('useEffect', currentUser)
-    })();
-
     setTimeout(async() =>{
       let userLogInToken;
       userLogInToken = null;
       try{
         userLogInToken = await AsyncStorage.getItem('USER_LOCAL_INFO')
         console.log("User Details in Main TabMenu 2 ", userLogInToken);
-        
-        console.log(" Login Status TabMenu: ", loginState)
-      }catch (e){
+        const currentUserDetails = JSON.parse(userLogInToken);
+        setMyDetails(currentUserDetails);
+       }catch (e){
         console.log(e);
       }
       setIsLoading(false);
-
-    }, 4000)
-    console.log(" My local Data TabMenu: ", userData)
+    }, 1000)
+    
   }, []);
+
+  const showActionSheet = () => {
+    actionSheet.current.show();
+  };
 
   if(isLoading){
     return <CustomSplash />
       {/* <ActivityIndicator size='large' color="#00ff00" /> */}
-     
   }
 
   return (
@@ -86,7 +88,8 @@ const BottomTab = () => {
     //       options={{ headerShown: false }}
     //     />
     //   ) : '' }}
-    <Tab.Navigator 
+    <>   
+        <Tab.Navigator 
             tabBarOptions={{
                 showLabel: false,
                 //showIcon: true,
@@ -101,7 +104,8 @@ const BottomTab = () => {
                 height: 70,
                 ...styles.shadow
             }
-            }}>
+            }}
+             >
 
             <Tab.Screen name="Home" component={HomeScreen}
              options = {{
@@ -131,7 +135,7 @@ const BottomTab = () => {
             }} />
 
             <Tab.Screen name="Account" component={AccountScreen}
-            options = {{
+            options = {{animationEnabled: true,
                 tabBarIcon: ({ focused }) =>(
                     <View style={{alignItems:'center', justifyContent:'center', top:10}}>
                         {/* <Image source={require('../assets/icons/magnifying-glass.png')}
@@ -161,24 +165,31 @@ const BottomTab = () => {
             <Tab.Screen name="SendMoney" component={SendMoneyScreen} 
             options = {{
                 tabBarIcon: ({ focused }) =>(
-                    //  <Image source={require('../assets/icons/add.png')}
-                    //         resizeMode='contain'
-                    //        style={{
-                    //         width: 30, 
-                    //         height: 30, 
-                    //         tintColor: focused ? '#748c94' : '#fff'
-                    //         }}
-                    //     />
-                        <Ionicons
+                    <Ionicons
                             name="send-outline"
                             size={25}
-                            color={focused ? '#fff' : '#748c94'}
+                            color={focused ? '#fff' : '#ffd'}
                         /> 
                      ),
                     tabBarButton: (props) =>(
                     <CustomTabBarButton {...props} />
                     )
-            }}
+                }}
+                // this will call the action sheet or modal to popup
+                    listeners={({}) =>({
+                        tabPress: event => {
+                            event.preventDefault();
+                            showActionSheet()
+                        }
+                    })}
+                    // this will call a new page to slide up and display
+
+                    // listeners={({navigation}) =>({
+                    //     tabPress: event => {
+                    //         event.preventDefault();
+                    //         navigation.Navigate("PaymentHistory")
+                    //     }
+                    // })}
             />
 
             <Tab.Screen name="History" component={HistoryScreen} options = {{
@@ -234,6 +245,25 @@ const BottomTab = () => {
             }}/>
              
         </Tab.Navigator>
+        <ActionSheet
+            ref={actionSheet}
+            tintColor='#aaa'
+            styles={styles}
+            // Title of the Bottom Sheet
+            title={<Text style={{color: '#aaa', fontSize:18, fontFamily:'_semiBold', alignItems:"center"}}>Transfer Type ?</Text>}
+            message={<Text style={{color: '#aaa', fontSize:13, fontFamily:'_regular'}}>Choose any of the menu items below to carry out your action as requested, thank you.</Text>}
+            // Options Array to show in bottom sheet
+            options={optionArray}
+            //theme='ios'
+            cancelButtonIndex={3}
+            destructiveButtonIndex={3}
+            onPress={(index) => {
+            // Clicking on the option will give you alert
+            alert(optionArray[index]);
+            }}
+        />
+    </>
+    
   );
 }
 
