@@ -32,10 +32,7 @@ const MainRootNavigation = ({navigation}) =>{
       })();
       setUserInfoData(getDataInLocalStorage('USER_TOKEN'));  
       }, []);
-
-      console.log("my login State MainVa ", loginState)
-      console.log(" My details MainVa ", myDetails)
-
+      
     return (
         <Stack.Navigator headerMode='none'>
 

@@ -2,12 +2,20 @@ import React from 'react';
 import {StyleSheet, View, Text } from 'react-native';
 
 const HistoryScreen = () => {
+
+
+
+  
+const recentTranDataInfo = ({item}) =>{
+  <Text>{item.sender_name}</Text>
+}
   return (
     <View>
       <Text>History Screen</Text>
      </View>
   );
 }
+
 
 const styles = StyleSheet.create({
     constrainer:{

@@ -136,6 +136,7 @@ const BottomTab = () => {
 
             <Tab.Screen name="Account" component={AccountScreen}
             options = {{animationEnabled: true,
+                
                 tabBarIcon: ({ focused }) =>(
                     <View style={{alignItems:'center', justifyContent:'center', top:10}}>
                         {/* <Image source={require('../assets/icons/magnifying-glass.png')}

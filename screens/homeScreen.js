@@ -101,34 +101,27 @@ const HomeScreen = () => {
      
   // }, []);
   
-//  componentDidMount = async () => {
-//     setTimeout(() =>{
-//       setIsLoading(false);
-//     }, 3000)
-//  }
-// get user information from local storage here
-useEffect(() => {
-  setTimeout(async() =>{
-    // let recentTransaction;
-    // recentTransaction = null;
+  const getTransaction = async() =>{
     try{
       setRecentLoading(true);
-      //const recentTransaction = await client.get(`/api/recent_transactions/${myDetails._id}`)
-      const recentTransaction = await client.get('/api/recent_transactions/'+ myDetails._id)
-      
+      const recentTransaction = await client.get('/api/recent_transactions/'+myDetails._id)
       // if(recentTransaction.data.msg =='200'){
       //   setRecentTranData(recentTransaction)
       // }
-      setRecentTranData(recentTransaction)
-      console.log("User Transaction Home ", recentTranData);
-      
-     }catch (e){
+      setRecentTranData(recentTransaction.data)
+      }catch (e){
       console.log(e);
     }
     finally {
       setRecentLoading(false);
       }
- 
+  };
+// get user information from local storage here
+useEffect(() => {
+  getTransaction()
+
+  setTimeout(async() =>{
+   
   }, 2000)
   
 }, []);
@@ -140,11 +133,8 @@ const props = {
   
 };
 
-const recentTranDataInfo = ({item}) =>{
-  <Text>{item.sender_name}</Text>
-}
   return (
-    <SafeAreaView style={{flex: 1, backgroundColor: "#eBecf4"}}>
+    <SafeAreaView style={{flex: 1, backgroundColor: "#F7F7F7"}}>
 
               <StatusBar barStyle='light-content' translucent={true} backgroundColor='transparent' />
 
@@ -197,18 +187,16 @@ const recentTranDataInfo = ({item}) =>{
 
             {/* body of the screen */}
             <ScrollView style={{marginBottom: 50}}>
-              {/* This show a dash round line */}
-                {/* <View style={styles.placeholder}>
-                  <View style={styles.placeholderInset}>
-
-                  </View>
-                </View> */}
-
-                    <View style={styles.middlePage}>
+              
+              
+            <View style={styles.middlePage}>
+                      {/* chat graph here */}
+                      
                       <Text style={styles.chatHeader}>Transaction Overview</Text>
                       <MyBarChart />
                     </View>
-                       
+
+                      {/* Quick here */}
                       <TouchableOpacity style={[styles.middleSection, {marginTop: 10, overflow: 'hidden'}]}
                         onPress={() =>{
                           sheetLoan.current.open();
@@ -247,7 +235,7 @@ const recentTranDataInfo = ({item}) =>{
                             
                         </TouchableOpacity>
                           
-                          {/* circle progress bar here */}
+                          {/* circle progress bar Loan repayment */}
                           
                           <View style={{marginHorizontal: 10, marginTop: 10, marginBottom: 10}}>
                               <View style={{flexDirection: 'column', alignItems:'center', justifyContent:'center', marginVertical: 5}}>
@@ -274,7 +262,9 @@ const recentTranDataInfo = ({item}) =>{
                     
                   {/* Recent transaction */}
 
-                  <View style={{flexDirection: "row", justifyContent: 'space-between', alignItems:'center', marginHorizontal: 10, marginBottom: 10, marginTop: 20}}>
+                  <View style={{flexDirection: "row", justifyContent: 'space-between', alignItems:'center', marginHorizontal: 10, marginTop: 20}}>
+                  {recentTranData.length ? <>
+                    
                     <Text style={{color:"#aaa", fontSize: 15, fontFamily:'_semiBold'}}>Recent transaction</Text>
                     <TouchableOpacity
                     onPress={() =>{
@@ -283,152 +273,81 @@ const recentTranDataInfo = ({item}) =>{
                     >
                     <Text style={{color:"#000", fontSize: 15, fontFamily: '_regular'}}>View </Text>
                     </TouchableOpacity>
+                  </> : ''}
+                    
                    </View>
 
-                   
-                        
                         {/* list view here */}
                         
-                        <View style={{marginBottom:50}}>
-                            <View style={{alignItems: 'center',justifyContent: 'center',}}> 
-                              <Text >{recentLoading ? <ActivityIndicator size='large' color={colors.secondaryColor1} /> : " "}</Text>
-                            </View>
+                        { recentLoading ? '': 
+                            <View style={{justifyContent:'center', alignItems:'center'}}>
+                              {recentTranData.length ? '': <>
+                              <Text style={{fontFamily:'_regular', fontSize:14, color:"#aaa", flexShrink: 1}}>
+                            Recent transactions will show here.
+                            </Text>
+                                  <View style={{justifyContent:'center', alignItems:'center'}}>
+                                    <Ionicons name="file-tray-outline" size={30} color="#aaa" marginLeft={8}/>
+                                  </View>
+                              </>
+                              }
+                             </View>
+                            }
 
+                        <View style={{marginBottom:50}}>
                             <FlatList
                               keyExtractor = {item => item._id}  
                               data={recentTranData}
-                              renderItem = {item => (<Text>My name Here</Text>)} 
-                            />
-                            
-                            <TouchableOpacity style={styles.recentTransaction}
+                              renderItem = {({item}) => (
+                              <TouchableOpacity style={styles.recentTransaction}
                               onPress={() =>{
                                 Alert.alert("You click to View all transactions")
                               }}>
                             {/* icon or symbol */}
-                              <View style={{flexDirection:'row', alignItems:'center'}}
-                              onTap={() =>{
-                                Alert.alert("You click to View More...")
-                              }}
-                              >
-                                {/* Coin image */}
+                              <View style={{flexDirection:'row', alignItems:'center'}}>
+                                {/* Status icon */}
                                 <View>
-                                  <Ionicons name="ios-arrow-down-circle-sharp"
-                                  size={30} color="#ea3372" marginLeft={8}/>
+                                {item.transac_nature =='Debit'? <Ionicons name="ios-arrow-down-circle-sharp"
+                                  size={30} color="#ea3372" marginLeft={8}/> : <Ionicons name="ios-arrow-up-circle-sharp"
+                                  size={30} color="#ea3372" marginLeft={8}/>}
                                 </View>
                                   
                                 {/* text */}
                                 <View style={{flexDirection:'column',
                                   justifyContent:'flex-start', marginLeft: 10}}>
                                 <Text style={{fontFamily:'_semiBold',
-                                    color:'#aaa', fontSize:13, marginTop: 5}}>Transfer | Debit</Text>
-                                  <Text style={{fontFamily:'_semiBold', fontSize:13, marginBottom: 5}}>{'\u20A6'}30,000.00</Text>
+                                    color:'#aaa', fontSize:13, marginTop: 5}}>{item.tran_type} | {item.transac_nature}</Text>
+                                  <Text style={{fontFamily:'_semiBold', fontSize:13, marginBottom: 5}}>{item.transac_nature =='Debit'? '-' : '+'}<NumberValueFormat value={item.amount} /></Text>
                                 </View>
                               </View>
 
                               {/* price Send and indicator */}
-                              <View style={{flexDirection:'column',
-                                backgroundColor:'#fff', alignItems:'center',
-                                  justifyContent:'center'}}>
-                                {/* navigation Icon */}
-                              
-                                {/* date and navigation sign*/}
-                                  <View style={{flexDirection:'row', alignItems:'center',
-                                    justifyContent:'center'}}>
-                                    <Text style={{fontFamily:'_semiBold', fontSize:10, color:"#aaa"}}>02/05/23</Text>
-                                    <FontAwesome name="angle-right"
-                                  size={25} color="#aaa" style={{marginLeft:10}} />
-                                  </View>
-
-                              </View>
-                            </TouchableOpacity>
-                          
-                            <TouchableOpacity style={styles.recentTransaction}
-                                  onPress={() =>{
-                                    Alert.alert("You click to View all transactions")
-                                  }}>
-                                {/* icon or symbol */}
-                                <View style={{flexDirection:'row', alignItems:'center'}}
-                                onTap={() =>{
-                                  Alert.alert("You click to View More...")
-                                }}
-                                >
-                                  {/* Coin image */}
-                                  <View>
-                                    <Ionicons name="ios-arrow-down-circle-sharp"
-                                    size={30} color="#ea3372" marginLeft={8}/>
-                                  </View>
-                                    
-                                  {/* text */}
-                                  <View style={{flexDirection:'column',
-                                    justifyContent:'flex-start', marginLeft: 10}}>
-                                  <Text style={{fontFamily:'_semiBold',
-                                      color:'#aaa', fontSize:13, marginTop: 5}}>Debit</Text>
-                                    <Text style={{fontFamily:'_semiBold', fontSize:13, marginBottom: 5}}>{'\u20A6'}30,000.00</Text>
-                                  </View>
-                                </View>
-
-                                {/* price Send and indicator */}
                                 <View style={{flexDirection:'column',
                                   backgroundColor:'#fff', alignItems:'center',
                                     justifyContent:'center'}}>
                                   {/* navigation Icon */}
-                                
+                              
                                   {/* date and navigation sign*/}
                                     <View style={{flexDirection:'row', alignItems:'center',
                                       justifyContent:'center'}}>
-                                      <Text style={{fontFamily:'_semiBold', fontSize:10, color:"#aaa"}}>02/05/23</Text>
+                                      <Text style={{fontFamily:'_semiBold', fontSize:10, color:"#aaa"}}>{item.creditOn}</Text>
                                       <FontAwesome name="angle-right"
                                     size={25} color="#aaa" style={{marginLeft:10}} />
                                     </View>
 
-                                </View>
-                            </TouchableOpacity>
-                          
-                            <TouchableOpacity style={[styles.recentTransaction]}
-                                onPress={() =>{
-                                  Alert.alert("You click to View all transactions")
-                                }}
-                              >
-                              {/* icon or symbol */}
-                              <View style={{flexDirection:'row', alignItems:'center'}}
-                              onTap={() =>{
-                                Alert.alert("You click to View More...")
-                              }}
-                              >
-                                {/* Coin image */}
-                                <View>
-                                  <Ionicons name="arrow-up-circle-outline"
-                                  size={30} color="green" marginLeft={8}/>
-                                </View>
-                                  
-                                {/* text */}
-                                <View style={{flexDirection:'column',
-                                  justifyContent:'flex-start', marginLeft: 10}}>
-                                <Text style={{fontFamily:'_semiBold',
-                                    color:'#aaa', fontSize:13, marginTop: 5}}>Transfer | Debit</Text>
-                                  <Text style={{fontFamily:'_semiBold', fontSize:13, marginBottom: 5}}>{'\u20A6'}30,000.00</Text>
-                                </View>
                               </View>
-
-                              {/* price Send and indicator */}
-                              <View style={{flexDirection:'column',
-                                backgroundColor:'#fff', alignItems:'center',
-                                  justifyContent:'center'}}>
-                                {/* navigation Icon */}
-                              
-                                {/* date and navigation sign*/}
-                                  <View style={{flexDirection:'row', alignItems:'center',
-                                    justifyContent:'center'}}>
-                                    <Text style={{fontFamily:'_semiBold', fontSize:10, color:"#aaa"}}>02/05/23</Text>
-                                    <FontAwesome name="angle-right"
-                                  size={25} color="#aaa" style={{marginLeft:10}} />
-                                  </View>
-                              </View>
-                            </TouchableOpacity>
+                            </TouchableOpacity>)} 
+                            />
+                           
                         </View>
                   
             </ScrollView>
+              {/* This show a dash round line */}
+                {/* <View style={styles.placeholder}>
+                  <View style={styles.placeholderInset}>
 
+                  </View>
+                </View> */}    
+           
                 
                  {/* Modal full popup here */}
                  <Modal
@@ -590,8 +509,6 @@ const styles = StyleSheet.create({
         color: "#E1E1E1",
         justifyContent:"flex-end",
         textAlign: "center",
-        
-
     },
     balanceSubTitle:{
         fontSize: 15,
@@ -753,11 +670,11 @@ const styles = StyleSheet.create({
      circleIconLeft:{
         borderRadius: 100, 
         overflow: 'hidden', 
-        borderColor: colors.secondaryColor1, 
+        borderColor: '#B8950A', 
         width: 35, 
         height: 35, 
         marginVertical: 10,
-        backgroundColor: colors.secondaryColor1,
+        backgroundColor: '#B8950A',
         alignItems: "center",
         justifyContent: "center",
      },

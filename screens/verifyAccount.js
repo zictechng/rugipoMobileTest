@@ -223,7 +223,7 @@ import Loader from '../components/Loader';
       };
       
   return (
-    <SafeAreaView style={{flex: 1}}>
+    <SafeAreaView style={{flex: 1, backgroundColor: "#F7F7F7"}}>
 
             {/* <View style={styles.titleBar}>
                 <Icons name="arrow-circle-left" size={24} color="#52575D"></Icons>
