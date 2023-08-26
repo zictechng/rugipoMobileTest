@@ -1,5 +1,5 @@
 import React, {useContext, useState, useCallback, useMemo, useRef, useEffect} from 'react';
-import {StyleSheet, View, Text, ActivityIndicator, FlatList, TouchableOpacity } from 'react-native';
+import {Button, StyleSheet, View, Text, ActivityIndicator, FlatList, TouchableOpacity } from 'react-native';
 import { LinearGradient } from 'expo-linear-gradient';
 import moment from 'moment';
 import { StatusBar } from 'expo-status-bar';
@@ -12,24 +12,62 @@ import { gs, colors } from '../styles'
 import { SafeAreaView } from 'react-native-safe-area-context';
 import client from '../api/client';
 
-
-
 const AccountScreen = ({navigation}) => {
 
   const [loginState, setLoginState, isLoading, setIsLoading, myDetails, setMyDetails] = useContext(UserContext);
-  const [recentTranData, setRecentTranData] = useState([]);
   const [recentLoading, setRecentLoading] = useState(false);
+  const [allDataFetched, setAllDataFetched] = useState(false);
+  const [transactions, setTransactions] = useState([]);
 
+
+  const [currentPage, setCurrentPage] = useState(1);
+  // get user account details here
+    useEffect(() => {
+      setData()
+    }, [currentPage]);
+
+
+  const loadMoreTransactions = () => {
+    setCurrentPage(currentPage + 1);
+    };
+    // const setData = async () => {
+      // if (recentLoading || allDataFetched) {
+      // return;
+      // }
+      
+    //   setRecentLoading(true);
+      
+    //   try {
+    //     const res = await client.get(`api/all_transactions/${myDetails._id}?page=${currentPage}`)
+    //     const newTransactions = res.data;
+    //   console.log(" Data from backend: " + res.data);
+    //   if (newTransactions.length === 0) {
+    //   setAllDataFetched(true);
+    //   return;
+    //   }
+      
+    //   setTransactions([...transactions, ...newTransactions]);
+    //   setCurrentPage(currentPage + 1);
+    //   } catch (error) {
+    //   console.error(error);
+    //   } finally {
+    //     setRecentLoading(false);
+    //   }
+    //   };
 
   const setData = async() =>{
+    if(recentLoading || allDataFetched) return;
+    
     try{
       setRecentLoading(true);
-      //const recentTransaction = await client.get(`/api/recent_transactions/${myDetails._id}`)
-      const recentTransaction = await client.get('/api/all_transaction/'+myDetails._id)
-      
-      setRecentTranData(recentTransaction.data)
-      console.log("User Transaction Home ", recentTranData);
-      
+      const res = await client.get(`api/all_statement/${myDetails._id}?page=${currentPage}`)
+        const newTransactions = res.data;
+        if(newTransactions.length === 0){
+          setAllDataFetched(true);
+          return
+        }
+      setTransactions([...transactions, ...newTransactions]);
+      setCurrentPage(currentPage + 1);
      }catch (e){
       console.log(e);
     }
@@ -37,15 +75,6 @@ const AccountScreen = ({navigation}) => {
       setRecentLoading(false);
       }
   };
-
-  // get user information from local storage here
-useEffect(() => {
-  setData()
-
-  setTimeout(async() =>{
-   }, 2000)
-  
-}, []);
 
 // flat list data here
 const recentTranDataInfo = ({item}) =>(
@@ -111,7 +140,7 @@ const myListEmpty = () => {
                 </TouchableOpacity>
                 
               <TouchableOpacity style = {styles.circleIconLeft1} >
-                  <Text style={{fontSize: 18, fontFamily:"_semiBold", color:'#fff'}}>Account Statements</Text>
+                  <Text style={{fontSize: 18, fontFamily:"_semiBold", color:'#fff'}}>Account Statements {transactions.length}</Text>
                 </TouchableOpacity>
                 <View style={styles.nameView}>
               </View>
@@ -126,11 +155,10 @@ const myListEmpty = () => {
                   
                   <View style={styles.placeholderInset}>
                         <View style={{flex:1, justifyContent:'center', alignItems:'center'}}>
-                        {recentLoading ? <ActivityIndicator size='large' color={colors.secondaryColor1} /> : ''}
                         
                             { recentLoading ? '': 
                             <View>
-                              {recentTranData.length ? '': <>
+                              {transactions.length ? '': <>
                               <Text style={{fontFamily:'_regular', fontSize:14, color:"#aaa", flexShrink: 1}}>
                             No record at the moment Please
                             </Text>
@@ -144,11 +172,23 @@ const myListEmpty = () => {
                         </View>
 
                     <View style={{marginTop: 10, marginBottom: 60}}>
-                    {!recentLoading && recentTranData.length > 0 ? 
+                    {!recentLoading && transactions.length > 0 ? 
                     <FlatList
+                    inverted
                      keyExtractor = {item => item._id}  
-                     data={recentTranData}
+                     data={transactions}
                      renderItem = {recentTranDataInfo} 
+                    //  ListFooterComponent={() => (
+                    //   <Button title="Load More" onPress={loadMoreTransactions} />
+                    //   )}
+                      onEndReached={loadMoreTransactions}
+                      initialNumToRender={3}
+                      ListFooterComponent = {() => {
+                        allDataFetched ? (
+                          <ActivityIndicator size="large"/>
+                        )
+                        : null
+                      }}
                      />
                      : ''}
                       
