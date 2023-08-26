@@ -12,89 +12,103 @@ import { gs, colors } from '../styles'
 import { SafeAreaView } from 'react-native-safe-area-context';
 import client from '../api/client';
 
+
+let stopFetchMore = true;
+const ListFooterComponent = () =>(
+
+  <Text style={{fontSize: 16, fontFamily: '_semiBold', textAlign: 'center', padding: 5}}>
+    <ActivityIndicator size='large' color='#A78808' />
+  </Text>
+)
 const AccountScreen = ({navigation}) => {
 
   const [loginState, setLoginState, isLoading, setIsLoading, myDetails, setMyDetails] = useContext(UserContext);
+  
   const [recentLoading, setRecentLoading] = useState(false);
+  const [recordLoading, setRecordLoading] = useState(false);
   const [allDataFetched, setAllDataFetched] = useState(false);
   const [transactions, setTransactions] = useState([]);
 
 
   const [currentPage, setCurrentPage] = useState(1);
   // get user account details here
-    useEffect(() => {
-      setData()
-    }, [currentPage]);
-
-
-  const loadMoreTransactions = () => {
-    setCurrentPage(currentPage + 1);
-    };
-    // const setData = async () => {
-      // if (recentLoading || allDataFetched) {
-      // return;
-      // }
-      
-    //   setRecentLoading(true);
-      
-    //   try {
-    //     const res = await client.get(`api/all_transactions/${myDetails._id}?page=${currentPage}`)
-    //     const newTransactions = res.data;
-    //   console.log(" Data from backend: " + res.data);
-    //   if (newTransactions.length === 0) {
-    //   setAllDataFetched(true);
-    //   return;
-    //   }
-      
-    //   setTransactions([...transactions, ...newTransactions]);
-    //   setCurrentPage(currentPage + 1);
-    //   } catch (error) {
-    //   console.error(error);
-    //   } finally {
-    //     setRecentLoading(false);
-    //   }
-    //   };
 
   const setData = async() =>{
-    if(recentLoading || allDataFetched) return;
-    
+    setRecordLoading(true);
     try{
-      setRecentLoading(true);
       const res = await client.get(`api/all_statement/${myDetails._id}?page=${currentPage}`)
-        const newTransactions = res.data;
-        if(newTransactions.length === 0){
-          setAllDataFetched(true);
-          return
-        }
-      setTransactions([...transactions, ...newTransactions]);
-      setCurrentPage(currentPage + 1);
+      setTransactions([...res.data])
+      
      }catch (e){
       console.log(e);
     }
     finally {
-      setRecentLoading(false);
+      setRecordLoading(false);
       }
   };
+    useEffect(() => {
+      setData()
+    }, []);
+
+   const loadMoreRecord = async() => {
+    setCurrentPage(currentPage + 1)
+    try {
+      
+      setRecentLoading(true);
+        if(!stopFetchMore){
+          const res = await client.get(`api/all_statement/${myDetails._id}?page=${currentPage + 1}`)
+          if(res.data.length === 0 || res.data.status == '404') return setRecentLoading(false);
+
+          setTransactions([...transactions, ...res.data]);
+          stopFetchMore = true;
+        }
+        setRecentLoading(false);
+    } catch (error) {
+      console.log(error.message);
+    }
+    finally {
+      setRecentLoading(false);
+      }
+   }
+
+  // const setData = async() =>{
+  //   if(recentLoading || allDataFetched) return;
+    
+  //   try{
+  //     setRecentLoading(true);
+  //     const res = await client.get(`api/all_statement/${myDetails._id}?page=${currentPage}`)
+  //       const newTransactions = res.data;
+  //       if(newTransactions.length === 0){
+  //         setAllDataFetched(true);
+  //         return
+  //       }
+  //     setTransactions([...transactions, ...newTransactions]);
+  //     setCurrentPage(currentPage + 1);
+  //    }catch (e){
+  //     console.log(e);
+  //   }
+  //   finally {
+  //     setRecentLoading(false);
+  //     }
+  // };
 
 // flat list data here
 const recentTranDataInfo = ({item}) =>(
     <TouchableOpacity style={styles.recentTransaction}>
-                                {/* icon or symbol */}
-                                  
-                              <View style={{flexDirection:'row', alignItems:'center'}}>
-                                  {/* text */}
-                                    <View style={{flexDirection:'column',
-                                      justifyContent:'flex-start', marginHorizontal:15}}>
-                                    
-                                        <View style={{flexDirection:'row',justifyContent:'space-between', marginTop: 8}}>
-                                          
-                                          <Text style={{fontFamily:'_semiBold', color:'#aaa', fontSize:14, marginTop: 5}}>Status: {item.transac_nature}</Text>
-                                          <Text style={{fontFamily:'_semiBold', fontSize:15, color:"#000", marginTop: 5}}>
-                                          {item.transac_nature =='Debit'? '-' : '+'}<NumberValueFormat value={item.amount} />
-                                            </Text>
-                                          
-                                        </View>
-                                    
+              <View style={{flexDirection:'row', alignItems:'center'}}>
+                {/* text */}
+                  <View style={{flexDirection:'column',
+                    justifyContent:'flex-start', marginHorizontal:15}}>
+                  
+                      <View style={{flexDirection:'row',justifyContent:'space-between', marginTop: 8}}>
+                        
+                        <Text style={{fontFamily:'_semiBold', color:'#aaa', fontSize:14, marginTop: 5}}>Status: {item.transac_nature}</Text>
+                        <Text style={{fontFamily:'_semiBold', fontSize:15, color:"#000", marginTop: 5}}>
+                        {item.transac_nature =='Debit'? '-' : '+'}<NumberValueFormat value={item.amount} />
+                          </Text>
+                        
+                      </View>
+                  
                                       {/* <Text style={{flex: 1, flexWrap: 'wrap', fontFamily:'_semiBold', fontSize:13, marginBottom: 5}}>you look wonderful and beautiful! Let chat more on whatsapp +44 7389 646157 and get to know each other better for a date outing.
     Hope to hear from you</Text> */}
     <Text style={{fontFamily:'_regular', fontSize:13, marginBottom: 5, textAlign:'justify', flexShrink: 1}}>you look wonderful and beautiful! Let chat more on whatsapp +44 7389 646157 and get to know each other better for a date outing.
@@ -155,59 +169,41 @@ const myListEmpty = () => {
                   
                   <View style={styles.placeholderInset}>
                         <View style={{flex:1, justifyContent:'center', alignItems:'center'}}>
-                        
-                            { recentLoading ? '': 
+
+                        {recordLoading ? <ActivityIndicator size='large' color='#A78808' /> : ''}
+                        {recordLoading ? '' :
                             <View>
-                              {transactions.length ? '': <>
+                                {transactions.length ? '': <>
                               <Text style={{fontFamily:'_regular', fontSize:14, color:"#aaa", flexShrink: 1}}>
-                            No record at the moment Please
-                            </Text>
+                                No record at the moment Please
+                              </Text>
                                   <View style={{justifyContent:'center', alignItems:'center'}}>
                                     <Ionicons name="file-tray-outline" size={30} color="#aaa" marginLeft={8}/>
                                   </View>
                               </>
                               }
+                            
                             </View>
                             }
+                          
                         </View>
 
                     <View style={{marginTop: 10, marginBottom: 60}}>
-                    {!recentLoading && transactions.length > 0 ? 
-                    <FlatList
-                    inverted
-                     keyExtractor = {item => item._id}  
-                     data={transactions}
-                     renderItem = {recentTranDataInfo} 
-                    //  ListFooterComponent={() => (
-                    //   <Button title="Load More" onPress={loadMoreTransactions} />
-                    //   )}
-                      onEndReached={loadMoreTransactions}
-                      initialNumToRender={3}
-                      ListFooterComponent = {() => {
-                        allDataFetched ? (
-                          <ActivityIndicator size="large"/>
-                        )
-                        : null
-                      }}
-                     />
-                     : ''}
-                      
-                      {/* {recentLoading ? '' :
-                     <FlatList
-                        keyExtractor = {item => item._id}  
-                        data={recentTranData}
-                        renderItem = {recentTranDataInfo} 
-                        ListEmptyComponent={myListEmpty}
-                        // ListHeaderComponent={() => (
-                        //   <Text style={{ fontSize: 30, textAlign: "center",marginTop:20,fontWeight:'bold',textDecorationLine: 'underline' }}>
-                        //     List of Persons
-                        //   </Text>
-                        // )}
+                      <FlatList
+                      keyExtractor = {item => item._id}  
+                      data={transactions}
+                      renderItem = {recentTranDataInfo} 
+                      //  ListFooterComponent={() => (
+                      //   <Button title="Load More" onPress={loadMoreTransactions} />
+                      //   )}
+                        onEndReached={loadMoreRecord}
+                        onEndReachedThreshold={0.5} 
+                        onScrollBeginDrag={() =>{
+                          stopFetchMore = false;
+                        }}
+                        ListFooterComponent = {() => recentLoading && <ListFooterComponent />}
                       />
-                      } */}
-                      
-                      
-                    </View>
+                     </View>
                           
                    </View>
                 </View> 

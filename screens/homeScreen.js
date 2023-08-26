@@ -294,7 +294,54 @@ const props = {
                             }
 
                         <View style={{marginBottom:50}}>
-                            <FlatList
+
+                        <View>
+                          {recentTranData.map((item, index) => (
+                            
+                            <TouchableOpacity style={styles.recentTransaction}
+                            onPress={() =>{
+                              Alert.alert("You click to View all transactions")
+                            }}  key={index} >
+                          
+                            <View style={{flexDirection:'row', alignItems:'center'}}
+                             >
+                              
+                              <View>
+                              {item.transac_nature =='Debit'? <Ionicons name="ios-arrow-down-circle-sharp"
+                                size={30} color="#ea3372" marginLeft={8}/> : <Ionicons name="ios-arrow-up-circle-sharp"
+                                size={30} color="#ea3372" marginLeft={8}/>}
+                              </View>
+                                
+                              {/* text */}
+                              <View style={{flexDirection:'column',
+                                justifyContent:'flex-start', marginLeft: 10}}>
+                              <Text style={{fontFamily:'_semiBold',
+                                  color:'#aaa', fontSize:13, marginTop: 5}}>{item.tran_type} | {item.transac_nature}</Text>
+                                <Text style={{fontFamily:'_semiBold', fontSize:13, marginBottom: 5}}>{item.transac_nature =='Debit'? '-' : '+'}<NumberValueFormat value={item.amount} /></Text>
+                              </View>
+                            </View>
+
+                            {/* price Send and indicator */}
+                              <View style={{flexDirection:'column',
+                                backgroundColor:'#fff', alignItems:'center',
+                                  justifyContent:'center'}}>
+                                {/* navigation Icon */}
+                            
+                                {/* date and navigation sign*/}
+                                  <View style={{flexDirection:'row', alignItems:'center',
+                                    justifyContent:'center'}}>
+                                    <Text style={{fontFamily:'_semiBold', fontSize:10, color:"#aaa"}}>{item.creditOn}</Text>
+                                    <FontAwesome name="angle-right"
+                                  size={25} color="#aaa" style={{marginLeft:10}} />
+                                  </View>
+
+                            </View>
+                          </TouchableOpacity>
+                          
+                            
+                          ))}
+                        </View>
+                            {/* <FlatList
                               keyExtractor = {item => item._id}  
                               data={recentTranData}
                               renderItem = {({item}) => (
@@ -302,16 +349,16 @@ const props = {
                               onPress={() =>{
                                 Alert.alert("You click to View all transactions")
                               }}>
-                            {/* icon or symbol */}
+                           
                               <View style={{flexDirection:'row', alignItems:'center'}}>
-                                {/* Status icon */}
+                                
                                 <View>
                                 {item.transac_nature =='Debit'? <Ionicons name="ios-arrow-down-circle-sharp"
                                   size={30} color="#ea3372" marginLeft={8}/> : <Ionicons name="ios-arrow-up-circle-sharp"
                                   size={30} color="#ea3372" marginLeft={8}/>}
                                 </View>
                                   
-                                {/* text */}
+                                
                                 <View style={{flexDirection:'column',
                                   justifyContent:'flex-start', marginLeft: 10}}>
                                 <Text style={{fontFamily:'_semiBold',
@@ -320,13 +367,11 @@ const props = {
                                 </View>
                               </View>
 
-                              {/* price Send and indicator */}
+                              
                                 <View style={{flexDirection:'column',
                                   backgroundColor:'#fff', alignItems:'center',
                                     justifyContent:'center'}}>
-                                  {/* navigation Icon */}
-                              
-                                  {/* date and navigation sign*/}
+                                  
                                     <View style={{flexDirection:'row', alignItems:'center',
                                       justifyContent:'center'}}>
                                       <Text style={{fontFamily:'_semiBold', fontSize:10, color:"#aaa"}}>{item.creditOn}</Text>
@@ -336,7 +381,7 @@ const props = {
 
                               </View>
                             </TouchableOpacity>)} 
-                            />
+                            /> */}
                            
                         </View>
                   
