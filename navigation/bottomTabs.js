@@ -8,6 +8,7 @@ import { createStackNavigator } from '@react-navigation/stack';
 import Ionicons from '@expo/vector-icons/Ionicons';
 import ActionSheet from '@alessiocancian/react-native-actionsheet';
 import { useNavigation } from '@react-navigation/native';
+import { gs, colors } from "../styles";
 // screen imports goes here
 import HomeScreen from '../screens/homeScreen';
 import HistoryScreen from '../screens/historyScreen';
@@ -35,7 +36,7 @@ const CustomTabBarButton = ({children, onPress}) =>(
             width: 60,
             height: 60,
             borderRadius: 35,
-            backgroundColor: '#e32f45'
+            backgroundColor: colors.secondaryColor1
         }}>
             {children}
         </View>
@@ -60,7 +61,7 @@ const BottomTab = () => {
       userLogInToken = null;
       try{
         userLogInToken = await AsyncStorage.getItem('USER_LOCAL_INFO')
-        console.log("User Details in Main TabMenu 2 ", userLogInToken);
+        //console.log("User Details in Main TabMenu 2 ", userLogInToken);
         const currentUserDetails = JSON.parse(userLogInToken);
         setMyDetails(currentUserDetails);
        }catch (e){
@@ -116,7 +117,7 @@ const BottomTab = () => {
                            style={{
                             width: 20, 
                             height: 20, 
-                            tintColor: focused ? '#e32f45' : '#748c94'
+                            tintColor: focused ? colors.secondaryColor2 : '#748c94'
                             }}
                         />
                         {/* <Ionicons
@@ -125,7 +126,7 @@ const BottomTab = () => {
                             color={focused ? '#e32f45' : '#748c94'}
                         /> */}
                         <Text 
-                        style={{color: focused ? '#e32f45' : '#748c94', 
+                        style={{color: focused ? colors.secondaryColor2 : '#748c94', 
                         fontSize: 12, 
                         marginBottom: 15}}>
                         Home
@@ -150,10 +151,10 @@ const BottomTab = () => {
                         <Ionicons
                             name="contract-outline"
                             size={25}
-                            color={focused ? '#e32f45' : '#748c94'}
+                            color={focused ? colors.secondaryColor2 : '#748c94'}
                         />
                         <Text 
-                        style={{color: focused ? '#e32f45' : '#748c94', 
+                        style={{color: focused ? colors.secondaryColor2 : '#748c94', 
                         fontSize: 12, 
                         marginBottom: 15}}>
                         Statements
@@ -207,10 +208,10 @@ const BottomTab = () => {
                         <Ionicons
                             name="bar-chart-outline"
                             size={25}
-                            color={focused ? '#e32f45' : '#748c94'}
+                            color={focused ? colors.secondaryColor2 : '#748c94'}
                         />
                         <Text 
-                        style={{color: focused ? '#e32f45' : '#748c94', 
+                        style={{color: focused ? colors.secondaryColor2 : '#748c94', 
                         fontSize: 12, 
                         marginBottom: 15}}>
                         History
@@ -233,10 +234,10 @@ const BottomTab = () => {
                         <Ionicons
                             name="stats-chart-outline"
                             size={25}
-                            color={focused ? '#e32f45' : '#748c94'}
+                            color={focused ? colors.secondaryColor2 : '#748c94'}
                         />
                         <Text 
-                        style={{color: focused ? '#e32f45' : '#748c94', 
+                        style={{color: focused ? colors.secondaryColor2 : '#748c94', 
                         fontSize: 12, 
                         marginBottom: 15}}>
                         Account
@@ -248,19 +249,20 @@ const BottomTab = () => {
         </Tab.Navigator>
         <ActionSheet
             ref={actionSheet}
-            tintColor='#aaa'
+            tintColor='#777'
             styles={styles}
             // Title of the Bottom Sheet
-            title={<Text style={{color: '#aaa', fontSize:18, fontFamily:'_semiBold', alignItems:"center"}}>Transfer Type ?</Text>}
-            message={<Text style={{color: '#aaa', fontSize:13, fontFamily:'_regular'}}>Choose any of the menu items below to carry out your action as requested, thank you.</Text>}
+            title={<Text style={{color: '#777', fontSize:18, fontFamily:'_semiBold', alignItems:"center"}}>Transfer Type </Text>}
+            message={<Text style={{color: '#aaa', fontSize:13, fontFamily:'_regular'}}>Choose any of the option below to get started with funds transfer, thank you.</Text>}
             // Options Array to show in bottom sheet
             options={optionArray}
             //theme='ios'
             cancelButtonIndex={3}
             destructiveButtonIndex={3}
             onPress={(index) => {
+                console.log('Press', index)
             // Clicking on the option will give you alert
-            alert(optionArray[index]);
+            //alert(optionArray[index]);
             }}
         />
     </>

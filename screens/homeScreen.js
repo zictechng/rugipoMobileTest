@@ -11,7 +11,8 @@ import { UserContext } from '../components/UserContext';
 import { Ionicons, Entypo, SimpleLineIcons, FontAwesome, FontAwesome5} from '@expo/vector-icons'
 import FeatherIcon from 'react-native-vector-icons/Feather'
 import AsyncStorage from '@react-native-async-storage/async-storage';
-
+import { useNavigation } from '@react-navigation/native';
+import moment from "moment";
 import { gs, colors } from '../styles'
 import { ScrollView } from 'react-native-gesture-handler';
 import Icon from 'react-native-vector-icons/FontAwesome'
@@ -59,6 +60,7 @@ const MyBarChart = () => {
   };
 
 const HomeScreen = () => {
+  const navigation = useNavigation();
 
   const [loginState, setLoginState, isLoading, setIsLoading, myDetails, setMyDetails] = useContext(UserContext);
   const [isModalVisible, setisModalVisible] = useState(false);
@@ -122,7 +124,7 @@ useEffect(() => {
 
   setTimeout(async() =>{
    
-  }, 2000)
+  }, 1000)
   
 }, []);
 const props = {
@@ -196,7 +198,7 @@ const props = {
                       <MyBarChart />
                     </View>
 
-                      {/* Quick here */}
+                      {/* Quick Loan here */}
                       <TouchableOpacity style={[styles.middleSection, {marginTop: 10, overflow: 'hidden'}]}
                         onPress={() =>{
                           sheetLoan.current.open();
@@ -216,10 +218,10 @@ const props = {
                                  
                               {/* Quick Loan */}
                               <View style={{flexDirection:'column',
-                                justifyContent:'flex-start', marginLeft: 10}}>
+                                justifyContent:'flex-start', marginLeft: 10, flexShrink:1,}}>
                               <Text style={{fontFamily:'_semiBold',
                                   color:'#fff', fontSize:18, marginTop: 5}}>Quick Loans</Text>
-                                <Text style={{color:'#001f00', fontSize:13, fontFamily:'_regular', flexShrink:1, flexWrap: 'wrap', maxWidth:300, marginBottom: 10}}>Apply for a quick loan to uplift your business need swiftly</Text>
+                                <Text style={{color:'#001f00', fontSize:13, fontFamily:'_regular', flexWrap: 'wrap', maxWidth:250, marginBottom: 10}}>Apply for a quick loan to uplift your business need swiftly</Text>
                               </View>
                             </View>
 
@@ -265,12 +267,9 @@ const props = {
                   <View style={{flexDirection: "row", justifyContent: 'space-between', alignItems:'center', marginHorizontal: 10, marginTop: 20}}>
                   {recentTranData.length ? <>
                     
-                    <Text style={{color:"#aaa", fontSize: 15, fontFamily:'_semiBold'}}>Recent transaction</Text>
+                    <Text style={{color:"#aaa", fontSize: 15, fontFamily:'_regular'}}>Recent transaction</Text>
                     <TouchableOpacity
-                    onPress={() =>{
-                      Alert.alert("You click to View all transactions")
-                    }}
-                    >
+                      onPress={() => navigation.navigate('History')}>
                     <Text style={{color:"#000", fontSize: 15, fontFamily: '_regular'}}>View </Text>
                     </TouchableOpacity>
                   </> : ''}
@@ -283,7 +282,7 @@ const props = {
                             <View style={{justifyContent:'center', alignItems:'center'}}>
                               {recentTranData.length ? '': <>
                               <Text style={{fontFamily:'_regular', fontSize:14, color:"#aaa", flexShrink: 1}}>
-                            Recent transactions will show here.
+                                Recent transactions will show here.
                             </Text>
                                   <View style={{justifyContent:'center', alignItems:'center'}}>
                                     <Ionicons name="file-tray-outline" size={30} color="#aaa" marginLeft={8}/>
@@ -309,7 +308,7 @@ const props = {
                               <View>
                               {item.transac_nature =='Debit'? <Ionicons name="ios-arrow-down-circle-sharp"
                                 size={30} color="#ea3372" marginLeft={8}/> : <Ionicons name="ios-arrow-up-circle-sharp"
-                                size={30} color="#ea3372" marginLeft={8}/>}
+                                size={30} color="#09d97b" marginLeft={8}/>}
                               </View>
                                 
                               {/* text */}
@@ -330,7 +329,7 @@ const props = {
                                 {/* date and navigation sign*/}
                                   <View style={{flexDirection:'row', alignItems:'center',
                                     justifyContent:'center'}}>
-                                    <Text style={{fontFamily:'_semiBold', fontSize:10, color:"#aaa"}}>{item.creditOn}</Text>
+                                    <Text style={{fontFamily:'_semiBold', fontSize:10, color:"#aaa"}}>{moment(item.creditOn).format("DD/mm/YYYY hh:mm:ss")}</Text>
                                     <FontAwesome name="angle-right"
                                   size={25} color="#aaa" style={{marginLeft:10}} />
                                   </View>

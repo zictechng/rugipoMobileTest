@@ -16,6 +16,7 @@ export const colors = {
     pink: "#ea3372",
     iconColor: "#05375a",
     warningColor: "#FF0000",
+    redColor: "e32f45",
     
     text: "#fff",
     textSec: "#aaa",

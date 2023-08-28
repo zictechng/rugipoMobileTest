@@ -236,7 +236,7 @@ const AccountScreen = ({ navigation }) => {
 
           <TouchableOpacity style={styles.circleIconLeft1}>
             <Text
-              style={{ fontSize: 18, fontFamily: "_semiBold", color: "#fff" }}
+              style={{ fontSize: 22, fontFamily: "_semiBold", color: "#fff" }}
             >
               Account Statements
             </Text>
