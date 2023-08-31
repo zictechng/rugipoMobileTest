@@ -234,7 +234,7 @@ const LoginScreen = ({navigation}) => {
             
                 {userData != '' ? <Text style={styles.text_header}>Welcome,<Text style={{fontSize: 25}}> { userData.surname}</Text></Text>:
                 <Text style={styles.text_header}>Welcome</Text>}
-                <Text style={styles.text_header_section}>Login to access your account...</Text>
+                <Text style={styles.text_header_section}>Login to access your account.</Text>
                 {/* <Text style={styles.text_header_section} onPress={() =>navigation.navigate('Verify')}>Verify...</Text> */}
             </View>
     

@@ -1,28 +1,21 @@
 import React from 'react';
-import { View, StyleSheet, Text, TouchableOpacity, Pressable , Dimensions, ActivityIndicator } from 'react-native';
+import { View, StyleSheet, Text, TouchableOpacity, Pressable , Dimensions, ActivityIndicator, Image} from 'react-native';
 import { gs, colors } from "../styles";
 import FeatherIcon from 'react-native-vector-icons/Feather';
 import {
-    Ionicons,
-    Entypo,
-    SimpleLineIcons,
-    FontAwesome,
     FontAwesome5,
-    MaterialCommunityIcons,
-    MaterialIcons
   } from "@expo/vector-icons";
 import * as Animatable from 'react-native-animatable'
 
-const WIDTH = Dimensions.get('window').width;
-const HEIGHT_MODAL = 500;
 
-const SimpleModal = (props) => {
+const WIDTH = Dimensions.get('window').width;
+const HEIGHT_MODAL = 400;
+
+const LoanModal = (props) => {
 
     closeModal = (bool, data) =>{
-        props.changeModalVisible(bool);
-        props.setData(data);
-        //console.log("Use click ", data);
-    }
+        props.loanModalVisible(bool);
+       }
   return (
     <View
         disabled={true}
@@ -34,39 +27,32 @@ const SimpleModal = (props) => {
             <View style={styles.textView}>
                 <View style={{backgroundColor: colors.secondaryColor2, 
                     width: '100%', 
-                    height: 40,
+                    height: 70,
                     borderTopEndRadius: 10, 
                     borderTopStartRadius:10, 
                     marginTop : -10, justifyContent: 'center', alignItems: 'center'}}>
-                    <Text style={[styles.text, {fontSize: 20, color:'#fff'}]}>Beneficiaries</Text>
+                    <Text style={[styles.text, {fontSize: 20, color:'#fff'}]}>About Loans</Text>
                 </View>
                 
                 <View style={{marginTop: 20, marginBottom: 8}}>
                     
                             <View style={{justifyContent: 'center', alignItems: 'center', marginBottom: 10}}>
-                                <FontAwesome5
-                                name="users"
-                                size={30}
-                                color="#aaa"
-                                marginLeft={8}/>
+                             <Image source={require('../assets/loan.png')} style={{width:80, height:80, tintColor: colors.secondaryColor2}}  />
                             </View>
 
-                            <View style={styles.rowWrapper2}>
-                                <View style={styles.row}>
-                                  <Text style={[styles.rowLabel, ]}>Ken Developer</Text>
-                                        <View style={styles.rowSpacer} />
-                                        <Text style={{color:'#aaa'}}>10/08/2022</Text>
-                                        <FeatherIcon name='chevron-right' color='#ababab'
-                                        size={22} />
-                                </View>  
+                            <View style={[styles.rowWrapper2, {justifyContent: 'center', alignItems:'center'}]}>
+                                <Text style={[styles.rowLabel, {fontSize: 20} ]}>
+                                    Interested in quick loan?
+                                </Text>  
                             </View>
                             <View style={styles.rowWrapper2}>
                                 <View style={styles.row}>
-                                  <Text style={[styles.rowLabel, ]}>Ken Developer</Text>
+                                  <Text style={[styles.rowLabel, {fontSize: 15, fontFamily: '_regular'}]}>
+                                    Our loan facility is very helpful and handy for business support on the go! For more details and how you
+                                    can access the loan, kindly contact our admin for more details.
+                                    </Text>
                                         <View style={styles.rowSpacer} />
-                                        <Text style={{color:'#aaa'}}>10/08/2022</Text>
-                                        <FeatherIcon name='chevron-right' color='#ababab'
-                                        size={22} />
+                                        
                                 </View>  
                             </View>
                    </View>
@@ -82,7 +68,7 @@ const SimpleModal = (props) => {
                 
             </View>
             
-                <View style={styles.buttonView}>
+                <View style={{justifyContent: 'center', alignItems:'center'}}>
                     <Pressable style={styles.touchableOpacity}
                         onPress={() => closeModal(false, 'Confirm modal')} >
                         <Text style={[styles.text, {color: '#fff'}]}>
@@ -102,7 +88,7 @@ const styles = StyleSheet.create({
         justifyContent: 'center',
         alignItems: 'center',
         //backgroundColor: '#000000aa',
-        backgroundColor: 'rgba(0, 0, 0, 0.5)'
+        backgroundColor: 'rgba(0, 0, 0, 0.4)',
         
      },
     rowWrapper: {
@@ -113,10 +99,6 @@ const styles = StyleSheet.create({
         marginTop: 35,
       },
       rowWrapper2:{
-        paddingLeft: 24,
-        backgroundColor: '#e3e3e3',
-        borderColor: '#e3e3e3',
-        borderRadius: 15,
         marginBottom: 15,
         width: WIDTH - 90,
      },
@@ -125,8 +107,7 @@ const styles = StyleSheet.create({
         alignItems: 'center',
         justifyContent: 'flex-start',
         paddingRight: 24,
-        height: 50,
-      },
+         },
       rowLabel: {
         fontSize: 14,
         fontFamily: '_semiBold',
@@ -167,12 +148,14 @@ const styles = StyleSheet.create({
         },
    
     touchableOpacity:{
-        paddingVertical: 8,
+        //paddingVertical: 8,
+        width: 100,
+        justifyContent: 'center',
         alignItems: 'center',
         borderRadius: 15,
         marginHorizontal: 5,
         backgroundColor: colors.secondaryColor1,
-        marginBottom: -20,
+        marginBottom: 10,
      }
 })
-export { SimpleModal}
+export { LoanModal}

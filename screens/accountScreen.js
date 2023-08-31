@@ -226,14 +226,8 @@ const AccountScreen = ({ navigation }) => {
         end={[1, 1]}
         style={{ elevation: 30, shadowColor: '#930D2F'}}
       >
-        <View style={[gs.rowBetween, { marginTop: 18, marginHorizontal: 10 }]}>
-          <TouchableOpacity
-            style={styles.circleIconLeft}
-            onPress={() => navigation.goBack()}
-          >
-            <Ionicons name="arrow-back" color={colors.text} size={20} />
-          </TouchableOpacity>
-
+        <View style={[gs.rowBetween, { marginTop: 18, marginHorizontal: 10, justifyContent: 'center' }]}>
+         
           <TouchableOpacity style={styles.circleIconLeft1}>
             <Text
               style={{ fontSize: 22, fontFamily: "_semiBold", color: "#fff" }}

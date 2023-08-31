@@ -6,8 +6,6 @@ import GeneralRootScreen from './generalRootScreen';
 import { UserContext } from '../components/UserContext';
 import ContactScreen from '../screens/contact';
 
-
-
 // import other screens/page here
 
 const AppStack = createStackNavigator();

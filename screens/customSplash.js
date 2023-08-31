@@ -1,12 +1,18 @@
 import React, {useContext, useEffect, useState} from 'react';
-import { ActivityIndicator, StyleSheet, View, Text } from 'react-native';
+import { SafeAreaView, StatusBar, ActivityIndicator, StyleSheet, View, Text } from 'react-native';
 
 const CustomSplash = () => {
   return (
-    <View style={styles.constrainer}>
-      <Text></Text>
-      <ActivityIndicator size='large' color="#fff" />
-     </View>
+    <SafeAreaView style={styles.constrainer}>
+
+          <StatusBar style="light" translucent={true} backgroundColor='transparent' />
+              <View>
+                  <Text></Text>
+                  <ActivityIndicator size='large' color="#fff" />
+             </View>
+    
+    </SafeAreaView>
+    
   );
 }
 

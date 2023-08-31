@@ -136,9 +136,9 @@ const props = {
 };
 
   return (
-    <SafeAreaView style={{flex: 1, backgroundColor: "#F7F7F7"}}>
-
-              <StatusBar barStyle='light-content' translucent={true} backgroundColor='transparent' />
+    <SafeAreaView style={{ flex: 1, backgroundColor: '#f6f6f6', }}>
+        <StatusBar
+      style="light" translucent={true} backgroundColor='transparent'animated={true} />
 
                 {/* header of the screen */}
             <LinearGradient colors={[colors.secondaryColor2, colors.secondaryColor2]} start={[0,0]} end={[1,1]}
@@ -183,9 +183,6 @@ const props = {
                     <Text style={styles.balanceSubTitle}>Current Balance</Text>
                 </View>
             </LinearGradient>
-
-            {/* loader indicator here */}
-            {/* <Loader loading={isLoading} /> */}
 
             {/* body of the screen */}
             <ScrollView style={{marginBottom: 50}}>

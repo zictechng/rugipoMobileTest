@@ -9,12 +9,19 @@ import {
   Image,
   TouchableOpacity,
   Switch,
-  StatusBar
+  StatusBar, 
+  Modal,
+  Dimensions,
+  Pressable
 } from 'react-native';
+import { ALERT_TYPE, Dialog, Toast } from 'react-native-alert-notification';
 import { LinearGradient } from "expo-linear-gradient";
 import moment from "moment";
 import { UserContext } from "../components/UserContext";
 import FeatherIcon from 'react-native-vector-icons/Feather';
+import { SimpleModal } from '../components/SimpleModal';
+import { LoanModal } from '../components/loanModal';
+import Dialog2 from "react-native-dialog";
 import {
   Ionicons,
   Entypo,
@@ -27,46 +34,112 @@ import {
 import { gs, colors } from "../styles";
 import { useNavigation } from '@react-navigation/native';
 import AsyncStorage from '@react-native-async-storage/async-storage';
+import AwesomeAlert from 'react-native-awesome-alerts';
+
 
 const ProfileScreen = () => {
-  const navigation = useNavigation();
+const navigation = useNavigation();
 
 
-  const [loginState, setLoginState, isLoading, setIsLoading] = useContext(UserContext);
+  const [loginState, setLoginState, isLoading, setIsLoading, myDetails, setMyDetails, myMethod ] = useContext(UserContext);
+  const [isModalVisible, setisModalVisible] = useState(false);
+  const [isLoanModalVisible, setisLoanModalVisible] = useState(false);
+  const [showModal, setshowModal] = useState(false);
+  const [chooseData, setchooseData] = useState();
 
-  const logout1 = async() =>{
-    try {
-    AsyncStorage.removeItem('USER_TOKEN')
-    .then(() => {
-    console.log('AsyncStorage cleared successfully.');
-    //setLoginState()
-      })
-    } catch (e) {
-      console.log(e.message);
-    }
+  const [showAboutModal, setshowAboutModal] = useState(false);
+  const [showIsAboutModal, setshowIsAboutModal] = useState(false);
+
+  const changeModalVisible = (bool) =>{
+    setisModalVisible(bool);
+    setshowAboutModal(false);
   }
 
+
+  const loanModalVisible = (bool) =>{
+    setisLoanModalVisible(bool);
+    setshowAboutModal(false);
+  }
+
+  const setData = (data) =>{
+    setchooseData(data);
+    setshowAboutModal(false);
+    };
   const logout = async() =>{
+    setTimeout(async() =>{
     try {
-        const res = await AsyncStorage.removeItem('USER_TOKEN');
-        //const my_details = await AsyncStorage.getItem("USER_TOKEN");
-        //const currentUser = JSON.parse(my_details);
-        //await AsyncStorage.multiRemove(keys);
-        if(res === undefined || res === null)
-        {
-          setLoginState(null);
+          const res = await AsyncStorage.removeItem('USER_TOKEN');
+         
+          if(res === undefined || res === null)
+          {
+          navigation.replace('Login');
+          setLoginState(null)
           console.log('AsyncStorage cleared successfully.');
         }
-        console.log("Out is ", res)
+       
        } catch (error) {
         console.error('Error clearing app data.');
       }
+    }, 1000)
   }
 
+ 
+  const handleAboutModal = () =>{
+    Alert.alert(
+      title='Hay !',
+      message='Thank you for checking, we are currently working on this module, please check back.',
+      [
+        {
+          text: 'Cancel',
+          onPress: () => console.log('Cancel Pressed'),
+          style: 'cancel',
+        },
+        {text: 'OK', onPress: () => console.log('OK Pressed'),
+        style: 'ok',
+        },
+      ],
+        {cancelable : true}
+      );
+  }
+ 
+  const blockendMyAccount = () => {
+    console.log("My account is blocked...");
+  }
+
+  const deactiveAccount = () =>{
+    return (
+      Alert.alert(
+        title='Caution !',
+        message='Are you sure you want to blocked your account?',
+        [
+          {
+            text: 'Cancel',
+            onPress: () => console.log('Cancel Pressed'),
+            style: 'cancel',
+          },
+          {text: 'Yes', onPress: () => blockendMyAccount(),
+          style: 'ok',
+          },
+        ],
+          {cancelable : true}
+        )
+
+        //   Dialog.show({
+        //     type: ALERT_TYPE.WARNING,
+        //     textBodyStyle: { fontFamily: '_regular', fontSize: 16 },
+        //     titleStyle: { fontFamily: '_bold', fontSize: 20 },
+        //     title: 'Caution ',
+        //     textBody: 'Are you sure you want to de-activate your account?',
+        //     button: 'Okay',
+        //     onPress:{blockendMyAccount},
+            
+        // })
+      )
+    }
   return (
        <View style={{flex: 1}}>
         
-        <SafeAreaView style={{ flex: 1, backgroundColor: '#f6f6f6', }}>
+        <SafeAreaView style={{ flex: 1, backgroundColor: '#F7F7F7', }}>
         <StatusBar
       style="light" translucent={true} backgroundColor='transparent'animated={true} />
 
@@ -78,18 +151,10 @@ const ProfileScreen = () => {
         end={[1, 1]}
         style={{ elevation: 30, shadowColor: '#930D2F'}}
       >
-        <View style={[gs.rowBetween, { marginTop: 18, marginHorizontal: 10 }]}>
-          <TouchableOpacity
-            style={styles.circleIconLeft}
-            onPress={() => navigation.goBack()}
-          >
-            <Ionicons name="arrow-back" color={colors.text} size={20} />
-          </TouchableOpacity>
-
+        <View style={[gs.rowBetween, { marginTop: 18, marginHorizontal: 10, justifyContent: 'center' }]}>
           <TouchableOpacity style={styles.circleIconLeft1}>
             <Text
-              style={{ fontSize: 22, fontFamily: "_semiBold", color: "#fff" }}
-            >
+              style={{ fontSize: 22, fontFamily: "_semiBold", color: "#fff" }}>
               Account
             </Text>
           </TouchableOpacity>
@@ -145,8 +210,7 @@ const ProfileScreen = () => {
                             <TouchableOpacity 
                                 onPress={() =>{
                                 // navigation goes here
-                                Alert.alert("You selected me")
-                               // navigation.navigate(index)
+                                navigation.navigate('ProfileDetails')
                                   }}>
                                 <View style={styles.row}>
                                   <Ionicons 
@@ -155,7 +219,7 @@ const ProfileScreen = () => {
                                     style={styles.rowIcon}
                                     size={22}
                                     />
-                                     <Text style={styles.rowLabel}>Profile</Text>
+                                     <Text style={styles.rowLabel}>Account Profile</Text>
                                         <View style={styles.rowSpacer} />
                                     
                                         {/* <Text style={styles.rowValue}>0000</Text> */}
@@ -174,8 +238,8 @@ const ProfileScreen = () => {
                             <TouchableOpacity 
                                 onPress={() =>{
                                 // navigation goes here
-                                Alert.alert("You selected me")
-                               // navigation.navigate(index)
+                               
+                               navigation.navigate('Referral')
                                   }}>
                                 <View style={styles.row}>
                                   <FontAwesome5 
@@ -186,8 +250,6 @@ const ProfileScreen = () => {
                                     />
                                      <Text style={styles.rowLabel}>Referrals</Text>
                                         <View style={styles.rowSpacer} />
-                                    
-                                        {/* <Text style={styles.rowValue}>0000</Text> */}
                                         <FeatherIcon name='chevron-right' color='#ababab'
                                         size={22} />
                                     
@@ -203,8 +265,7 @@ const ProfileScreen = () => {
                             <TouchableOpacity 
                                 onPress={() =>{
                                 // navigation goes here
-                                Alert.alert("You selected me")
-                               // navigation.navigate(index)
+                                navigation.navigate('Identification')
                                   }}>
                                 <View style={styles.row}>
                                   <MaterialCommunityIcons 
@@ -230,11 +291,11 @@ const ProfileScreen = () => {
                     
                       <View style={[styles.rowWrapper, {borderTopWidth:1} ]}>
                             <TouchableOpacity 
-                                onPress={() =>{
-                                // navigation goes here
-                                Alert.alert("You selected me")
-                               // navigation.navigate(index)
-                                  }}>
+                              //  onPress={() =>{
+                              //   setshowModal(!showModal);
+                              // }}
+                              onPress={() =>changeModalVisible(true)}
+                              >
                                 <View style={styles.row}>
                                   <FontAwesome5 
                                     color="#616161"
@@ -267,8 +328,7 @@ const ProfileScreen = () => {
                             <TouchableOpacity 
                                 onPress={() =>{
                                 // navigation goes here
-                                Alert.alert("You selected me")
-                               // navigation.navigate(index)
+                                navigation.navigate('ReportIssues')
                                   }}>
                                 <View style={styles.row}>
                                   <MaterialIcons 
@@ -294,11 +354,7 @@ const ProfileScreen = () => {
 
                       <View style={[styles.rowWrapper, {borderTopWidth:1} ]}>
                             <TouchableOpacity 
-                                onPress={() =>{
-                                // navigation goes here
-                                Alert.alert("You selected me")
-                               // navigation.navigate(index)
-                                  }}>
+                               onPress={() =>loanModalVisible(true)}>
                                 <View style={styles.row}>
                                   <MaterialIcons 
                                     color="#616161"
@@ -325,9 +381,8 @@ const ProfileScreen = () => {
                             <TouchableOpacity 
                                 onPress={() =>{
                                 // navigation goes here
-                                Alert.alert("You selected me")
-                               // navigation.navigate(index)
-                                  }}>
+                                handleAboutModal()
+                                 }}>
                                 <View style={styles.row}>
                                   <Ionicons 
                                     color="#616161"
@@ -354,8 +409,7 @@ const ProfileScreen = () => {
                             <TouchableOpacity 
                                 onPress={() =>{
                                 // navigation goes here
-                                Alert.alert("You selected me")
-                               // navigation.navigate(index)
+                                navigation.navigate('contact-us')
                                   }}>
                                 <View style={styles.row}>
                                   <Ionicons 
@@ -389,8 +443,7 @@ const ProfileScreen = () => {
                             <TouchableOpacity 
                                 onPress={() =>{
                                 // navigation goes here
-                                Alert.alert("You selected me")
-                               // navigation.navigate(index)
+                                deactiveAccount()
                                   }}>
                                 <View style={styles.row}>
                                   <MaterialIcons 
@@ -504,6 +557,41 @@ const ProfileScreen = () => {
 
       </ScrollView>
        
+
+
+          {/* Modal beneficially here */}
+            <Modal
+              transparent={true}
+              animationType="slide"
+              useNativeDriver={true}
+              visible={isModalVisible}
+              nRequestClose={() => changeModalVisible(false)}
+            >
+              <SimpleModal
+                changeModalVisible = {changeModalVisible}
+                setData={setData}
+              />
+          </Modal>
+          {/* Modal Loan here */}
+          <Modal
+              transparent={true}
+              animationType="slideInBig"
+              useNativeDriver={true}
+              visible={isLoanModalVisible}
+              nRequestClose={() => loanModalVisible(false)}
+            >
+              <LoanModal
+                loanModalVisible = {loanModalVisible}
+                setData={setData}
+              />
+          </Modal>
+
+          {/* About us modal */}
+        
+        
+          
+            
+
     </SafeAreaView>
     </View>
   );
@@ -512,6 +600,7 @@ const ProfileScreen = () => {
 const styles = StyleSheet.create({
   container: {
     paddingVertical: 24,
+    backgroundColor: '#F7F7F7',
   },
   section: {
     paddingTop: 12,
@@ -524,6 +613,16 @@ const styles = StyleSheet.create({
     borderColor: colors.secondaryColor1,
     alignItems: "center",
     justifyContent: "center",
+  },
+  textPopup:{
+    marginTop: 10,
+    fontWeight: 'bold'
+  },
+  modal:{
+    flex: 1,
+    alignItems: "center",
+    backgroundColor: "#F2688B",
+    padding: 5,
   },
   circleIconLeft: {
     borderRadius: 100,
@@ -582,8 +681,8 @@ const styles = StyleSheet.create({
     marginBottom: 6,
   },
   subtitle: {
-    fontSize: 15,
-    fontWeight: '500',
+    fontSize: 14,
+    fontFamily: '_regular',
     color: '#929292',
   },
   profile: {
@@ -659,6 +758,7 @@ const styles = StyleSheet.create({
     flexShrink: 1,
     flexBasis: 0,
   },
+
 });
 
 export default ProfileScreen;

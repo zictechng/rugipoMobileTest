@@ -6,6 +6,12 @@ import { createStackNavigator } from '@react-navigation/stack';
 import BottomTab from './bottomTabs';
 import GeneralRootScreen from './generalRootScreen';
 import ContactScreen from '../screens/contact';
+import LoginScreen from '../screens/loginScreen';
+import ProfileDetailsScreen from '../screens/profileDetails';
+import ReferralScreen from '../screens/referralScreen';
+import IdentificationScreen from '../screens/identificationScreen';
+import ReportScreen from '../screens/reportScreen';
+import ContactUsScreen from '../screens/contactScreen';
 
 // import other screens/page here
 
@@ -21,54 +27,28 @@ const MainRootNavigation = ({navigation}) =>{
     const [userData, setUserData]= useState({});
     const [userInfoData, setUserInfoData]= useState(null);
 
-     // get user information from local storage here
-
-      useEffect(() => {
-        (async()=>{
-          const savedUser = await AsyncStorage.getItem("USER_LOCAL_INFO");
-          const currentUser = JSON.parse(savedUser);
-          setUserData(currentUser);
-           //console.log('useEffect', currentUser)
-      })();
-      setUserInfoData(getDataInLocalStorage('USER_TOKEN'));  
-      }, []);
-      
+     // This will make scree slide from left to right / right to slide
+     const horizontalAnimation = {
+      gestureDirection: 'horizontal',
+      cardStyleInterpolator: ({ current, layouts }) => {
+        return {
+          cardStyle: {
+            transform: [
+              {
+                translateX: current.progress.interpolate({
+                  inputRange: [0, 1],
+                  outputRange: [layouts.screen.width, 0],
+                }),
+              },
+            ],
+          },
+        };
+      },
+    };
     return (
-        <Stack.Navigator headerMode='none'>
+        <Stack.Navigator headerMode='none' >
 
-        {/* {isLoading ? (
-        <Stack.Screen
-          name="CustomSplash"
-          component={CustomSplash}
-          options={{ headerShown: false }}
-        />
-      ) : !loginState && !isLoading ? (
-        <Stack.Screen 
-          name="GeneralRootScreen" 
-          headerMode='none'>
-          {() => <GeneralRootScreen />}
-        </Stack.Screen>
-      ) : (
-        loginState &&
-        !isLoading && (
-          <>
-            <Stack.Screen 
-                  name='BottomTab'
-                  headerMode='none'>
-                    {() => <BottomTab />}
-            </Stack.Screen>
-
-            <Stack.Screen 
-                  name='contact'
-                  component={ContactScreen}
-              >
-            </Stack.Screen>
-
-          </>
-        )
-      )}   */}
-      
-            {loginState == null || loginState == ''? (
+                {loginState === undefined || loginState === null? (
                    <Stack.Screen 
                    name="GeneralRootScreen" 
                    headerMode='none'>
@@ -77,14 +57,47 @@ const MainRootNavigation = ({navigation}) =>{
                   ) : (
                   <>
                   <Stack.Screen 
-                  name='BottomTab'
-                  headerMode='none'>
+                  screenOptions={{ presentation: 'modal' }}
+                  name='BottomTab'>
                     {() => <BottomTab />}
                   </Stack.Screen>
 
                   <Stack.Screen 
                   name='contact'
                   component={ContactScreen}
+                  >
+                  </Stack.Screen>
+                 
+                  <Stack.Screen 
+                  name='ProfileDetails'
+                  component={ProfileDetailsScreen}
+                  >
+                  </Stack.Screen>
+
+                  <Stack.Screen 
+                  name='Referral'
+                  component={ReferralScreen}>
+                  </Stack.Screen>
+
+                  <Stack.Screen 
+                  name='Identification'
+                  component={IdentificationScreen}>
+                  </Stack.Screen>
+
+                  <Stack.Screen 
+                  name='ReportIssues'
+                  component={ReportScreen}
+                  options={horizontalAnimation}>
+                  </Stack.Screen>
+
+                  <Stack.Screen 
+                  name='contact-us'
+                  component={ContactUsScreen}>
+                  </Stack.Screen>
+
+                  <Stack.Screen 
+                  name='Login'
+                  component={LoginScreen}
                   >
                   </Stack.Screen>
                   </>
