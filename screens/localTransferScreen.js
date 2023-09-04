@@ -8,12 +8,10 @@ import {
   Text,
   Image,
   TouchableOpacity,
-  Switch,
   StatusBar,
   TextInput, 
   Keyboard,
   ActivityIndicator,
-  Modal,
   Platform
 } from 'react-native';
 import { LinearGradient } from "expo-linear-gradient";
@@ -29,11 +27,8 @@ import { gs, colors } from "../styles";
 import { useNavigation } from '@react-navigation/native';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import * as Animatable from 'react-native-animatable'
-import DatePicker from 'react-native-modern-datepicker'
-import { getToday, getFormatedDate } from 'react-native-modern-datepicker';
-import { SelectList } from 'react-native-dropdown-select-list';
 
-const ContactUsScreen = () => {
+const LocalTransferScreen = () => {
   const navigation = useNavigation();
      // function to dismiss the keyboard when clicking out the input field
      dismissKeyboard = () => {
@@ -56,71 +51,7 @@ const [complainMessage, setComplainMessage] = useState({})
     const [isloginBtn, setIsLoginBtn] = useState(false);
     const [logBtnDisabled, setLogBtnDisabled] = useState(false);
 
-    const [selectedData, setSelectedData] = useState('');
-
-    // date implementation
-    const today = new Date();
-    const startDate = getFormatedDate(today.setDate(today.getDate() +1), 'DD/MM/YYYY')    
-    const [open, setOpen] = useState(false);
-    const [date, setDate] = useState('');
-    const [datePick, setDatePick] = useState(false);
-
-    const handleOnPress =() => {
-      setOpen(!open);
-      setDatePick(false);
-    }
-
-    const handleChange =(propDate) => {
-      setDate(propDate)
-      setDatePick(true);
-      //const displayDate = getFormatedDate(propDate, 'DD/MM/YYYY');
-      //console.log("New Date", displayDate) 
-      }
-      
-
-    // function for subject field
-    const textInputChange = (val) => {
-        if(val.trim().length >= 4){
-            setData({
-                ...data,
-                reportSubject: val,
-                check_subjectInputChange: false,
-            });
-        }else{
-            setData({
-                ...data,
-                reportSubject: val,
-                check_subjectInputChange: true,
-            });
-        }
-    }
-
-    // function for message input field
-    const textInputChangeMessage = (val) => {
-        if(val.trim().length >= 20){
-            setData({
-                ...data,
-                reportMessage: val,
-                check_messageInputChange: false,
-            });
-        }else{
-            setData({
-                ...data,
-                reportMessage: val,
-                check_messageInputChange: true,
-             });
-        }
-    }
-
-    const optionData = [
-        {key:'Debit', value:"Debit"},
-        {key:'Credit', value:"Credit"},
-        {key:'Loan', value:"Loan"},
-        {key:'Account Issue', value:"Account Issue"},
-        {key:'Login Issue', value:"Login Issue"},
-        {key:'Account Balance', value:"Account Balance"},
-        {key:'Other Issue', value:"Other Issue"},
-];
+   
     const sendMessage = () =>{
         setLogBtnDisabled(true)
         setIsLoginBtn(true)
@@ -129,7 +60,7 @@ const [complainMessage, setComplainMessage] = useState({})
 
   return (
     <SafeAreaView style={{ flex: 1, backgroundColor: colors.secondaryColor2}}>
-        <StatusBar backgroundColor={colors.secondaryColor2} style="light" />
+        <StatusBar backgroundColor={colors.secondaryColor2} barStyle="light-content" />
         <View style={{ flex: 1, backgroundColor: '#F7F7F7', }}>
 
          {/* header of the screen */}
@@ -148,7 +79,7 @@ const [complainMessage, setComplainMessage] = useState({})
           <TouchableOpacity style={styles.circleIconLeft1}>
             <Text
               style={{ fontSize: 22, fontFamily: "_semiBold", color: "#fff" }}>
-              Contact Us
+              Local Transfer
             </Text>
           </TouchableOpacity>
           <View style={styles.nameView}></View>
@@ -160,11 +91,9 @@ const [complainMessage, setComplainMessage] = useState({})
        
         <View style={styles.header}>
           {/* <Text style={styles.title}>Settings</Text> */}
-          <View style={{justifyContent: 'center', alignItems: 'center', marginBottom: 10}}>
-                        <Image source={require('../assets/customer-service.png')} style={{width:130, height:130,}}  />
-                    </View>
+          
           <Text style={styles.subtitle}>
-            How may we help you today? drop us a message.
+            You can now easily send money to your friends and family
           </Text>
                 
         </View>
@@ -176,50 +105,103 @@ const [complainMessage, setComplainMessage] = useState({})
             <View>
                     <View style={[styles.action, {borderBottomWidth:0, marginBottom: 30, marginRight: 20}]}>
                     {/* <Text style={[styles.text_footer, {marginTop: 8, marginRight: 8}]}>Reason</Text> */}
-                        <SelectList 
-                        data={optionData} 
-                        selected={setSelectedData}
-                        //onSelect={() => alert(selectedData)}
-                        setSelected={(val) => setSelectedData(val)} 
-                        boxStyles={{borderColor:'#aaa', borderRadius:5}}
-                        inputStyles={{fontFamily: '_semiBold', fontSize: 14, color:colors.textColor1}}
-                        dropdownTextStyles={{fontFamily:'_semiBold', fontSize:14, color:colors.textColor1}}
-                        placeholder='Select reason'
-                        maxHeight={200}
-                        />
-                    </View>
-                       {/* if reason is not selected show error here */}
+                    <View style={[styles.textAreaContainer, {marginBottom: 30}]} >
                 
-                {/* <Text style={[styles.text_footer, {marginTop: 20}]}>Message</Text> */}
-                <View style={styles.textAreaContainer} >
-                
-                    <View style={[styles.action, {borderBottomWidth: 0, marginRight: 10}]}>
-                        <TextInput 
-                        placeholder="Enter Message"
-                        style={styles.textInput}
-                        autoCapitalize="none"
-                        onChangeText={(val) => textInputChangeMessage(val)}
-                        multiline={true}
-                        numberOfLines={10}
-                        textAlignVertical="top"
-                        value={data.reportMessage}
-                        onEndEditing={(e) =>textInputChangeMessage(e.nativeEvent.text)}
-                        //onChangeText={(text) => setComplainMessage({text})}
-                        //value={complainMessage.text}
-                        />
+                        <View style={[styles.action, {borderBottomWidth: 0, marginRight: 10}]}>
+                            <TextInput 
+                            placeholder="Customer Bank Name"
+                            style={styles.textInput}
+                            autoCapitalize="none"
+                            onChangeText={(val) => (val)}
+                            value={data.reportMessage}
+                            onEndEditing={(e) => (e.nativeEvent.text)}
+                            //onChangeText={(text) => setComplainMessage({text})}
+                            //value={complainMessage.text}
+                            />
                         </View>
                     
-                </View>
-                {/* How error message here if message field is empty */}
-                { data.check_messageInputChange ?
-                    <Animatable.View animation="fadeInLeft" duration={500}>
-                    <Text style={styles.errorMsg}>Message should contain at least 10 characters long </Text>
-                    </Animatable.View> : null
-                        }
+                    </View>
+
+                    <View style={[styles.textAreaContainer, {marginBottom: 30}]} >
+                
+                        <View style={[styles.action, {borderBottomWidth: 0, marginRight: 10}]}>
+                            <TextInput 
+                            placeholder="Account Name"
+                            style={styles.textInput}
+                            autoCapitalize="none"
+                            onChangeText={(val) => (val)}
+                            value={data.reportMessage}
+                            onEndEditing={(e) => (e.nativeEvent.text)}
+                            //onChangeText={(text) => setComplainMessage({text})}
+                            //value={complainMessage.text}
+                            />
+                        </View>
                     
-                    <View style={styles.button}>
+                    </View>
+
+                    <View style={[styles.textAreaContainer, {marginBottom: 30}]} >
+                
+                        <View style={[styles.action, {borderBottomWidth: 0, marginRight: 10}]}>
+                            <TextInput 
+                            placeholder="Account Number"
+                            style={styles.textInput}
+                            autoCapitalize="none"
+                            onChangeText={(val) => (val)}
+                            value={data.reportMessage}
+                            onEndEditing={(e) => (e.nativeEvent.text)}
+                            //onChangeText={(text) => setComplainMessage({text})}
+                            //value={complainMessage.text}
+                            />
+                        </View>
+                    
+                    </View>
+
+                    <View style={[styles.textAreaContainer, {marginBottom: 30}]} >
+                
+                        <View style={[styles.action, {borderBottomWidth: 0, marginRight: 10, flexDirection: 'row'}]}>
+                            <TextInput 
+                            placeholder="Amount"
+                            style={styles.textInput}
+                            autoCapitalize="none"
+                            onChangeText={(val) => (val)}
+                            value={data.reportMessage}
+                            onEndEditing={(e) => (e.nativeEvent.text)}
+                            //onChangeText={(text) => setComplainMessage({text})}
+                            //value={complainMessage.text}
+                            />
+                           
+                           <Text style={{color: '#aaa', position:'relative'}}> {'\u20A6'}</Text>
+                        </View>
+                    
+                    </View>
+
+                    <View style={styles.textAreaContainer} >
+                
+                        <View style={[styles.action, {borderBottomWidth: 0, marginRight: 10}]}>
+                            <TextInput 
+                            placeholder="Bank Address"
+                            style={styles.textInput}
+                            autoCapitalize="none"
+                            multiline={true}
+                            numberOfLines={5}
+                            textAlignVertical="top"
+                            onChangeText={(val) => (val)}
+                            value={data.reportMessage}
+                            onEndEditing={(e) => (e.nativeEvent.text)}
+                            //onChangeText={(text) => setComplainMessage({text})}
+                            //value={complainMessage.text}
+                            />
+                        </View>
+                     </View>
+                     {/* Show this if user did not enter correct details */}
+                     {/* <Animatable.View animation="fadeInLeft" duration={500}>
+                    <Text style={styles.errorMsg}>Message should contain at least 10 characters long </Text>
+                    </Animatable.View> */}
+                 </View>
+                     
+                    <View style={[styles.button, {marginTop: 20}]}>
                         <TouchableOpacity  style={[styles.signIn, logBtnDisabled? styles.signInDisable: '']}
-                            onPress={() =>{sendMessage()}}
+                            onPress={() => navigation.navigate('confirmTransfer')}
                             disabled={logBtnDisabled}
                         > 
                         <LinearGradient
@@ -228,31 +210,16 @@ const [complainMessage, setComplainMessage] = useState({})
                         >
                             <Text style={[styles.textSign,{
                                 color:'#fff'
-                            }]}>{isloginBtn ? '' : "Report"} </Text>
+                            }]}>{isloginBtn ? '' : "Transfer"} </Text>
                             {isloginBtn && <ActivityIndicator color='#fff' size={25}/>}
                         </LinearGradient>
-                        </TouchableOpacity>
-
-                        
+                        </TouchableOpacity>   
                     </View>
-            
             </View>
                          
         </Animatable.View>
 
-                {/* <View style={{ justifyContent: "center", alignItems: "center" }}>
-                    <Text style={{ color:'#aaa' }}>Your referrals details will show here </Text>
-                    <View
-                      style={{ justifyContent: "center", alignItems: "center" }}>
-                      <Ionicons
-                        name="file-tray-outline"
-                        size={30}
-                        color="#aaa"
-                        marginLeft={8}/>
-                    </View>
-                </View> */}
-
-      </ScrollView>
+        </ScrollView>
        </View>
     </SafeAreaView>
   );
@@ -324,16 +291,11 @@ const styles = StyleSheet.create({
     marginRight: 12,
   },
 
-  text_footer: {
-    color: colors.textColor1,
-    fontSize: 18,
-    fontFamily: '_semiBold',
-},
 action: {
     marginTop: 20,
     borderBottomWidth: 0.6,
     borderBottomColor: '#aaa',
-    paddingBottom: 5
+    paddingBottom: 5,
 },
 actionError: {
     flexDirection: 'row',
@@ -360,11 +322,6 @@ button: {
     marginBottom: 20,
     marginRight: 20,
 },
-bgImage:{
-    position: 'absolute',
-    bottom: -6,
-    right: 20,
-   },
 
 signIn: {
     width: '100%',
@@ -389,13 +346,10 @@ textSign: {
 },
 textAreaContainer: {
     borderColor: '#aaa',
-    borderWidth: 0.5,
-    marginRight: 20
+    borderWidth: 0.9,
+    marginRight: 20,
+    borderRadius: 10,
   },
-  textArea: {
-    height: 150,
-    justifyContent: "flex-start"
-  }
 });
 
-export default ContactUsScreen;
+export default LocalTransferScreen;

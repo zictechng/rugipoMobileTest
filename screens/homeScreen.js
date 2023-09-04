@@ -6,7 +6,7 @@ import {
   import { widthPercentageToDP as wp, 
     heightPercentageToDP as hp } from 'react-native-responsive-screen';
 import { SafeAreaView, View, Text, StyleSheet, Image, Alert, Modal, ActivityIndicator,
-  TextInput, TouchableOpacity, StatusBar, Dimensions, Pressable, ImageBackground, FlatList} from 'react-native';
+  TextInput, TouchableOpacity, StatusBar, Dimensions, Pressable, ImageBackground, FlatList, Platform} from 'react-native';
 import { UserContext } from '../components/UserContext';
 import { Ionicons, Entypo, SimpleLineIcons, FontAwesome, FontAwesome5} from '@expo/vector-icons'
 import FeatherIcon from 'react-native-vector-icons/Feather'
@@ -136,16 +136,15 @@ const props = {
 };
 
   return (
-    <SafeAreaView style={{ flex: 1, backgroundColor: '#f6f6f6', }}>
-        <StatusBar
-      style="light" translucent={true} backgroundColor='transparent'animated={true} />
+    <SafeAreaView style={{ flex: 1, backgroundColor: colors.secondaryColor2}}>
+        <StatusBar backgroundColor={colors.secondaryColor2} style="light" />
+      <View style={{ flex: 1, backgroundColor: '#F7F7F7', }}>
 
-                {/* header of the screen */}
-            <LinearGradient colors={[colors.secondaryColor2, colors.secondaryColor2]} start={[0,0]} end={[1,1]}
-            style={{ elevation: 30, shadowColor: '#930D2F'}}>
+      <LinearGradient colors={[colors.secondaryColor2, colors.secondaryColor2]} start={[0,0]} end={[1,1]}
+            style={{shadowColor: '#930D2F'}}>
               
 
-                <View style={[gs.rowBetween, {marginTop: 25, marginHorizontal: 10}]}>
+                <View style={[gs.rowBetween, {marginTop: Platform.OS === "ios" ? 10 : 26, marginHorizontal: 10}]}>
                    {/* <View style = {styles.circleIconLeft}>
                         
                     </View> */}
@@ -238,8 +237,8 @@ const props = {
                           
                           <View style={{marginHorizontal: 10, marginTop: 10, marginBottom: 10}}>
                               <View style={{flexDirection: 'column', alignItems:'center', justifyContent:'center', marginVertical: 5}}>
-                              <Text style={{fontFamily:'_regular', color:'#aaa', fontSize:15, marginTop: 10, marginHorizontal: 15}}>
-                                Loan re-payment indicator
+                              <Text style={{fontFamily:'_regular', color:'#aaa', fontSize:15, marginTop: 10, marginHorizontal: 15, marginBottom: 10}}>
+                                Loan payment indicator
                               </Text>
                                 <CircularProgress
                                   value={25}
@@ -261,10 +260,11 @@ const props = {
                     
                   {/* Recent transaction */}
 
-                  <View style={{flexDirection: "row", justifyContent: 'space-between', alignItems:'center', marginHorizontal: 10, marginTop: 20}}>
+                  <View style={{flexDirection: "row", justifyContent: 'space-between', alignItems:'center', marginHorizontal: 15, marginTop: 20, marginBottom: 10}}>
                   {recentTranData.length ? <>
                     
-                    <Text style={{color:"#aaa", fontSize: 15, fontFamily:'_regular'}}>Recent transaction</Text>
+                    <Text style={{color:"#aaa", fontSize: 15, fontFamily:'_regular'}} 
+                    onPress={() => navigation.navigate('detailsPage')}>Recent transaction</Text>
                     <TouchableOpacity
                       onPress={() => navigation.navigate('History')}>
                     <Text style={{color:"#000", fontSize: 15, fontFamily: '_regular'}}>View </Text>
@@ -423,7 +423,8 @@ const props = {
                       openDuration={250}
                       dragFromTopOnly={true}
                       closeOnDragDown={true}
-                      animationType="fade"  
+                      animationType="fade"
+                      theme='ios'  
                     >
                         <View style={styles.sheetContent}>
                           <FontAwesome5 name="hand-holding-usd" color="#A78808" size={48} style={{alignSelf:'center'}}></FontAwesome5>
@@ -490,6 +491,9 @@ const props = {
                         </View>
                     </RBSheet>
                  */}
+      </View>
+                {/* header of the screen */}
+            
                 
                     
      </SafeAreaView>
@@ -754,7 +758,7 @@ const styles = StyleSheet.create({
         flexDirection:'row',
         borderWidth:1, borderColor:'#ddd',
         borderRadius:15, justifyContent:'space-between',
-        marginHorizontal: 10,
+        marginHorizontal: 15,
         backgroundColor: "#fff",
         paddingRight:10, 
         marginBottom:10,

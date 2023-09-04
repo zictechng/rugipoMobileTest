@@ -3,7 +3,7 @@ import React, {useRef, useState, useContext, useEffect} from 'react';
 import OTPInputView from '@twotalltotems/react-native-otp-input';
 
 import { View, Text, TextInput, StyleSheet, KeyboardAvoidingView, Platform, TouchableOpacity, Alert, ScrollView,
-    ActivityIndicator } from 'react-native';
+    ActivityIndicator, StatusBar } from 'react-native';
 
 import { useNavigation } from '@react-navigation/native';
 import { UserContext } from '../components/UserContext';
@@ -224,7 +224,7 @@ import Loader from '../components/Loader';
       
   return (
     <SafeAreaView style={{flex: 1, backgroundColor: "#F7F7F7"}}>
-
+        <StatusBar backgroundColor={colors.secondaryColor2} barStyle="dark-content" />
             {/* <View style={styles.titleBar}>
                 <Icons name="arrow-circle-left" size={24} color="#52575D"></Icons>
                 <Icons name="ellipsis-v" size={24} color="#52575D"></Icons>

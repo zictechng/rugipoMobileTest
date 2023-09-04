@@ -3,9 +3,11 @@ import { StyleSheet, View, Text } from 'react-native';
 
 const SendMoneyScreen = () => {
   return (
-    <View>
-      <Text>Send Fund Screen</Text>
-     </View>
+    <View style={{ flex: 1, backgroundColor: colors.secondaryColor2}}>
+        <StatusBar backgroundColor={colors.secondaryColor2} style="light" />
+        <View style={{ flex: 1, backgroundColor: '#F7F7F7', }}>
+        </View>
+    </View>
   );
 }
 

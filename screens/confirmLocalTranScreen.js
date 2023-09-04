@@ -28,11 +28,14 @@ import { gs, colors } from "../styles";
 import { useNavigation } from '@react-navigation/native';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 
-const ProfileDetailsScreen = () => {
+const ConfirmLocalTransferScreen = () => {
   const navigation = useNavigation();
 
 
   const [loginState, setLoginState, isLoading, setIsLoading, myDetails, setMyDetails, myMethod ] = useContext(UserContext);
+
+    const [isloginBtn, setIsLoginBtn] = useState(false);
+    const [logBtnDisabled, setLogBtnDisabled] = useState(false);
 
   return (
        <View style={{flex: 1}}>
@@ -59,7 +62,7 @@ const ProfileDetailsScreen = () => {
             <Text
               style={{ fontSize: 22, fontFamily: "_semiBold", color: "#fff" }}
             >
-              Profile
+              Confirm Transfer
             </Text>
           </TouchableOpacity>
           <View style={styles.nameView}></View>
@@ -71,40 +74,16 @@ const ProfileDetailsScreen = () => {
        
       <ScrollView contentContainerStyle={styles.container}>
        
-        <View style={styles.profile}>
-          <Image
-            alt=""
-            source={{
-              uri: 'https://images.unsplash.com/photo-1633332755192-727a05c4013d?ixlib=rb-1.2.1&ixid=MnwxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8&auto=format&fit=facearea&facepad=2.5&w=256&h=256&q=80',
-            }}
-            style={styles.profileAvatar}
-          />
-
-          <Text style={styles.profileName}>John Doe</Text>
-
-          <Text style={styles.profileEmail}>tag ID: </Text> 
-          <TouchableOpacity
-            onPress={() => {
-              // handle onPress
-            }}>
-            <View style={styles.profileAction}>
-              <Text style={styles.profileActionText}>Edit Profile</Text>
-
-              <FeatherIcon color="#fff" name="edit" size={16} />
-            </View>
-          </TouchableOpacity>
-        </View>
-
         <View style={styles.section}>
                 <View style={styles.sectionHeader}>
-                    <Text style={styles.sectionHeaderText}>Personal information</Text>
+                    <Text style={styles.sectionHeaderText}>Confirm your transfer transaction details</Text>
                 </View>
 
                 <View style={[styles.profileData, {backgroundColor:'#fffaff'}]}>
                     <View style={[styles.rowWrapperProfile, {borderTopWidth:0, } ]}>
                             <View>
                                 <View style={[styles.row, {marginTop: 6}]}>
-                                    <Text style={[styles.rowLabel, {color:'#cccac6'}]}>Account Full Name</Text>
+                                    <Text style={[styles.rowLabel, {color:'#cccac6'}]}>Transfer Type</Text>
                                      <Text style={[styles.rowLabel, {color:'#777'}]}>Profile</Text>
                                     <View style={[styles.rowSpacer]} />
                             </View>       
@@ -113,7 +92,7 @@ const ProfileDetailsScreen = () => {
                       <View style={[styles.rowWrapperProfile, {borderTopWidth:1, marginTop: 10} ]}>
                             <View>
                                 <View style={[styles.row, {marginTop: 10}]}>
-                                    <Text style={[styles.rowLabel, {color:'#cccac6'}]}>Gender</Text>
+                                    <Text style={[styles.rowLabel, {color:'#cccac6'}]}>Recipient Bank</Text>
                                      <Text style={[styles.rowLabel, {color:'#777'}]}>Profile</Text>
                                     <View style={styles.rowSpacer} />
                             </View>       
@@ -123,7 +102,7 @@ const ProfileDetailsScreen = () => {
                       <View style={[styles.rowWrapperProfile, {borderTopWidth:1, marginTop: 10} ]}>
                             <View>
                                 <View style={[styles.row, {marginTop: 10}]}>
-                                    <Text style={[styles.rowLabel, {color:'#cccac6'}]}>Phone Number</Text>
+                                    <Text style={[styles.rowLabel, {color:'#cccac6'}]}>Source Account</Text>
                                      <Text style={[styles.rowLabel, {color:'#777'}]}>Profile</Text>
                                     <View style={styles.rowSpacer} />
                             </View>       
@@ -133,7 +112,7 @@ const ProfileDetailsScreen = () => {
                       <View style={[styles.rowWrapperProfile, {borderTopWidth:1, marginTop: 10} ]}>
                             <View>
                                 <View style={[styles.row, {marginTop: 10}]}>
-                                    <Text style={[styles.rowLabel, {color:'#cccac6'}]}>Email</Text>
+                                    <Text style={[styles.rowLabel, {color:'#cccac6'}]}>Recipient Account Number</Text>
                                      <Text style={[styles.rowLabel, {color:'#777'}]}>Profile</Text>
                                     <View style={styles.rowSpacer} />
                             </View>       
@@ -143,7 +122,7 @@ const ProfileDetailsScreen = () => {
                       <View style={[styles.rowWrapperProfile, {borderTopWidth:1, marginTop: 10} ]}>
                             <View>
                                 <View style={[styles.row, {marginTop: 10}]}>
-                                    <Text style={[styles.rowLabel, {color:'#cccac6'}]}>Date of Birth</Text>
+                                    <Text style={[styles.rowLabel, {color:'#cccac6'}]}>Recipient Name</Text>
                                      <Text style={[styles.rowLabel, {color:'#777'}]}>Profile</Text>
                                     <View style={styles.rowSpacer} />
                             </View>       
@@ -153,109 +132,52 @@ const ProfileDetailsScreen = () => {
                       <View style={[styles.rowWrapperProfile, {borderTopWidth:1, marginTop: 10} ]}>
                             <View>
                                 <View style={[styles.row, {marginTop: 10}]}>
-                                    <Text style={[styles.rowLabel, {color:'#cccac6'}]}>State</Text>
+                                    <Text style={[styles.rowLabel, {color:'#cccac6'}]}>Transfer Amount</Text>
                                      <Text style={[styles.rowLabel, {color:'#777'}]}>Profile</Text>
                                     <View style={styles.rowSpacer} />
                             </View>       
                             </View>
                       </View>
 
-                      <View style={[styles.rowWrapperProfile, {borderTopWidth:1, marginTop: 10} ]}>
+                      <View style={[styles.rowWrapperProfile, {borderTopWidth:1, marginTop: 10, marginBottom: 10} ]}>
                             <View>
                                 <View style={[styles.row, {marginTop: 10}]}>
-                                    <Text style={[styles.rowLabel, {color:'#cccac6'}]}>City</Text>
+                                    <Text style={[styles.rowLabel, {color:'#cccac6'}]}>Transaction Charges</Text>
                                      <Text style={[styles.rowLabel, {color:'#777'}]}>Profile</Text>
                                     <View style={styles.rowSpacer} />
                             </View>       
                             </View>
                       </View>
-
-                      <View style={[styles.rowWrapperProfile, {borderTopWidth:1, marginTop: 10} ]}>
-                            <View>
-                                <View style={[styles.row, {marginTop: 10}]}>
-                                    <Text style={[styles.rowLabel, {color:'#cccac6'}]}>Country</Text>
-                                     <Text style={[styles.rowLabel, {color:'#777'}]}>Profile</Text>
-                                    <View style={styles.rowSpacer} />
-                            </View>       
-                            </View>
-                      </View>
-
-                      <View style={[styles.rowWrapperProfile, {borderTopWidth:1, marginTop: 10} ]}>
-                            <View>
-                                <View style={[styles.row, {marginTop: 10}]}>
-                                    <Text style={[styles.rowLabel, {color:'#cccac6'}]}>Contact Address</Text>
-                                     <Text style={[styles.rowLabel, {color:'#777'}]}>Lorem ipsum dolor sit amet, consectetuer adipiscing elit. Aenean commodo ligula eget dolor. Aenean massa. Cum sociis natoque penatibus et magnis dis parturient montes, nascetur ridiculus mus. Donec quam felis, ultricies nec, pellentesque eu, pretium quis, sem. Nulla consequat massa quis enim. Donec pede justo, fringilla vel, aliquet nec, vulputate</Text>
-                                    <View style={styles.rowSpacer} />
-                            </View>       
-                            </View>
-                      </View>
-
                 </View>
 
                 <View style={styles.sectionHeader}>
-                    <Text style={styles.sectionHeaderText}>Account information</Text>
+                    <Text style={[styles.sectionHeaderText, {color: colors.secondaryColor2}]}>* Transfer limit is always maintain by the bank every 24 hours</Text>
                 </View>
 
-                <View style={styles.profileData}>
-                    <View style={[styles.rowWrapper, {borderTopWidth:0} ]}>
-                            <View>
-                                <View style={[styles.row, {marginTop: 6}]}>
-                                    <Text style={[styles.rowLabel, {color:'#cccac6'}]}>Account Number</Text>
-                                     <Text style={[styles.rowLabel, {color:'#fff'}]}>Profile</Text>
-                                    <View style={styles.rowSpacer} />
-                            </View>       
-                            </View>
-                      </View>
-                      <View style={[styles.rowWrapper, {borderTopWidth:1, marginTop: 10} ]}>
-                            <View>
-                                <View style={[styles.row, {marginTop: 10}]}>
-                                    <Text style={[styles.rowLabel, {color:'#cccac6'}]}>Account Type</Text>
-                                     <Text style={[styles.rowLabel, {color:'#fff'}]}>Profile</Text>
-                                    <View style={styles.rowSpacer} />
-                            </View>       
-                            </View>
-                      </View>
+                <View style={styles.button}>
+                        <TouchableOpacity  style={[styles.signIn, logBtnDisabled? styles.signInDisable: '']}
+                            onPress={() => navigation.navigate('confirmTransfer')}
+                            disabled={logBtnDisabled}> 
+                        <LinearGradient
+                        colors={[colors.secondaryColor1, colors.secondaryColor1]}
+                        style={styles.signIn}>
+                            <Text style={[styles.textSign,{
+                                color:'#fff'
+                            }]}>{isloginBtn ? '' : "Send"} </Text>
+                            {isloginBtn && <ActivityIndicator color='#fff' size={25}/>}
+                        </LinearGradient>
+                        </TouchableOpacity>   
+                </View>
 
-                      <View style={[styles.rowWrapper, {borderTopWidth:1, marginTop: 10} ]}>
-                            <View>
-                                <View style={[styles.row, {marginTop: 10}]}>
-                                    <Text style={[styles.rowLabel, {color:'#cccac6'}]}>Account Status</Text>
-                                     <Text style={[styles.rowLabel, {color:'#fff'}]}>Profile</Text>
-                                    <View style={styles.rowSpacer} />
-                            </View>       
-                            </View>
-                      </View>
+                <View style={[styles.button, {marginTop: 10}]}>
+                        <TouchableOpacity  style={[styles.signIn,{backgroundColor:'#aaa'}]}
+                            onPress={() => navigation.navigate('transferSuccessful')}> 
+                        <Text style={[styles.textSign,{
+                                color:'#fff'
+                            }]}> Cancel </Text>
+                        </TouchableOpacity>   
+                </View>
 
-                      <View style={[styles.rowWrapper, {borderTopWidth:1, marginTop: 10} ]}>
-                            <View>
-                                <View style={[styles.row, {marginTop: 10}]}>
-                                    <Text style={[styles.rowLabel, {color:'#cccac6'}]}>Account Username</Text>
-                                     <Text style={[styles.rowLabel, {color:'#fff'}]}>Profile</Text>
-                                    <View style={styles.rowSpacer} />
-                            </View>       
-                            </View>
-                      </View>
-
-                      <View style={[styles.rowWrapper, {borderTopWidth:1, marginTop: 10} ]}>
-                            <View>
-                                <View style={[styles.row, {marginTop: 10}]}>
-                                    <Text style={[styles.rowLabel, {color:'#cccac6'}]}>Account PIN</Text>
-                                     <Text style={[styles.rowLabel, {color:'#fff'}]}>Profile</Text>
-                                    <View style={styles.rowSpacer} />
-                            </View>       
-                            </View>
-                      </View>
-
-                      <View style={[styles.rowWrapper, {borderTopWidth:1, marginTop: 10, marginBottom: 6} ]}>
-                            <View>
-                                <View style={[styles.row, {marginTop: 10}]}>
-                                    <Text style={[styles.rowLabel, {color:'#cccac6'}]}>Currency Type</Text>
-                                     <Text style={[styles.rowLabel, {color:'#fff'}]}>Profile</Text>
-                                    <View style={styles.rowSpacer} />
-                            </View>       
-                            </View>
-                      </View>      
-                </View>        
           </View>
 
       </ScrollView>
@@ -307,6 +229,34 @@ const styles = StyleSheet.create({
     backgroundColor: colors.secondaryColor1,
     borderRadius: 12,
   },
+  button: {
+    alignItems: 'center',
+    marginTop: 30,
+    marginBottom: 20,
+    marginHorizontal: 20
+},
+
+signIn: {
+    width: '100%',
+    height: 50,
+    justifyContent: 'center',
+    alignItems: 'center',
+    borderRadius: 10,
+    flexDirection: 'row',
+},
+signInDisable: {
+    width: '100%',
+    height: 50,
+    justifyContent: 'center',
+    alignItems: 'center',
+    borderRadius: 10,
+    flexDirection: 'row',
+    opacity: 0.7
+},
+textSign: {
+    fontSize: 18,
+    fontFamily: '_semiBold',
+},
   profileActionText: {
     marginRight: 8,
     fontSize: 15,
@@ -416,4 +366,4 @@ const styles = StyleSheet.create({
   },
 });
 
-export default ProfileDetailsScreen;
+export default ConfirmLocalTransferScreen;

@@ -1,22 +1,25 @@
 import React, {useContext, useEffect, useRef, useState} from 'react';
-import { ActivityIndicator, StyleSheet, Text, View, Image, TouchableOpacity } from 'react-native';
+import { ActivityIndicator, StyleSheet, Text, View, Image, TouchableOpacity, Modal } from 'react-native';
 import { UserContext } from '../components/UserContext';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { getDataInLocalStorage } from '../components/localData';
 import { createBottomTabNavigator } from '@react-navigation/bottom-tabs';
 import { createStackNavigator } from '@react-navigation/stack';
 import Ionicons from '@expo/vector-icons/Ionicons';
-import ActionSheet from '@alessiocancian/react-native-actionsheet';
+import { MaterialIcons, Entypo, SimpleLineIcons, FontAwesome, FontAwesome5, FontAwesome6} from '@expo/vector-icons'
+//import ActionSheet from '@alessiocancian/react-native-actionsheet';
 import { useNavigation } from '@react-navigation/native';
 import { gs, colors } from "../styles";
+import { useActionSheet } from '@expo/react-native-action-sheet';
 // screen imports goes here
 import HomeScreen from '../screens/homeScreen';
 import HistoryScreen from '../screens/historyScreen';
 import ProfileScreen from '../screens/profileScreen';
 import AccountScreen from '../screens/accountScreen';
 import SendMoneyScreen from '../screens/sendMoneyScreen';
-import ContactScreen from '../screens/contact';
 import CustomSplash from '../screens/customSplash';
+import { Alert } from 'react-native';
+import { InterBankModal } from '../components/interBankModal';
 
 const Tab = createBottomTabNavigator();
 const Stack = createStackNavigator();
@@ -48,11 +51,84 @@ const BottomTab = () => {
     const [loginState, setLoginState, isLoading, setIsLoading, myDetails, setMyDetails] = useContext(UserContext);
     const [userData, setUserData]= useState({});
 
-    let actionSheet = useRef();
+    const { showActionSheetWithOptions } = useActionSheet();
    
    var optionArray = [
     'Wire Transfer', 'Inter-Bank Transfer', 'Local Transfer', 'cancel', 
    ];
+
+   let actionSheet = useRef();
+  var optionArray = [ 'Local Transfer', 'Wire Transfer', 'Inter-Bank Transfer', 'Cancel'];
+
+  const [isLoanModalVisible, setisLoanModalVisible] = useState(false);
+
+
+  const changeModalVisible = (bool) =>{
+    setisModalVisible(bool);
+    
+  }
+
+
+  const loanModalVisible = (bool) =>{
+    setisLoanModalVisible(bool);
+
+  }
+
+  const setData = (data) =>{
+    setchooseData(data);
+  
+    };
+ 
+
+  const showActionSheet = () => {
+    //To show the Bottom ActionSheet
+    actionSheet.current.show();
+  };
+  
+      const onPress = () => {
+        const options = optionArray;
+       
+        //const destructiveButtonIndex = 0;
+        const cancelButtonIndex = 3;
+        
+        showActionSheetWithOptions({
+        options,
+        cancelButtonIndex,
+        //destructiveButtonIndex,
+        title:'Transfer Type',
+        message:'Choose any of the option below to get started with funds transfer.',
+        tintColor: colors.blackColor1,
+        showSeparators: true,
+        messageTextStyle: {fontFamily:'_regular',fontSize: 15},
+        titleTextStyle: {color: '#777', fontSize:18, fontFamily:'_semiBold', alignItems:'center', justifyContent:'center'},
+        icons:[<FontAwesome name="exchange" color="#aaa" size={24} ></FontAwesome>,
+        <FontAwesome5 name="wind" color="#aaa" size={24} ></FontAwesome5>,
+        <FontAwesome name="bank" color="#aaa" size={24} ></FontAwesome>,
+        <FontAwesome name="close" color={colors.secondaryColor1} size={24} ></FontAwesome>]
+        }, 
+            (selectedIndex) => {
+                if(selectedIndex === 0) {
+                    navigation.navigate('localTransfer', {
+                        //data: someData,
+                        withAnimation: true,
+                        animationType: 'slide',
+                    });
+                  }
+
+                  if(selectedIndex === 1) {
+                    navigation.navigate('wireTransfer', {
+                        //data: someData,
+                        withAnimation: true,
+                        
+                    });
+                  }
+
+                  if(selectedIndex === 2) {
+                    loanModalVisible(true);
+                  }
+            console.log('You selected ' + selectedIndex);
+            });
+        }
 
     // get user information from local storage here
     {loginState ?  
@@ -73,10 +149,6 @@ const BottomTab = () => {
         
       }, []) : null}
  
-
-  const showActionSheet = () => {
-    actionSheet.current.show();
-  };
 
   if(isLoading){
     return <CustomSplash />
@@ -184,7 +256,7 @@ const BottomTab = () => {
                     listeners={({}) =>({
                         tabPress: event => {
                             event.preventDefault();
-                            showActionSheet()
+                            onPress()
                         }
                     })}
                     // this will call a new page to slide up and display
@@ -250,24 +322,18 @@ const BottomTab = () => {
             }}/>
              
         </Tab.Navigator>
-        <ActionSheet
-            ref={actionSheet}
-            tintColor='#777'
-            styles={styles}
-            // Title of the Bottom Sheet
-            title={<Text style={{color: '#777', fontSize:18, fontFamily:'_semiBold', alignItems:"center"}}>Transfer Type </Text>}
-            message={<Text style={{color: '#aaa', fontSize:13, fontFamily:'_regular'}}>Choose any of the option below to get started with funds transfer, thank you.</Text>}
-            // Options Array to show in bottom sheet
-            options={optionArray}
-            //theme='ios'
-            cancelButtonIndex={3}
-            destructiveButtonIndex={3}
-            onPress={(index) => {
-                console.log('Press', index)
-            // Clicking on the option will give you alert
-            //alert(optionArray[index]);
-            }}
-        />
+        
+        
+                    <Modal
+                        transparent={true}
+                        animationType="slideInBig"
+                        useNativeDriver={true}
+                        visible={isLoanModalVisible}
+                        nRequestClose={() => loanModalVisible(false)}>
+                        <InterBankModal
+                            loanModalVisible = {loanModalVisible}
+                            setData={setData}/>
+                    </Modal>
     </>
     
   );
@@ -283,6 +349,9 @@ const styles = StyleSheet.create({
         shadowOpacity: 0.25,
         shadowRadius: 3.5,
         elevation: 5,
+    },
+    messageStyle: {
+        color: '#aaa', fontSize:13, fontFamily:'_regular'
     }
 })
 

@@ -15,6 +15,7 @@ import {
   FlatList,
   TouchableOpacity,
   SafeAreaView,
+  Platform
 } from "react-native";
 import { LinearGradient } from "expo-linear-gradient";
 import moment from "moment";
@@ -215,9 +216,9 @@ const AccountScreen = ({ navigation }) => {
   );
 
   return (
-    <SafeAreaView style={{ flex: 1, backgroundColor: "#F7F7F7" }}>
-      <StatusBar
-        style="light" translucent={true} backgroundColor='transparent'animated={true} />
+  <SafeAreaView style={{ flex: 1, backgroundColor: colors.secondaryColor2}}>
+    <StatusBar backgroundColor={colors.secondaryColor2} style="light" />
+      <View style={{ flex: 1, backgroundColor: '#F7F7F7', }}>
 
       {/* header of the screen */}
       <LinearGradient
@@ -226,7 +227,7 @@ const AccountScreen = ({ navigation }) => {
         end={[1, 1]}
         style={{ elevation: 30, shadowColor: '#930D2F'}}
       >
-        <View style={[gs.rowBetween, { marginTop: 18, marginHorizontal: 10, justifyContent: 'center' }]}>
+        <View style={[gs.rowBetween, { marginTop: Platform.OS === "ios" ? 18 : 30 , marginHorizontal: 10, justifyContent: 'center' }]}>
          
           <TouchableOpacity style={styles.circleIconLeft1}>
             <Text
@@ -326,6 +327,7 @@ const AccountScreen = ({ navigation }) => {
             />
           </View>
         </View>
+      </View>
       </View>
     </SafeAreaView>
   );

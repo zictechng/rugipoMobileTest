@@ -11,22 +11,16 @@ import {
   Switch,
   StatusBar, 
   Modal,
-  Dimensions,
-  Pressable
+  Platform,
+  ActivityIndicator
 } from 'react-native';
-import { ALERT_TYPE, Dialog, Toast } from 'react-native-alert-notification';
 import { LinearGradient } from "expo-linear-gradient";
-import moment from "moment";
 import { UserContext } from "../components/UserContext";
 import FeatherIcon from 'react-native-vector-icons/Feather';
 import { SimpleModal } from '../components/SimpleModal';
 import { LoanModal } from '../components/loanModal';
-import Dialog2 from "react-native-dialog";
 import {
   Ionicons,
-  Entypo,
-  SimpleLineIcons,
-  FontAwesome,
   FontAwesome5,
   MaterialCommunityIcons,
   MaterialIcons
@@ -34,8 +28,6 @@ import {
 import { gs, colors } from "../styles";
 import { useNavigation } from '@react-navigation/native';
 import AsyncStorage from '@react-native-async-storage/async-storage';
-import AwesomeAlert from 'react-native-awesome-alerts';
-
 
 const ProfileScreen = () => {
 const navigation = useNavigation();
@@ -48,7 +40,7 @@ const navigation = useNavigation();
   const [chooseData, setchooseData] = useState();
 
   const [showAboutModal, setshowAboutModal] = useState(false);
-  const [showIsAboutModal, setshowIsAboutModal] = useState(false);
+  const [logoutLoading, setLogoutLoading] = useState(false);
 
   const changeModalVisible = (bool) =>{
     setisModalVisible(bool);
@@ -65,8 +57,10 @@ const navigation = useNavigation();
     setchooseData(data);
     setshowAboutModal(false);
     };
+
   const logout = async() =>{
     setTimeout(async() =>{
+      setLogoutLoading(true);
     try {
           const res = await AsyncStorage.removeItem('USER_TOKEN');
          
@@ -80,7 +74,11 @@ const navigation = useNavigation();
        } catch (error) {
         console.error('Error clearing app data.');
       }
+      finally{
+      setLogoutLoading(false);
+      }
     }, 1000)
+  
   }
 
  
@@ -136,12 +134,44 @@ const navigation = useNavigation();
         // })
       )
     }
+
+    
+    const requestLogout = () =>{
+      return (
+        Alert.alert(
+          title='Caution !',
+          message='Are you sure you want to logout?',
+          [
+            {
+              text: 'No',
+              onPress: () => console.log('Cancel Pressed'),
+              style: 'cancel',
+            },
+            {text: 'Yes', onPress: () => logout(),
+            style: 'ok',
+            },
+          ],
+            {cancelable : true}
+          )
+  
+          //   Dialog.show({
+          //     type: ALERT_TYPE.WARNING,
+          //     textBodyStyle: { fontFamily: '_regular', fontSize: 16 },
+          //     titleStyle: { fontFamily: '_bold', fontSize: 20 },
+          //     title: 'Caution ',
+          //     textBody: 'Are you sure you want to de-activate your account?',
+          //     button: 'Okay',
+          //     onPress:{blockendMyAccount},
+              
+          // })
+        )
+      }
   return (
        <View style={{flex: 1}}>
         
-        <SafeAreaView style={{ flex: 1, backgroundColor: '#F7F7F7', }}>
-        <StatusBar
-      style="light" translucent={true} backgroundColor='transparent'animated={true} />
+        <SafeAreaView style={{ flex: 1, backgroundColor: colors.secondaryColor2}}>
+          <StatusBar backgroundColor={colors.secondaryColor2} barStyle="light-content" />
+            <View style={{ flex: 1, backgroundColor: '#F7F7F7', }}>
 
 
          {/* header of the screen */}
@@ -151,7 +181,7 @@ const navigation = useNavigation();
         end={[1, 1]}
         style={{ elevation: 30, shadowColor: '#930D2F'}}
       >
-        <View style={[gs.rowBetween, { marginTop: 18, marginHorizontal: 10, justifyContent: 'center' }]}>
+        <View style={[gs.rowBetween, {marginTop: Platform.OS === "ios" ? 18 : 30, marginHorizontal: 10, justifyContent: 'center' }]}>
           <TouchableOpacity style={styles.circleIconLeft1}>
             <Text
               style={{ fontSize: 22, fontFamily: "_semiBold", color: "#fff" }}>
@@ -188,16 +218,7 @@ const navigation = useNavigation();
 
           <Text style={styles.profileEmail}>john.doe@mail.com</Text>
 
-          <TouchableOpacity
-            onPress={() => {
-              // handle onPress
-            }}>
-            <View style={styles.profileAction}>
-              <Text style={styles.profileActionText}>Edit Profile</Text>
-
-              <FeatherIcon color="#fff" name="edit" size={16} />
-            </View>
-          </TouchableOpacity>
+          
         </View>
 
         <View style={styles.section}>
@@ -471,8 +492,7 @@ const navigation = useNavigation();
                             <TouchableOpacity 
                                 onPress={() =>{
                                 // navigation goes here
-                                Alert.alert("You selected me")
-                               // navigation.navigate(index)
+                                 navigation.navigate('reset-pin')
                                   }}>
                                 <View style={styles.row}>
                                   <MaterialIcons 
@@ -500,8 +520,7 @@ const navigation = useNavigation();
                             <TouchableOpacity 
                                 onPress={() =>{
                                 // navigation goes here
-                                Alert.alert("You selected me")
-                               // navigation.navigate(index)
+                                 navigation.navigate('reset-password')
                                   }}>
                                 <View style={styles.row}>
                                   <Ionicons 
@@ -534,7 +553,7 @@ const navigation = useNavigation();
                 
                       <View style={[styles.rowWrapper, {borderTopWidth:0} ]}>
                             <TouchableOpacity 
-                                onPress={() => logout()}>
+                                onPress={() => requestLogout()}>
                                 <View style={styles.row}>
                                   <Ionicons 
                                     color={colors.secondaryColor2}
@@ -548,6 +567,7 @@ const navigation = useNavigation();
                                          value={form[1]}
                                          onValueChange={value => setForm({...form, [1]: value})}
                                          /> */}
+                                  {logoutLoading && <ActivityIndicator color='#aaa' size={20} />}
                                  </View>       
                             </TouchableOpacity>
                       </View>      
@@ -572,6 +592,7 @@ const navigation = useNavigation();
                 setData={setData}
               />
           </Modal>
+
           {/* Modal Loan here */}
           <Modal
               transparent={true}
@@ -586,12 +607,7 @@ const navigation = useNavigation();
               />
           </Modal>
 
-          {/* About us modal */}
-        
-        
-          
-            
-
+        </View>
     </SafeAreaView>
     </View>
   );

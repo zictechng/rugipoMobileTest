@@ -12,6 +12,7 @@ import UserProvider from "./components/UserProvider";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import { NavigationContainer } from "@react-navigation/native";
 import MainRootNavigation from "./navigation/mainRootNavigation";
+import { ActionSheetProvider } from '@expo/react-native-action-sheet';
 //LogBox.ignoreAllLogs(); // this will suppress errors not to be showing to users in the app 
 export default function App() {
   const { fontsLoaded } = useCustomFonts();
@@ -65,9 +66,11 @@ export default function App() {
   return (
     <AlertNotificationRoot>
       <UserProvider>
+      <ActionSheetProvider>
         <NavigationContainer>
           <MainRootNavigation />
         </NavigationContainer>
+      </ActionSheetProvider>
       </UserProvider>
     </AlertNotificationRoot>
   );

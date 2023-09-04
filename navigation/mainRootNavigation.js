@@ -12,6 +12,17 @@ import ReferralScreen from '../screens/referralScreen';
 import IdentificationScreen from '../screens/identificationScreen';
 import ReportScreen from '../screens/reportScreen';
 import ContactUsScreen from '../screens/contactScreen';
+import PasswordResetSCreen from '../screens/passwordResetScreen';
+import TransferPinResetScreen from '../screens/transferPinResetScreen';
+import LocalTransferScreen from '../screens/localTransferScreen';
+import ConfirmLocalTransferScreen from '../screens/confirmLocalTranScreen';
+import TransferSuccessful from '../screens/transferSuccessfulScreen';
+import WireTransferScreen from '../screens/wireTransferScreen';
+import ConfirmWireScreen from '../screens/confirmWireScreen';
+import CotCodeScreen from '../screens/cotCodeScreen';
+import TaxCodeScreen from '../screens/taxCodeScreen';
+import ImfCodeScreen from '../screens/imfCodeScreen';
+import DetailsPageScreen from '../screens/detailsPageScreen';
 
 // import other screens/page here
 
@@ -57,9 +68,11 @@ const MainRootNavigation = ({navigation}) =>{
                   ) : (
                   <>
                   <Stack.Screen 
-                  screenOptions={{ presentation: 'modal' }}
-                  name='BottomTab'>
-                    {() => <BottomTab />}
+                  name='BottomTab'
+                  screenOptions={{ presentation: 'modal',
+                  horizontalAnimation
+                  }}>
+                  {() => <BottomTab />}
                   </Stack.Screen>
 
                   <Stack.Screen 
@@ -70,17 +83,20 @@ const MainRootNavigation = ({navigation}) =>{
                  
                   <Stack.Screen 
                   name='ProfileDetails'
+                  options={horizontalAnimation}
                   component={ProfileDetailsScreen}
                   >
                   </Stack.Screen>
 
                   <Stack.Screen 
                   name='Referral'
+                  options={horizontalAnimation}
                   component={ReferralScreen}>
                   </Stack.Screen>
 
                   <Stack.Screen 
                   name='Identification'
+                  options={horizontalAnimation}
                   component={IdentificationScreen}>
                   </Stack.Screen>
 
@@ -92,7 +108,77 @@ const MainRootNavigation = ({navigation}) =>{
 
                   <Stack.Screen 
                   name='contact-us'
+                  options={horizontalAnimation}
                   component={ContactUsScreen}>
+                  </Stack.Screen>
+                  
+                  <Stack.Screen 
+                  name='reset-password'
+                  options={horizontalAnimation}
+                  component={PasswordResetSCreen}>
+                  </Stack.Screen>
+
+                  <Stack.Screen 
+                  name='reset-pin'
+                  options={horizontalAnimation}
+                  component={TransferPinResetScreen}>
+                  </Stack.Screen>
+
+                  <Stack.Screen 
+                  name='localTransfer'
+                  options={horizontalAnimation}
+                  component={LocalTransferScreen}>
+                  </Stack.Screen>
+                  
+                  <Stack.Screen 
+                  name='confirmTransfer'
+                  options={horizontalAnimation}
+                  component={ConfirmLocalTransferScreen}>
+                  </Stack.Screen>
+
+                  <Stack.Screen 
+                  name='transferSuccessful'
+                  options={{
+                    headerShown: false,
+                    presentation: 'slide',
+                    }}
+                  component={TransferSuccessful}>
+                  </Stack.Screen>
+
+                  <Stack.Screen 
+                  name='wireTransfer'
+                  options={horizontalAnimation}
+                  component={WireTransferScreen}>
+                  </Stack.Screen>
+
+                  <Stack.Screen 
+                  name='confirmWireTransfer'
+                  options={horizontalAnimation}
+                  component={ConfirmWireScreen}>
+                  </Stack.Screen>
+
+                  <Stack.Screen 
+                  name='cotCode'
+                  options={horizontalAnimation}
+                  component={CotCodeScreen}>
+                  </Stack.Screen>
+
+                  <Stack.Screen 
+                  name='taxCode'
+                  options={horizontalAnimation}
+                  component={TaxCodeScreen}>
+                  </Stack.Screen>
+
+                  <Stack.Screen 
+                  name='imfCode'
+                  options={horizontalAnimation}
+                  component={ImfCodeScreen}>
+                  </Stack.Screen>
+
+                  <Stack.Screen 
+                  name='detailsPage'
+                  options={horizontalAnimation}
+                  component={DetailsPageScreen}>
                   </Stack.Screen>
 
                   <Stack.Screen 

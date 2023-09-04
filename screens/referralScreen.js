@@ -39,17 +39,16 @@ const ReferralScreen = () => {
   return (
       
         
-        <SafeAreaView style={{ flex: 1, backgroundColor: '#f6f6f6', }}>
-        <StatusBar
-      style="light" translucent={true} backgroundColor='transparent'animated={true} />
-
+    <View style={{ flex: 1, backgroundColor: colors.secondaryColor2}}>
+      <StatusBar backgroundColor={colors.secondaryColor2} style="light" />
+        <View style={{ flex: 1, backgroundColor: '#F7F7F7', }}>
          {/* header of the screen */}
       <LinearGradient
         colors={[colors.secondaryColor2, colors.secondaryColor2]}
         start={[0, 0]}
         end={[1, 1]}
         style={{ elevation: 30, shadowColor: '#930D2F'}}>
-        <View style={[gs.rowBetween, { marginTop: 18, marginHorizontal: 10 }]}>
+        <View style={[gs.rowBetween, { marginTop: Platform.OS === "ios" ? 18 : 26, marginHorizontal: 10 }]}>
           <TouchableOpacity
             style={styles.circleIconLeft}
             onPress={() => navigation.goBack()}>
@@ -110,8 +109,8 @@ const ReferralScreen = () => {
                 </View>
 
       </ScrollView>
-       
-    </SafeAreaView>
+       </View>
+    </View>
   );
 }
 

@@ -9,7 +9,8 @@ import {
   Image,
   TouchableOpacity,
   Switch,
-  StatusBar
+  StatusBar,
+  Platform
 } from 'react-native';
 import { LinearGradient } from "expo-linear-gradient";
 import moment from "moment";
@@ -39,9 +40,9 @@ const IdentificationScreen = () => {
   return (
       
         
-        <SafeAreaView style={{ flex: 1, backgroundColor: '#f6f6f6', }}>
-            <StatusBar
-            style="light" translucent={true} backgroundColor='transparent'animated={true} />
+    <View style={{ flex: 1, backgroundColor: colors.secondaryColor2}}>
+       <StatusBar backgroundColor={colors.secondaryColor2} style="light" />
+          <View style={{ flex: 1, backgroundColor: '#F7F7F7', }}>
 
          {/* header of the screen */}
         <LinearGradient
@@ -49,7 +50,7 @@ const IdentificationScreen = () => {
             start={[0, 0]}
             end={[1, 1]}
             style={{ elevation: 30, shadowColor: '#930D2F'}}>
-            <View style={[gs.rowBetween, { marginTop: 18, marginHorizontal: 10 }]}>
+            <View style={[gs.rowBetween, { marginTop: Platform.OS === "ios" ? 18 : 26, marginHorizontal: 10 }]}>
             <TouchableOpacity
             style={styles.circleIconLeft}
             onPress={() => navigation.goBack()}>
@@ -100,8 +101,8 @@ const IdentificationScreen = () => {
                         </View>    
          
                 </ScrollView>
-       
-        </SafeAreaView>
+            </View>
+        </View>
   );
 }
 
@@ -179,14 +180,23 @@ const styles = StyleSheet.create({
     borderColor: '#e3e3e3',
     borderRadius: 15,
     marginHorizontal: 10,
+    shadowOffset: {
+      width: 0,
+      height: 2,
+    },
+    shadowOpacity: 0.22,
+    shadowRadius: 2.22,
+    shadowColor: "#000",
+    elevation: 3,
   },
+  
   rowWrapper: {
     paddingLeft: 24,
     backgroundColor: '#fff',
     borderColor: '#e3e3e3',
     borderRadius: 15,
     marginHorizontal: 10,
-  },
+   },
   rowIcon: {
     marginRight: 12,
   },
