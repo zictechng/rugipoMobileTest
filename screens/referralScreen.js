@@ -39,7 +39,7 @@ const ReferralScreen = () => {
   return (
       
         
-    <View style={{ flex: 1, backgroundColor: colors.secondaryColor2}}>
+    <SafeAreaView style={{ flex: 1, backgroundColor: colors.secondaryColor2}}>
       <StatusBar backgroundColor={colors.secondaryColor2} style="light" />
         <View style={{ flex: 1, backgroundColor: '#F7F7F7', }}>
          {/* header of the screen */}
@@ -72,32 +72,27 @@ const ReferralScreen = () => {
           {/* <Text style={styles.title}>Settings</Text> */}
 
           <Text style={styles.subtitle}>
-            Found details about your hard work for referring users
+          See details about your hard work for referring users
           </Text>
         </View>
                 
-                
-                    <View style={[styles.rowWrapper, {marginBottom: 8} ]}>
+                    {/* here is the flistview to show all referral details */}
+                    {/* <View style={[styles.rowWrapper, {marginBottom: 8} ]}>
                             <TouchableOpacity>
                                 <View style={styles.row}>
                                   
                                      <Text style={[styles.rowLabel, ]}>Ken Developer</Text>
                                         <View style={styles.rowSpacer} />
-                                    
-                                        {/* <Text style={styles.rowValue}>0000</Text> */}
+                                  
                                         <Text style={{color:'#aaa'}}>10/08/2022</Text>
                                         <FeatherIcon name='chevron-right' color='#ababab'
                                         size={22} />
-                                        
-                                        {/* <Switch
-                                         value={[1]}
-                                         onValueChange={value => ({ [1]: value})}/> */}
                                  </View>    
                              </TouchableOpacity>
-                    </View>
+                    </View> */}
 
-                <View style={{ justifyContent: "center", alignItems: "center" }}>
-                    <Text style={{ color:'#aaa' }}>Your referrals details will show here </Text>
+                <View style={{ justifyContent: "center", alignItems: "center", marginTop: '50%' }}>
+                    <Text style={{ color:'#aaa' }}>Your referrals users will show here </Text>
                     <View
                       style={{ justifyContent: "center", alignItems: "center" }}>
                       <Ionicons
@@ -110,7 +105,7 @@ const ReferralScreen = () => {
 
       </ScrollView>
        </View>
-    </View>
+    </SafeAreaView>
   );
 }
 

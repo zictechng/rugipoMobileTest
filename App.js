@@ -49,7 +49,7 @@ export default function App() {
       }
     } catch (error) {
       // Error retrieving data
-      console.log("Local error here ", error.message);
+      //console.log("Local error here ", error.message);
     }
   };
 

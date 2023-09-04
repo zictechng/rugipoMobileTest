@@ -1,4 +1,4 @@
-import React, { useState, useContext } from 'react';
+import React, { useState, useContext, useEffect } from 'react';
 import {
   Alert,
   StyleSheet,
@@ -17,8 +17,6 @@ import {
 import { LinearGradient } from "expo-linear-gradient";
 import moment from "moment";
 import { UserContext } from "../components/UserContext";
-import FeatherIcon from 'react-native-vector-icons/Feather';
-import Feather from 'react-native-vector-icons/Feather'
 import {
   Ionicons,
   
@@ -26,7 +24,10 @@ import {
 import { gs, colors } from "../styles";
 import { useNavigation } from '@react-navigation/native';
 import AsyncStorage from '@react-native-async-storage/async-storage';
-import * as Animatable from 'react-native-animatable'
+import * as Animatable from 'react-native-animatable';
+import { ALERT_TYPE, Dialog, Toast } from 'react-native-alert-notification';
+import client from '../api/client';
+import Loader from '../components/Loader';
 
 const PasswordResetSCreen = () => {
   const navigation = useNavigation();
@@ -37,25 +38,148 @@ const PasswordResetSCreen = () => {
 
   const [loginState, setLoginState, isLoading, setIsLoading, myDetails, setMyDetails, myMethod ] = useContext(UserContext);
 
-  const [data, setData] = React.useState({
-    reportSubject: '',
-    reportMessage: '',
-    check_subjectInputChange: false,
-    check_messageInputChange: false,
-});
-
-const [complainMessage, setComplainMessage] = useState({})
-
-    const [userData, setUserData]= useState('');
-    const [isMyLoading, setIsMyLoading] = useState(false);
     const [isloginBtn, setIsLoginBtn] = useState(false);
     const [logBtnDisabled, setLogBtnDisabled] = useState(false);
+    const [btnRegLoading, setBtnRegLoading] = useState(false);
+    const [userID, setUserID] = useState({});
+     // get user token details from local storage here
+  //   const getValueFromStorage = async () => {
+  //     try {
+  //       const value = await AsyncStorage.getItem('USER_LOCAL_INFO'); // Replace 'yourKey' with the key you used to store the value.
+  //       if (value !== null) {
+  //         setUserID(value);
+  //        } else {
+  //         console.log('Value not found in AsyncStorage');
+  //       }
+  //     } catch (error) {
+  //       console.error('Error reading value from AsyncStorage:', error);
+  //     }
+  //   };
+  // useEffect(() => {
+  //   getValueFromStorage();
+  // }, [userID]);
 
-   
-    const sendMessage = () =>{
-        setLogBtnDisabled(true)
-        setIsLoginBtn(true)
-        console.log('Respond of Message ', selectedData + ' ' + data.reportMessage)
+    const [data, setData] = React.useState({
+      previous_password: '',
+      new_password: '',
+      confirm_newPassword: '',
+      uid: myDetails._id,
+    });
+
+    const handleInputChange = (name, val) => {
+      setData({
+        ...data,
+        [name]: val,
+      });
+    };
+
+    const confirmUpdate = () =>{
+      return (
+        Alert.alert(
+          title='Caution !',
+          message='Are you sure you want to update your password?',
+          [
+            {
+              text: 'Cancel',
+              onPress: () => (''),
+              style: 'cancel',
+            },
+            {text: 'Yes', onPress: () => updatePassword(),
+            style: 'ok',
+            },
+          ],
+            {cancelable : true}
+          )
+        )
+      }
+
+    const updatePassword = async () =>{
+      if(data.new_password === undefined || data.new_password ==='' || data.confirm_newPassword ===''){
+        Toast.show({
+          type: ALERT_TYPE.DANGER,
+          title: 'Error',
+          textBody: 'All fields are required',
+          textBodyStyle: { fontFamily: '_regular', fontSize: 16 },
+          titleStyle: { fontFamily: '_bold', fontSize: 20 },
+      })
+      return
+      }
+      if(data.new_password !== data.confirm_newPassword){
+        Toast.show({
+          type: ALERT_TYPE.DANGER,
+          title: 'Fail',
+          textBody: 'Passwords do not match',
+          textBodyStyle: { fontFamily: '_regular', fontSize: 16 },
+          titleStyle: { fontFamily: '_bold', fontSize: 20 },
+      })
+      return
+      }
+      if(data.new_password.length < 5){
+        Toast.show({
+          type: ALERT_TYPE.DANGER,
+          title: 'Notice',
+          textBody: 'Password length too short, 6 characters minimum',
+          textBodyStyle: { fontFamily: '_regular', fontSize: 16 },
+          titleStyle: { fontFamily: '_bold', fontSize: 20 },
+      })
+      return
+      }
+      try {
+        setBtnRegLoading(true);
+        const res = await client.post('/api/updateUser_passwordMobile', data)
+        if(res.data.msg == '200'){
+          setData({
+            previous_password:'',
+            new_password: '',
+            confirm_newPassword: '',
+          })
+          // redirect back to profile page
+          navigation.navigate('Profile');
+         Dialog.show({
+          type: ALERT_TYPE.SUCCESS,
+          title: 'Successful',
+          textBody: 'Your account password has been updated successfully',
+          button: 'Okay',
+          textBodyStyle: { fontFamily: '_regular', fontSize: 16 },
+          titleStyle: { fontFamily: '_bold', fontSize: 20 },
+        })
+        
+      }
+        else if (res.data.status == '401') {
+        Toast.show({
+            type: ALERT_TYPE.DANGER,
+            title: 'Failed',
+            textBody: 'Authentication required',
+            textBodyStyle: { fontFamily: '_regular', fontSize: 16 },
+            titleStyle: { fontFamily: '_bold', fontSize: 20 },
+        })
+  
+      }
+      else if (res.data.status == '500') {
+        Toast.show({
+            type: ALERT_TYPE.DANGER,
+            title: 'Error',
+            textBody: 'Error occurred while processing! Please try again later',
+            textBodyStyle: { fontFamily: '_regular', fontSize: 16 },
+            titleStyle: { fontFamily: '_bold', fontSize: 20 },
+        })
+  
+      }
+      else {
+        Toast.show({
+            type: ALERT_TYPE.DANGER,
+            title: 'Error',
+            titleStyle: { fontFamily: '_bold', fontSize: 20 },
+            textBody: 'Sorry, Something went wrong',
+            textBodyStyle: { fontFamily: '_regular', fontSize: 16 },
+          })
+        }
+    } catch (error) {
+      console.log(error.message)
+      }
+      finally {
+        setBtnRegLoading(false);
+      }
     }
 
   return (
@@ -86,7 +210,8 @@ const [complainMessage, setComplainMessage] = useState({})
         </View>
       </LinearGradient>
       
-       
+      <Loader  loading={btnRegLoading} textInfo={'Updating wait...'}/>
+
       <ScrollView contentContainerStyle={styles.container} showsVerticalScrollIndicator={false}>
        
         <View style={styles.header}>
@@ -112,9 +237,10 @@ const [complainMessage, setComplainMessage] = useState({})
                             placeholder="Old password"
                             style={styles.textInput}
                             autoCapitalize="none"
-                            onChangeText={(val) => (val)}
-                            value={data.reportMessage}
+                            onChangeText={(val) => handleInputChange('previous_password', val)}
+                            value={data.previous_password}
                             onEndEditing={(e) => (e.nativeEvent.text)}
+                            secureTextEntry={true}
                             //onChangeText={(text) => setComplainMessage({text})}
                             //value={complainMessage.text}
                             />
@@ -129,11 +255,10 @@ const [complainMessage, setComplainMessage] = useState({})
                             placeholder="New Password"
                             style={styles.textInput}
                             autoCapitalize="none"
-                            onChangeText={(val) => (val)}
-                            value={data.reportMessage}
+                            onChangeText={(val) => handleInputChange('new_password', val)}
+                            value={data.new_password}
                             onEndEditing={(e) => (e.nativeEvent.text)}
-                            //onChangeText={(text) => setComplainMessage({text})}
-                            //value={complainMessage.text}
+                            secureTextEntry={true}
                             />
                         </View>
                     
@@ -146,27 +271,23 @@ const [complainMessage, setComplainMessage] = useState({})
                             placeholder="Confirm Password"
                             style={styles.textInput}
                             autoCapitalize="none"
-                            onChangeText={(val) => (val)}
-                            value={data.reportMessage}
+                            onChangeText={(val) => handleInputChange('confirm_newPassword', val)}
+                            value={data.confirm_newPassword}
                             onEndEditing={(e) => (e.nativeEvent.text)}
-                            //onChangeText={(text) => setComplainMessage({text})}
-                            //value={complainMessage.text}
+                           secureTextEntry={true}
                             />
                         </View>
                      </View>
                      {/* Show this if user did not enter correct details */}
-                     {/* <Animatable.View animation="fadeInLeft" duration={500}>
-                    <Text style={styles.errorMsg}>Message should contain at least 10 characters long </Text>
-                    </Animatable.View> */}
+                    
                  </View>
                        {/* if reason is not selected show error here */}
                 
                 {/* How error message here if message field is empty */}
-                
                     
                     <View style={styles.button}>
                         <TouchableOpacity  style={[styles.signIn, logBtnDisabled? styles.signInDisable: '']}
-                            onPress={() =>{sendMessage()}}
+                            onPress={() =>{confirmUpdate()}}
                             disabled={logBtnDisabled}
                         > 
                         <LinearGradient

@@ -431,17 +431,6 @@ divider:{
     marginHorizontal: 5, 
     marginBottom: 8,
     overflow: 'hidden',
-    ...Platform.select({
-        ios: {
-            borderWidth: 0.4,
-            borderRadius: 0.1,
-            borderStyle: 'dotted',
-            borderBottomWidth: 1,
-         },
-        android: {
-        borderBottomWidth: 1,
-        },
-      }),
 },
 profileAvatar: {
     width: 50,

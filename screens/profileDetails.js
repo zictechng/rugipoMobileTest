@@ -26,7 +26,7 @@ import {
 } from "@expo/vector-icons";
 import { gs, colors } from "../styles";
 import { useNavigation } from '@react-navigation/native';
-import AsyncStorage from '@react-native-async-storage/async-storage';
+import { ALERT_TYPE, Dialog, Toast } from 'react-native-alert-notification';
 
 const ProfileDetailsScreen = () => {
   const navigation = useNavigation();
@@ -34,10 +34,24 @@ const ProfileDetailsScreen = () => {
 
   const [loginState, setLoginState, isLoading, setIsLoading, myDetails, setMyDetails, myMethod ] = useContext(UserContext);
 
+  editNotification =() =>{
+    return (
+          Dialog.show({
+              type: ALERT_TYPE.WARNING,
+              title: 'Notice',
+              textBody: 'To update your account profile details, please contact your account administrator',
+              button: 'Okay',
+              titleStyle: {fontFamily: '_semiBold', fontSize: 18},
+              textBodyStyle: {fontFamily: '_regular', fontSize: 15,}
+            })
+          // Alert.alert('Please contact your account officer for account details update')
+    )
+  }
+
   return (
        <View style={{flex: 1}}>
         
-      <View style={{ flex: 1, backgroundColor: colors.secondaryColor2}}>
+      <SafeAreaView style={{ flex: 1, backgroundColor: colors.secondaryColor2}}>
         <StatusBar backgroundColor={colors.secondaryColor2} style="light" />
          <View style={{ flex: 1, backgroundColor: '#F7F7F7', }}>
 
@@ -72,19 +86,23 @@ const ProfileDetailsScreen = () => {
       <ScrollView contentContainerStyle={styles.container}>
        
         <View style={styles.profile}>
-          <Image
+          {/* <Image
             alt=""
             source={{
               uri: 'https://images.unsplash.com/photo-1633332755192-727a05c4013d?ixlib=rb-1.2.1&ixid=MnwxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8&auto=format&fit=facearea&facepad=2.5&w=256&h=256&q=80',
             }}
             style={styles.profileAvatar}
+          /> */}
+          <Image alt="" source={require('../assets/default_profile.png')}
+            style={styles.profileAvatar}
           />
 
-          <Text style={styles.profileName}>John Doe</Text>
+          <Text style={styles.profileName}>{myDetails.surname}</Text>
 
-          <Text style={styles.profileEmail}>tag ID: </Text> 
+          <Text style={styles.profileEmail}>tag ID: {myDetails.username} </Text> 
           <TouchableOpacity
             onPress={() => {
+              editNotification()
               // handle onPress
             }}>
             <View style={styles.profileAction}>
@@ -105,7 +123,7 @@ const ProfileDetailsScreen = () => {
                             <View>
                                 <View style={[styles.row, {marginTop: 6}]}>
                                     <Text style={[styles.rowLabel, {color:'#cccac6'}]}>Account Full Name</Text>
-                                     <Text style={[styles.rowLabel, {color:'#777'}]}>Profile</Text>
+                                     <Text style={[styles.rowLabel, {color:'#777'}]}>{myDetails.surname} {myDetails.first_name}</Text>
                                     <View style={[styles.rowSpacer]} />
                             </View>       
                             </View>
@@ -114,7 +132,7 @@ const ProfileDetailsScreen = () => {
                             <View>
                                 <View style={[styles.row, {marginTop: 10}]}>
                                     <Text style={[styles.rowLabel, {color:'#cccac6'}]}>Gender</Text>
-                                     <Text style={[styles.rowLabel, {color:'#777'}]}>Profile</Text>
+                                     <Text style={[styles.rowLabel, {color:'#777'}]}>{myDetails.gender}</Text>
                                     <View style={styles.rowSpacer} />
                             </View>       
                             </View>
@@ -124,7 +142,7 @@ const ProfileDetailsScreen = () => {
                             <View>
                                 <View style={[styles.row, {marginTop: 10}]}>
                                     <Text style={[styles.rowLabel, {color:'#cccac6'}]}>Phone Number</Text>
-                                     <Text style={[styles.rowLabel, {color:'#777'}]}>Profile</Text>
+                                     <Text style={[styles.rowLabel, {color:'#777'}]}>{myDetails.phone}</Text>
                                     <View style={styles.rowSpacer} />
                             </View>       
                             </View>
@@ -134,7 +152,7 @@ const ProfileDetailsScreen = () => {
                             <View>
                                 <View style={[styles.row, {marginTop: 10}]}>
                                     <Text style={[styles.rowLabel, {color:'#cccac6'}]}>Email</Text>
-                                     <Text style={[styles.rowLabel, {color:'#777'}]}>Profile</Text>
+                                     <Text style={[styles.rowLabel, {color:'#777'}]}>{myDetails.email}</Text>
                                     <View style={styles.rowSpacer} />
                             </View>       
                             </View>
@@ -144,7 +162,7 @@ const ProfileDetailsScreen = () => {
                             <View>
                                 <View style={[styles.row, {marginTop: 10}]}>
                                     <Text style={[styles.rowLabel, {color:'#cccac6'}]}>Date of Birth</Text>
-                                     <Text style={[styles.rowLabel, {color:'#777'}]}>Profile</Text>
+                                     <Text style={[styles.rowLabel, {color:'#777'}]}>{myDetails.dob}</Text>
                                     <View style={styles.rowSpacer} />
                             </View>       
                             </View>
@@ -154,7 +172,7 @@ const ProfileDetailsScreen = () => {
                             <View>
                                 <View style={[styles.row, {marginTop: 10}]}>
                                     <Text style={[styles.rowLabel, {color:'#cccac6'}]}>State</Text>
-                                     <Text style={[styles.rowLabel, {color:'#777'}]}>Profile</Text>
+                                     <Text style={[styles.rowLabel, {color:'#777'}]}>{myDetails.state}</Text>
                                     <View style={styles.rowSpacer} />
                             </View>       
                             </View>
@@ -164,7 +182,7 @@ const ProfileDetailsScreen = () => {
                             <View>
                                 <View style={[styles.row, {marginTop: 10}]}>
                                     <Text style={[styles.rowLabel, {color:'#cccac6'}]}>City</Text>
-                                     <Text style={[styles.rowLabel, {color:'#777'}]}>Profile</Text>
+                                     <Text style={[styles.rowLabel, {color:'#777'}]}>{myDetails.city}</Text>
                                     <View style={styles.rowSpacer} />
                             </View>       
                             </View>
@@ -174,7 +192,7 @@ const ProfileDetailsScreen = () => {
                             <View>
                                 <View style={[styles.row, {marginTop: 10}]}>
                                     <Text style={[styles.rowLabel, {color:'#cccac6'}]}>Country</Text>
-                                     <Text style={[styles.rowLabel, {color:'#777'}]}>Profile</Text>
+                                     <Text style={[styles.rowLabel, {color:'#777'}]}>{myDetails.country}</Text>
                                     <View style={styles.rowSpacer} />
                             </View>       
                             </View>
@@ -184,7 +202,7 @@ const ProfileDetailsScreen = () => {
                             <View>
                                 <View style={[styles.row, {marginTop: 10}]}>
                                     <Text style={[styles.rowLabel, {color:'#cccac6'}]}>Contact Address</Text>
-                                     <Text style={[styles.rowLabel, {color:'#777'}]}>Lorem ipsum dolor sit amet, consectetuer adipiscing elit. Aenean commodo ligula eget dolor. Aenean massa. Cum sociis natoque penatibus et magnis dis parturient montes, nascetur ridiculus mus. Donec quam felis, ultricies nec, pellentesque eu, pretium quis, sem. Nulla consequat massa quis enim. Donec pede justo, fringilla vel, aliquet nec, vulputate</Text>
+                                     <Text style={[styles.rowLabel, {color:'#777', marginBottom: 10}]}>{myDetails.address}</Text>
                                     <View style={styles.rowSpacer} />
                             </View>       
                             </View>
@@ -201,7 +219,7 @@ const ProfileDetailsScreen = () => {
                             <View>
                                 <View style={[styles.row, {marginTop: 6}]}>
                                     <Text style={[styles.rowLabel, {color:'#cccac6'}]}>Account Number</Text>
-                                     <Text style={[styles.rowLabel, {color:'#fff'}]}>Profile</Text>
+                                     <Text style={[styles.rowLabel, {color:'#fff'}]}>{myDetails.acct_number}</Text>
                                     <View style={styles.rowSpacer} />
                             </View>       
                             </View>
@@ -210,7 +228,7 @@ const ProfileDetailsScreen = () => {
                             <View>
                                 <View style={[styles.row, {marginTop: 10}]}>
                                     <Text style={[styles.rowLabel, {color:'#cccac6'}]}>Account Type</Text>
-                                     <Text style={[styles.rowLabel, {color:'#fff'}]}>Profile</Text>
+                                     <Text style={[styles.rowLabel, {color:'#fff'}]}>{myDetails.acct_type}</Text>
                                     <View style={styles.rowSpacer} />
                             </View>       
                             </View>
@@ -220,7 +238,7 @@ const ProfileDetailsScreen = () => {
                             <View>
                                 <View style={[styles.row, {marginTop: 10}]}>
                                     <Text style={[styles.rowLabel, {color:'#cccac6'}]}>Account Status</Text>
-                                     <Text style={[styles.rowLabel, {color:'#fff'}]}>Profile</Text>
+                                     <Text style={[styles.rowLabel, {color:'#fff'}]}>{myDetails.acct_status}</Text>
                                     <View style={styles.rowSpacer} />
                             </View>       
                             </View>
@@ -230,7 +248,7 @@ const ProfileDetailsScreen = () => {
                             <View>
                                 <View style={[styles.row, {marginTop: 10}]}>
                                     <Text style={[styles.rowLabel, {color:'#cccac6'}]}>Account Username</Text>
-                                     <Text style={[styles.rowLabel, {color:'#fff'}]}>Profile</Text>
+                                     <Text style={[styles.rowLabel, {color:'#fff'}]}>{myDetails.username}</Text>
                                     <View style={styles.rowSpacer} />
                             </View>       
                             </View>
@@ -240,7 +258,7 @@ const ProfileDetailsScreen = () => {
                             <View>
                                 <View style={[styles.row, {marginTop: 10}]}>
                                     <Text style={[styles.rowLabel, {color:'#cccac6'}]}>Account PIN</Text>
-                                     <Text style={[styles.rowLabel, {color:'#fff'}]}>Profile</Text>
+                                     <Text style={[styles.rowLabel, {color:'#fff'}]}>{myDetails.acct_pin}</Text>
                                     <View style={styles.rowSpacer} />
                             </View>       
                             </View>
@@ -250,7 +268,7 @@ const ProfileDetailsScreen = () => {
                             <View>
                                 <View style={[styles.row, {marginTop: 10}]}>
                                     <Text style={[styles.rowLabel, {color:'#cccac6'}]}>Currency Type</Text>
-                                     <Text style={[styles.rowLabel, {color:'#fff'}]}>Profile</Text>
+                                     <Text style={[styles.rowLabel, {color:'#fff'}]}>{myDetails.currency_type}</Text>
                                     <View style={styles.rowSpacer} />
                             </View>       
                             </View>
@@ -260,7 +278,7 @@ const ProfileDetailsScreen = () => {
 
       </ScrollView>
        </View>
-    </View>
+    </SafeAreaView>
     </View>
   );
 }

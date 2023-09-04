@@ -32,6 +32,9 @@ import * as Animatable from 'react-native-animatable'
 import DatePicker from 'react-native-modern-datepicker'
 import { getToday, getFormatedDate } from 'react-native-modern-datepicker';
 import { SelectList } from 'react-native-dropdown-select-list';
+import { ALERT_TYPE, Dialog, Toast } from 'react-native-alert-notification';
+import client from '../api/client';
+import Loader from '../components/Loader';
 
 const ContactUsScreen = () => {
   const navigation = useNavigation();
@@ -43,57 +46,16 @@ const ContactUsScreen = () => {
   const [loginState, setLoginState, isLoading, setIsLoading, myDetails, setMyDetails, myMethod ] = useContext(UserContext);
 
   const [data, setData] = React.useState({
-    reportSubject: '',
     reportMessage: '',
     check_subjectInputChange: false,
     check_messageInputChange: false,
 });
 
-const [complainMessage, setComplainMessage] = useState({})
-
-    const [userData, setUserData]= useState('');
-    const [isMyLoading, setIsMyLoading] = useState(false);
     const [isloginBtn, setIsLoginBtn] = useState(false);
     const [logBtnDisabled, setLogBtnDisabled] = useState(false);
+    const [btnRegLoading, setBtnRegLoading] = useState(false);
 
     const [selectedData, setSelectedData] = useState('');
-
-    // date implementation
-    const today = new Date();
-    const startDate = getFormatedDate(today.setDate(today.getDate() +1), 'DD/MM/YYYY')    
-    const [open, setOpen] = useState(false);
-    const [date, setDate] = useState('');
-    const [datePick, setDatePick] = useState(false);
-
-    const handleOnPress =() => {
-      setOpen(!open);
-      setDatePick(false);
-    }
-
-    const handleChange =(propDate) => {
-      setDate(propDate)
-      setDatePick(true);
-      //const displayDate = getFormatedDate(propDate, 'DD/MM/YYYY');
-      //console.log("New Date", displayDate) 
-      }
-      
-
-    // function for subject field
-    const textInputChange = (val) => {
-        if(val.trim().length >= 4){
-            setData({
-                ...data,
-                reportSubject: val,
-                check_subjectInputChange: false,
-            });
-        }else{
-            setData({
-                ...data,
-                reportSubject: val,
-                check_subjectInputChange: true,
-            });
-        }
-    }
 
     // function for message input field
     const textInputChangeMessage = (val) => {
@@ -121,10 +83,88 @@ const [complainMessage, setComplainMessage] = useState({})
         {key:'Account Balance', value:"Account Balance"},
         {key:'Other Issue', value:"Other Issue"},
 ];
-    const sendMessage = () =>{
+
+    const postMessage = {
+      subject: selectedData,
+      email: myDetails.email,
+      ticket_message: data.reportMessage,
+      createdBy: myDetails._id,
+      ticket_type: 'Contact',
+     }
+
+    const sendMessage = async () =>{
+
+      if(!selectedData || !data.reportMessage)
+      {
+        Toast.show({
+          type: ALERT_TYPE.DANGER,
+          title: 'Error',
+          textBody: 'All fields are required',
+          titleStyle: {fontFamily: '_semiBold', fontSize: 18},
+          textBodyStyle: {fontFamily: '_regular', fontSize: 14,},
+          })
+       return
+      }
+      try {
+        setBtnRegLoading(true);
         setLogBtnDisabled(true)
-        setIsLoginBtn(true)
-        console.log('Respond of Message ', selectedData + ' ' + data.reportMessage)
+        //setIsLoginBtn(true)
+        const res = await client.post('/api/submit_ticketMobile', postMessage)
+        
+        if(res.data.msg == '200'){
+          setData({
+           reportMessage: '',
+         })
+         setSelectedData(null)
+        
+         Dialog.show({
+          type: ALERT_TYPE.SUCCESS,
+          title: 'Successful',
+          textBody: 'Message sent successfully! We will get in-touched shortly',
+          button: 'Okay',
+          textBodyStyle: { fontFamily: '_regular', fontSize: 16 },
+          titleStyle: { fontFamily: '_bold', fontSize: 20 },
+        })
+     
+      }
+        else if (res.data.status == '401') {
+        Toast.show({
+            type: ALERT_TYPE.DANGER,
+            title: 'Failed',
+            textBody: 'Authentication required',
+            textBodyStyle: { fontFamily: '_regular', fontSize: 16 },
+            titleStyle: { fontFamily: '_bold', fontSize: 20 },
+        })
+ 
+      }
+      else if (res.data.status == '500') {
+        Toast.show({
+            type: ALERT_TYPE.DANGER,
+            title: 'Error',
+            textBody: 'Error occurred while processing! Please try again later',
+            textBodyStyle: { fontFamily: '_regular', fontSize: 16 },
+            titleStyle: { fontFamily: '_bold', fontSize: 20 },
+        })
+ 
+      }
+      else {
+        Toast.show({
+            type: ALERT_TYPE.DANGER,
+            title: 'Error',
+            titleStyle: { fontFamily: '_bold', fontSize: 20 },
+            textBody: 'Sorry, Something went wrong',
+            textBodyStyle: { fontFamily: '_regular', fontSize: 16 },
+
+           })
+        }
+      } catch (error) {
+        console.log(error.message)
+      }
+        finally{
+          setBtnRegLoading(false);
+          setLogBtnDisabled(false)
+          setIsLoginBtn(false)
+        }
     }
 
   return (
@@ -154,7 +194,8 @@ const [complainMessage, setComplainMessage] = useState({})
           <View style={styles.nameView}></View>
         </View>
       </LinearGradient>
-      
+        
+        <Loader  loading={btnRegLoading} textInfo={'Processing wait...'}/>
        
       <ScrollView contentContainerStyle={styles.container} showsVerticalScrollIndicator={false}>
        

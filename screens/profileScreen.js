@@ -28,25 +28,26 @@ import {
 import { gs, colors } from "../styles";
 import { useNavigation } from '@react-navigation/native';
 import AsyncStorage from '@react-native-async-storage/async-storage';
+import { ALERT_TYPE, Dialog, Toast } from 'react-native-alert-notification';
+import client from '../api/client';
+import Loader from '../components/Loader';
 
 const ProfileScreen = () => {
 const navigation = useNavigation();
 
-
   const [loginState, setLoginState, isLoading, setIsLoading, myDetails, setMyDetails, myMethod ] = useContext(UserContext);
   const [isModalVisible, setisModalVisible] = useState(false);
   const [isLoanModalVisible, setisLoanModalVisible] = useState(false);
-  const [showModal, setshowModal] = useState(false);
   const [chooseData, setchooseData] = useState();
 
   const [showAboutModal, setshowAboutModal] = useState(false);
   const [logoutLoading, setLogoutLoading] = useState(false);
+  const [btnRegLoading, setBtnRegLoading] = useState(false);
 
   const changeModalVisible = (bool) =>{
     setisModalVisible(bool);
     setshowAboutModal(false);
   }
-
 
   const loanModalVisible = (bool) =>{
     setisLoanModalVisible(bool);
@@ -59,8 +60,8 @@ const navigation = useNavigation();
     };
 
   const logout = async() =>{
+    setLogoutLoading(true);
     setTimeout(async() =>{
-      setLogoutLoading(true);
     try {
           const res = await AsyncStorage.removeItem('USER_TOKEN');
          
@@ -68,7 +69,7 @@ const navigation = useNavigation();
           {
           navigation.replace('Login');
           setLoginState(null)
-          console.log('AsyncStorage cleared successfully.');
+         // console.log('AsyncStorage cleared successfully.');
         }
        
        } catch (error) {
@@ -81,7 +82,6 @@ const navigation = useNavigation();
   
   }
 
- 
   const handleAboutModal = () =>{
     Alert.alert(
       title='Hay !',
@@ -100,11 +100,66 @@ const navigation = useNavigation();
       );
   }
  
-  const blockendMyAccount = () => {
-    console.log("My account is blocked...");
+  const postID = {
+    uid : myDetails._id
+  }
+  const blockendMyAccount = async() => {
+
+    try {
+      setBtnRegLoading(true);
+      const res = await client.post('/api/block_AccountMobile', postID)
+      if(res.data.msg == '200'){
+       Dialog.show({
+        type: ALERT_TYPE.SUCCESS,
+        title: 'Successful',
+        textBody: 'Your account has been block successfully',
+        button: 'Okay',
+        textBodyStyle: { fontFamily: '_regular', fontSize: 16 },
+        titleStyle: { fontFamily: '_bold', fontSize: 20 },
+      })
+   
+    }
+      else if (res.data.status == '401') {
+      Toast.show({
+          type: ALERT_TYPE.DANGER,
+          title: 'Failed',
+          textBody: 'Authentication required',
+          textBodyStyle: { fontFamily: '_regular', fontSize: 16 },
+          titleStyle: { fontFamily: '_bold', fontSize: 20 },
+      })
+
+    }
+    else if (res.data.status == '500') {
+      Toast.show({
+          type: ALERT_TYPE.DANGER,
+          title: 'Error',
+          textBody: 'Error occurred while processing! Please try again later',
+          textBodyStyle: { fontFamily: '_regular', fontSize: 16 },
+          titleStyle: { fontFamily: '_bold', fontSize: 20 },
+      })
+
+    }
+    else {
+      Toast.show({
+          type: ALERT_TYPE.DANGER,
+          title: 'Error',
+          titleStyle: { fontFamily: '_bold', fontSize: 20 },
+          textBody: 'Sorry, Something went wrong',
+          textBodyStyle: { fontFamily: '_regular', fontSize: 16 },
+
+      })
+  
+  }
+  } catch (error) {
+    console.log(error.message)
+    }
+    finally {
+      setBtnRegLoading(false);
+    }
   }
 
   const deactiveAccount = () =>{
+          
     return (
       Alert.alert(
         title='Caution !',
@@ -112,7 +167,7 @@ const navigation = useNavigation();
         [
           {
             text: 'Cancel',
-            onPress: () => console.log('Cancel Pressed'),
+            onPress: () => (''),
             style: 'cancel',
           },
           {text: 'Yes', onPress: () => blockendMyAccount(),
@@ -121,17 +176,6 @@ const navigation = useNavigation();
         ],
           {cancelable : true}
         )
-
-        //   Dialog.show({
-        //     type: ALERT_TYPE.WARNING,
-        //     textBodyStyle: { fontFamily: '_regular', fontSize: 16 },
-        //     titleStyle: { fontFamily: '_bold', fontSize: 20 },
-        //     title: 'Caution ',
-        //     textBody: 'Are you sure you want to de-activate your account?',
-        //     button: 'Okay',
-        //     onPress:{blockendMyAccount},
-            
-        // })
       )
     }
 
@@ -194,29 +238,32 @@ const navigation = useNavigation();
         </View>
       </LinearGradient>
       
-       
+      <Loader  loading={btnRegLoading} textInfo={'Updating wait...'}/>
+
       <ScrollView contentContainerStyle={styles.container}>
        
         <View style={styles.header}>
           {/* <Text style={styles.title}>Settings</Text> */}
 
-          <Text style={styles.subtitle}>
+          {/* <Text style={styles.subtitle}>
             more action about your account and its operations
-          </Text>
+          </Text> */}
         </View>
 
         <View style={styles.profile}>
-          <Image
-            alt=""
-            source={{
+          {/* this is for image fetch from server  */}
+          {/* <Image alt="" source={{
               uri: 'https://images.unsplash.com/photo-1633332755192-727a05c4013d?ixlib=rb-1.2.1&ixid=MnwxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8&auto=format&fit=facearea&facepad=2.5&w=256&h=256&q=80',
             }}
             style={styles.profileAvatar}
+          /> */}
+          <Image alt="" source={require('../assets/default_profile.png')}
+            style={styles.profileAvatar}
           />
 
-          <Text style={styles.profileName}>John Doe</Text>
+          <Text style={styles.profileName}>{myDetails.surname}</Text>
 
-          <Text style={styles.profileEmail}>john.doe@mail.com</Text>
+          <Text style={styles.profileEmail}>{myDetails.email}</Text>
 
           
         </View>
@@ -713,7 +760,8 @@ const styles = StyleSheet.create({
   profileAvatar: {
     width: 60,
     height: 60,
-    borderRadius: 9999,
+    borderRadius: 50,
+    
   },
   profileName: {
     marginTop: 12,

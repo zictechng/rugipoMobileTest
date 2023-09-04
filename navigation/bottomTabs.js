@@ -152,7 +152,7 @@ const BottomTab = () => {
 
   if(isLoading){
     return <CustomSplash />
-      {/* <ActivityIndicator size='large' color="#00ff00" /> */}
+    
   }
 
   return (
@@ -165,10 +165,11 @@ const BottomTab = () => {
     //   ) : '' }}
     <>   
         <Tab.Navigator 
-            tabBarOptions={{
-                showLabel: false,
+            screenOptions={{
+            tabBarShowLabel: false,
+            headerShown: false,
                 //showIcon: true,
-            style:{
+            tabBarStyle:{
                 position: 'absolute',
                 bottom: 15,
                 left: 15,
@@ -322,18 +323,17 @@ const BottomTab = () => {
             }}/>
              
         </Tab.Navigator>
-        
-        
-                    <Modal
-                        transparent={true}
-                        animationType="slideInBig"
-                        useNativeDriver={true}
-                        visible={isLoanModalVisible}
-                        nRequestClose={() => loanModalVisible(false)}>
-                        <InterBankModal
-                            loanModalVisible = {loanModalVisible}
-                            setData={setData}/>
-                    </Modal>
+
+        <Modal
+            transparent={true}
+            animationType="slideInBig"
+            useNativeDriver={true}
+            visible={isLoanModalVisible}
+            nRequestClose={() => loanModalVisible(false)}>
+            <InterBankModal
+                loanModalVisible = {loanModalVisible}
+                setData={setData}/>
+        </Modal>
     </>
     
   );

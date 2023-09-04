@@ -41,7 +41,7 @@ const SimpleModal = (props) => {
                     <Text style={[styles.text, {fontSize: 20, color:'#fff'}]}>Beneficiaries</Text>
                 </View>
                 
-                <View style={{marginTop: 20, marginBottom: 8}}>
+                {/* <View style={{marginTop: 20, marginBottom: 8}}>
                     
                             <View style={{justifyContent: 'center', alignItems: 'center', marginBottom: 10}}>
                                 <FontAwesome5
@@ -50,7 +50,7 @@ const SimpleModal = (props) => {
                                 color="#aaa"
                                 marginLeft={8}/>
                             </View>
-
+                            // here flatlist will show all the beneficiaries list limit by 10
                             <View style={styles.rowWrapper2}>
                                 <View style={styles.row}>
                                   <Text style={[styles.rowLabel, ]}>Ken Developer</Text>
@@ -69,16 +69,16 @@ const SimpleModal = (props) => {
                                         size={22} />
                                 </View>  
                             </View>
-                   </View>
+                   </View> */}
                 {/* If no data show this to users */}
-                {/* <View style={{flex: 1, justifyContent:'center', alignItems: 'center'}}>
+                <View style={{flex: 1, justifyContent:'center', alignItems: 'center'}}>
                     <Text style={[styles.text]}>Your Beneficiaries will show here</Text>
                         <FontAwesome5
                         name="users"
                         size={30}
                         color="#aaa"
                         marginLeft={8}/>
-                </View> */}
+                </View>
                 
             </View>
             
@@ -162,7 +162,7 @@ const styles = StyleSheet.create({
     text:{
         fontSize: 16,
         margin: 5,
-        fontFamily: '_semiBold',
+        fontFamily: '_regular',
         color: '#aaa'
         },
    

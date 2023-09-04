@@ -1,4 +1,4 @@
-import React, { useState, useContext } from 'react';
+import React, { useState, useContext, useEffect } from 'react';
 import {
   Alert,
   StyleSheet,
@@ -28,6 +28,9 @@ import AsyncStorage from '@react-native-async-storage/async-storage';
 import * as Animatable from 'react-native-animatable'
 import DatePicker from 'react-native-modern-datepicker'
 import { getToday, getFormatedDate } from 'react-native-modern-datepicker';
+import { ALERT_TYPE, Dialog, Toast } from 'react-native-alert-notification';
+import client from '../api/client';
+import Loader from '../components/Loader';
 
 const ReportScreen = () => {
   const navigation = useNavigation();
@@ -41,16 +44,16 @@ const ReportScreen = () => {
   const [data, setData] = React.useState({
     reportSubject: '',
     reportMessage: '',
+    reportDate: '',
     check_subjectInputChange: false,
     check_messageInputChange: false,
 });
 
-const [complainMessage, setComplainMessage] = useState({})
-
     const [userData, setUserData]= useState('');
-    const [isMyLoading, setIsMyLoading] = useState(false);
     const [isloginBtn, setIsLoginBtn] = useState(false);
     const [logBtnDisabled, setLogBtnDisabled] = useState(false);
+    const [myToken, setMyToken] = useState({});
+    const [btnRegLoading, setBtnRegLoading] = useState(false);
 
     // date implementation
     const today = new Date();
@@ -106,10 +109,109 @@ const [complainMessage, setComplainMessage] = useState({})
         }
     }
 
-    const sendMessage = () =>{
-        setLogBtnDisabled(true)
-        setIsLoginBtn(true)
-        console.log('Respond of Message ', data.reportSubject + ' ' + data.reportMessage)
+    // get user token details from local storage here
+  _getUserTokenInfo = async () => {
+    try {
+      const TokenInfo = await AsyncStorage.getItem("USER_TOKEN");
+      if (TokenInfo !== null) {
+        setMyToken(TokenInfo);
+      }
+    } catch (error) {
+      // Error retrieving data
+    }
+  };
+
+  useEffect(() => {
+    _getUserTokenInfo();
+  }, [myToken]);
+
+    const postData ={
+      ticket_message: data.reportMessage,
+      subject: data.reportSubject,
+      sender_name: myDetails.surname + ' ' + myDetails.first_name,
+      tick_date: date,
+      createdBy: myDetails._id,
+      ticket_type:'Ticket',
+    }
+    const sendMessage = async () =>{
+      if(!data.reportMessage || !data.reportSubject || !date){
+        Toast.show({
+          type: ALERT_TYPE.DANGER,
+          title: 'Error',
+          textBody: 'All fields are required',
+          titleStyle: {fontFamily: '_semiBold', fontSize: 18},
+          textBodyStyle: {fontFamily: '_regular', fontSize: 14,},
+          })
+       return
+      }
+      try {
+         // call api method
+         setBtnRegLoading(true);
+         setLogBtnDisabled(true)
+         //console.log('Respond of Message ', data.reportSubject + ' ' + data.reportMessage + ' ' + date  +' ' + myToken)
+          const res = await client.post('/api/submit_ticketMobile', postData, {
+          //  headers: {
+          //   Accept: 'application/json',
+          //   'Content-Type': 'application/json',
+          //   Authorization: `Bearer ${myToken}`,
+          // },
+           })
+           //console.log("Feedback", res.data)
+            if(res.data.msg == '200'){
+            setData({
+            reportSubject: '',
+            reportMessage: '',
+           })
+           setDate('')
+          
+           Dialog.show({
+            type: ALERT_TYPE.SUCCESS,
+            title: 'Successful',
+            textBody: 'Your ticket sent successfully! We will get in-touched shortly',
+            button: 'Okay',
+            textBodyStyle: { fontFamily: '_regular', fontSize: 16 },
+            titleStyle: { fontFamily: '_bold', fontSize: 20 },
+          })
+       
+        }
+          else if (res.data.status == '401') {
+          Toast.show({
+              type: ALERT_TYPE.DANGER,
+              title: 'Failed',
+              textBody: 'Authentication required',
+              textBodyStyle: { fontFamily: '_regular', fontSize: 16 },
+              titleStyle: { fontFamily: '_bold', fontSize: 20 },
+          })
+   
+        }
+        else if (res.data.status == '500') {
+          Toast.show({
+              type: ALERT_TYPE.DANGER,
+              title: 'Error',
+              textBody: 'Error occurred while processing! Please try again later',
+              textBodyStyle: { fontFamily: '_regular', fontSize: 16 },
+              titleStyle: { fontFamily: '_bold', fontSize: 20 },
+          })
+   
+        }
+        else {
+          Toast.show({
+              type: ALERT_TYPE.DANGER,
+              title: 'Error',
+              titleStyle: { fontFamily: '_bold', fontSize: 20 },
+              textBody: 'Sorry, Something went wrong',
+              textBodyStyle: { fontFamily: '_regular', fontSize: 16 },
+
+          })
+      
+      }
+      } catch (error) {
+        console.log(error.message)
+        }
+        finally {
+          setBtnRegLoading(false);
+          setLogBtnDisabled(false)
+        }
     }
 
   return (
@@ -139,7 +241,7 @@ const [complainMessage, setComplainMessage] = useState({})
           <View style={styles.nameView}></View>
         </View>
       </LinearGradient>
-      
+      <Loader  loading={btnRegLoading} textInfo={'Processing wait...'}/>
        
       <ScrollView contentContainerStyle={styles.container} showsVerticalScrollIndicator={false}>
        

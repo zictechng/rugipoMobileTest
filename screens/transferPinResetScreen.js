@@ -26,7 +26,10 @@ import {
 import { gs, colors } from "../styles";
 import { useNavigation } from '@react-navigation/native';
 import AsyncStorage from '@react-native-async-storage/async-storage';
-import * as Animatable from 'react-native-animatable'
+import * as Animatable from 'react-native-animatable';
+import { ALERT_TYPE, Dialog, Toast } from 'react-native-alert-notification';
+import client from '../api/client';
+import Loader from '../components/Loader';
 
 const TransferPinResetScreen = () => {
   const navigation = useNavigation();
@@ -37,26 +40,101 @@ const TransferPinResetScreen = () => {
 
   const [loginState, setLoginState, isLoading, setIsLoading, myDetails, setMyDetails, myMethod ] = useContext(UserContext);
 
-  const [data, setData] = React.useState({
-    reportSubject: '',
-    reportMessage: '',
-    check_subjectInputChange: false,
-    check_messageInputChange: false,
-});
-
-const [complainMessage, setComplainMessage] = useState({})
-
-    const [userData, setUserData]= useState('');
+    const [data, setData] = useState('');
     const [isMyLoading, setIsMyLoading] = useState(false);
     const [isloginBtn, setIsLoginBtn] = useState(false);
     const [logBtnDisabled, setLogBtnDisabled] = useState(false);
-
+    const [btnRegLoading, setBtnRegLoading] = useState(false);
     
-    const sendMessage = () =>{
-        setLogBtnDisabled(true)
-        setIsLoginBtn(true)
-        console.log('Respond of Message ', selectedData + ' ' + data.reportMessage)
+    const postID ={
+      new_pin: data,
+      uid: myDetails._id,
     }
+    const resetMyPin = async() =>{
+      if(data === undefined || data ===''){
+        Toast.show({
+          type: ALERT_TYPE.DANGER,
+          title: 'Error',
+          textBody: 'Please enter pin',
+          textBodyStyle: { fontFamily: '_regular', fontSize: 16 },
+          titleStyle: { fontFamily: '_bold', fontSize: 20 },
+      })
+      return
+      }
+      try {
+        setBtnRegLoading(true);
+        const res = await client.post('/api/reset_AccountPINMobile', postID)
+        if(res.data.msg == '200'){
+         Dialog.show({
+          type: ALERT_TYPE.SUCCESS,
+          title: 'Successful',
+          textBody: 'Your account pin has been reset successfully',
+          button: 'Okay',
+          textBodyStyle: { fontFamily: '_regular', fontSize: 16 },
+          titleStyle: { fontFamily: '_bold', fontSize: 20 },
+        })
+        
+        setData('')
+      }
+        else if (res.data.status == '401') {
+        Toast.show({
+            type: ALERT_TYPE.DANGER,
+            title: 'Failed',
+            textBody: 'Authentication required',
+            textBodyStyle: { fontFamily: '_regular', fontSize: 16 },
+            titleStyle: { fontFamily: '_bold', fontSize: 20 },
+        })
+  
+      }
+      else if (res.data.status == '500') {
+        Toast.show({
+            type: ALERT_TYPE.DANGER,
+            title: 'Error',
+            textBody: 'Error occurred while processing! Please try again later',
+            textBodyStyle: { fontFamily: '_regular', fontSize: 16 },
+            titleStyle: { fontFamily: '_bold', fontSize: 20 },
+        })
+  
+      }
+      else {
+        Toast.show({
+            type: ALERT_TYPE.DANGER,
+            title: 'Error',
+            titleStyle: { fontFamily: '_bold', fontSize: 20 },
+            textBody: 'Sorry, Something went wrong',
+            textBodyStyle: { fontFamily: '_regular', fontSize: 16 },
+  
+        })
+    
+    }
+    } catch (error) {
+      console.log(error.message)
+      }
+      finally {
+        setBtnRegLoading(false);
+      }
+    }
+
+    const confirmReset = () =>{
+          
+      return (
+        Alert.alert(
+          title='Caution !',
+          message='Are you sure you want to reset your PIN?',
+          [
+            {
+              text: 'Cancel',
+              onPress: () => (''),
+              style: 'cancel',
+            },
+            {text: 'Yes', onPress: () => resetMyPin(),
+            style: 'ok',
+            },
+          ],
+            {cancelable : true}
+          )
+        )
+      }
 
   return (
     <SafeAreaView style={{ flex: 1, backgroundColor: colors.secondaryColor2}}>
@@ -86,7 +164,8 @@ const [complainMessage, setComplainMessage] = useState({})
         </View>
       </LinearGradient>
       
-       
+      <Loader  loading={btnRegLoading} textInfo={'Updating wait...'}/>
+
       <ScrollView contentContainerStyle={styles.container} showsVerticalScrollIndicator={false}>
        
         <View style={styles.header}>
@@ -113,9 +192,10 @@ const [complainMessage, setComplainMessage] = useState({})
                             placeholder="Enter new pin"
                             style={styles.textInput}
                             autoCapitalize="none"
-                            onChangeText={(val) => ('')}
-                            value={data.reportMessage}
+                            onChangeText={(val) => setData(val)}
+                            value={data}
                             onEndEditing={(e) =>('')}
+                            secureTextEntry={true}
                             //onChangeText={(text) => setComplainMessage({text})}
                             //value={complainMessage.text}
                             />
@@ -137,7 +217,7 @@ const [complainMessage, setComplainMessage] = useState({})
                     
                     <View style={styles.button}>
                         <TouchableOpacity  style={[styles.signIn, logBtnDisabled? styles.signInDisable: '']}
-                            onPress={() =>{sendMessage()}}
+                            onPress={() =>{confirmReset()}}
                             disabled={logBtnDisabled}
                         > 
                         <LinearGradient
