@@ -120,16 +120,11 @@ import React, {
     useEffect(() => {
       setData();
     }, [currentPage]);
-  
-          console.log("Total Page ", allPage)
-          console.log("Current Page ", currentPage)
-          console.log("Total Record ", allData)
-          console.log("Current Record ", transactions.length)
+          // console.log("Total Page ", allPage)
+          // console.log("Current Page ", currentPage)
+          // console.log("Total Record ", allData)
+          // console.log("Current Record ", transactions.length)
     const loadMoreItems = () => {
-      
-      // if(!isEndReached){
-      //   return;
-      // }
         setCurrentPage(currentPage + 1)
       
     };

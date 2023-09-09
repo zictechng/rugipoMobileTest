@@ -20,6 +20,7 @@ import SendMoneyScreen from '../screens/sendMoneyScreen';
 import CustomSplash from '../screens/customSplash';
 import { Alert } from 'react-native';
 import { InterBankModal } from '../components/interBankModal';
+import client from '../api/client';
 
 const Tab = createBottomTabNavigator();
 const Stack = createStackNavigator();
@@ -48,7 +49,7 @@ const CustomTabBarButton = ({children, onPress}) =>(
 
 const BottomTab = () => {
     const navigation = useNavigation();
-    const [loginState, setLoginState, isLoading, setIsLoading, myDetails, setMyDetails] = useContext(UserContext);
+    const [loginState, setLoginState, isLoading, setIsLoading, myDetails, setMyDetails, messageNotice, setMessageNotice] = useContext(UserContext);
     const [userData, setUserData]= useState({});
 
     const { showActionSheetWithOptions } = useActionSheet();
@@ -79,7 +80,6 @@ const BottomTab = () => {
   
     };
  
-
   const showActionSheet = () => {
     //To show the Bottom ActionSheet
     actionSheet.current.show();
@@ -87,8 +87,7 @@ const BottomTab = () => {
   
       const onPress = () => {
         const options = optionArray;
-       
-        //const destructiveButtonIndex = 0;
+       //const destructiveButtonIndex = 0;
         const cancelButtonIndex = 3;
         
         showActionSheetWithOptions({
@@ -110,8 +109,10 @@ const BottomTab = () => {
                 if(selectedIndex === 0) {
                     navigation.navigate('localTransfer', {
                         //data: someData,
+                       
                         withAnimation: true,
                         animationType: 'slide',
+                        
                     });
                   }
 
@@ -126,7 +127,7 @@ const BottomTab = () => {
                   if(selectedIndex === 2) {
                     loanModalVisible(true);
                   }
-            console.log('You selected ' + selectedIndex);
+                //console.log('You selected ' + selectedIndex);
             });
         }
 
@@ -135,10 +136,13 @@ const BottomTab = () => {
         useEffect(() => {
         setTimeout(async() =>{
           let userLogInToken;
+          let userLoginID;
           userLogInToken = null;
+          userLoginID = null
           try{
             userLogInToken = await AsyncStorage.getItem('USER_LOCAL_INFO')
-            //console.log("User Details in Main TabMenu 2 ", userLogInToken);
+            userLoginID = await AsyncStorage.getItem('LOGIN_ID')
+            
             const currentUserDetails = JSON.parse(userLogInToken);
             setMyDetails(currentUserDetails);
            }catch (e){
@@ -148,7 +152,6 @@ const BottomTab = () => {
         }, 1000)
         
       }, []) : null}
- 
 
   if(isLoading){
     return <CustomSplash />
@@ -156,20 +159,17 @@ const BottomTab = () => {
   }
 
   return (
-    // {/* {isLoading ? (
-    //     <Stack.Screen
-    //       name="CustomSplash"
-    //       component={CustomSplash}
-    //       options={{ headerShown: false }}
-    //     />
-    //   ) : '' }}
     <>   
         <Tab.Navigator 
-            screenOptions={{
+            tabBarOptions={{
+            labeled: false,
             tabBarShowLabel: false,
             headerShown: false,
+            showLabel: false,
+            tabBarShowLabel: false,
                 //showIcon: true,
-            tabBarStyle:{
+            //tabBarStyle:{
+            style:{
                 position: 'absolute',
                 bottom: 15,
                 left: 15,

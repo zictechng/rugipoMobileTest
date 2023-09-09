@@ -37,7 +37,7 @@ const LoginScreen = ({navigation}) => {
         isValidPassword: true,
     });
     
-    const [loginState, setLoginState, isLoading, setIsLoading, userRegCode, setUserRegCode] = useContext(UserContext);
+    const [loginState, setLoginState, isLoading, setIsLoading, userRegCode, setUserRegCode, messageNotice, setMessageNotice,] = useContext(UserContext);
 
     const [userData, setUserData]= useState('');
     const [isMyLoading, setIsMyLoading] = useState(false);
@@ -150,17 +150,12 @@ const LoginScreen = ({navigation}) => {
             password: data.password,
              })
             //.then(res => {
-                    if(res.data.msg =='200'){
-                    // Dialog.show({
-                    //     type: ALERT_TYPE.SUCCESS,
-                    //     title: 'Success',
-                    //     textBody: 'Congrats! account authenticated',
-                    //     button: 'close',
-                    //   });
-                 AsyncStorage.setItem('USER_LOCAL_INFO', JSON.stringify(res.data.userData))
+                if(res.data.msg =='200'){
+                  AsyncStorage.setItem('USER_LOCAL_INFO', JSON.stringify(res.data.userData))
                  AsyncStorage.setItem('USER_TOKEN', JSON.stringify(res.data.token))
                  setDataInLocalStorage('USER_TOKEN', JSON.stringify(res.data.token))
                  setLoginState(res.data.token)
+                 AsyncStorage.setItem('LOGIN_ID', JSON.stringify(res.data.userData._id))
                
 
                 setIsMyLoading(false);

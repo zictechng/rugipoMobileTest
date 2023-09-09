@@ -16,21 +16,21 @@ import {
   KeyboardAvoidingView
 } from 'react-native';
 import { LinearGradient } from "expo-linear-gradient";
-import moment from "moment";
 import { UserContext } from "../components/UserContext";
-import FeatherIcon from 'react-native-vector-icons/Feather';
-import Feather from 'react-native-vector-icons/Feather'
+import moment from "moment";
 import {
   Ionicons} from "@expo/vector-icons";
 import { gs, colors } from "../styles";
 import { useNavigation } from '@react-navigation/native';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import * as Animatable from 'react-native-animatable'
-import { ALERT_TYPE, Dialog, Toast } from 'react-native-alert-notification';
 import DashedLine from 'react-native-dashed-line';
+import { NumberValueFormat } from '../components/FormatValue';
 
-const DetailsPageScreen = () => {
+const DetailsPageScreen = ({route}) => {
   const navigation = useNavigation();
+  let getDetail = route.params?.detail;
+    //console.log('Getting data ', getDetail._id)
      // function to dismiss the keyboard when clicking out the input field
      dismissKeyboard = () => {
         Keyboard.dismiss();
@@ -44,182 +44,6 @@ const DetailsPageScreen = () => {
     check_subjectInputChange: false,
     check_messageInputChange: false,
 });
-
-
-    const [isloginBtn, setIsLoginBtn] = useState(false);
-    const [logBtnDisabled, setLogBtnDisabled] = useState(false);
-    const [copiedText, setCopiedText] = useState('');
-    const [copiedTextOTP, setCopiedTextOtp] = useState('');
-    const [enterCode, setEnterCode] = useState('');
-   
-    const sendMessage = () =>{
-        setLogBtnDisabled(true)
-        setIsLoginBtn(true)
-        console.log('Respond of Message ', selectedData + ' ' + data.reportMessage)
-    }
-
-    const  ConfirmCode = async () =>{
-        if(enterCode.length != 4){
-            Toast.show({
-                type: ALERT_TYPE.DANGER,
-                title: 'Error!',
-                textBody: 'OTP code required 4 characters',
-                textBodyStyle: { fontFamily: '_regular', fontSize: 16 },
-                titleStyle: { fontFamily: '_bold', fontSize: 20 },
-                })
-            return
-        }
-        setBtnVerifyLoading(true)
-        //console.log('Auto Send Press', enterCode);
-        try{
-            const res = await client.post('/api/otp_verify', {
-                otp_code: enterCode,
-                user_email: userRegEmail,
-            })
-            if(res.data.msg =='200'){
-                Dialog.show({
-                    type: ALERT_TYPE.SUCCESS,
-                    textBodyStyle: { fontFamily: '_regular', fontSize: 16 },
-                    titleStyle: { fontFamily: '_bold', fontSize: 20 },
-                    title: 'Success',
-                    textBody: 'Account verified successfully',
-                    button: 'Okay',
-                   });
-                
-            navigation.navigate('Login');
-            } else if(res.data.status == '401') {
-                Toast.show({
-                    type: ALERT_TYPE.DANGER,
-                    title: 'Failed',
-                    textBody: 'No user found.',
-                    textBodyStyle: { fontFamily: '_regular', fontSize: 16 },
-                    titleStyle: { fontFamily: '_bold', fontSize: 20 },
-                    })
-                // Alert.alert("Login failed", "No user found",[
-                //     {text: "Okay"}
-                // ]);
-            }
-            else if(res.data.status == '403'){
-                Toast.show({
-                    type: ALERT_TYPE.DANGER,
-                    title: 'Error',
-                    textBody: 'Sorry, Try again.',
-                    textBodyStyle: { fontFamily: '_regular', fontSize: 16 },
-                    titleStyle: { fontFamily: '_bold', fontSize: 20 },
-                    })
-               
-            }
-            else if(res.data.status == '404'){
-                Toast.show({
-                    type: ALERT_TYPE.DANGER,
-                    title: 'Failed',
-                    textBody: 'Invalid OTP code.',
-                    textBodyStyle: { fontFamily: '_regular', fontSize: 16 },
-                    titleStyle: { fontFamily: '_bold', fontSize: 20 },
-                    })
-            }
-            else if(res.data.status == '500'){
-                Toast.show({
-                    type: ALERT_TYPE.DANGER,
-                    title: 'Sorry',
-                    textBody: 'Something went wrong!.',
-                    textBodyStyle: { fontFamily: '_regular', fontSize: 16 },
-                    titleStyle: { fontFamily: '_bold', fontSize: 20 },
-                    })
-            }
-             else {
-                Toast.show({
-                    type: ALERT_TYPE.DANGER,
-                    title: 'Error',
-                    textBody: 'Sorry, Something went wrong.',
-                    textBodyStyle: { fontFamily: '_regular', fontSize: 16 },
-                    titleStyle: { fontFamily: '_bold', fontSize: 20 },
-                    })
-                }
-        }
-        catch (error) {
-            console.log(error.message)
-        }
-        finally {
-            setBtnVerifyLoading(false)
-        }
-      };
-
-      // automatically call verify function once OTP code is entered
-      const  confirmCodeAuto = async (useCode, useEmail) =>{
-       setBtnVerifyLoading(true)
-        try{
-            const res = await client.post('/api/otp_verify', {
-                otp_code: useCode,
-                user_email: useEmail,
-            })
-            if(res.data.msg =='200'){
-                Dialog.show({
-                    type: ALERT_TYPE.SUCCESS,
-                    textBodyStyle: { fontFamily: '_regular', fontSize: 16 },
-                    titleStyle: { fontFamily: '_bold', fontSize: 20 },
-                    title: 'Success',
-                    textBody: 'Account verified successfully',
-                    button: 'Okay',
-                   });
-                
-            navigation.navigate('Login');
-            } else if(res.data.status == '401') {
-                Toast.show({
-                    type: ALERT_TYPE.DANGER,
-                    title: 'Failed',
-                    textBody: 'No user found.',
-                    textBodyStyle: { fontFamily: '_regular', fontSize: 16 },
-                    titleStyle: { fontFamily: '_bold', fontSize: 20 },
-                    })
-                // Alert.alert("Login failed", "No user found",[
-                //     {text: "Okay"}
-                // ]);
-            }
-            else if(res.data.status == '403'){
-                Toast.show({
-                    type: ALERT_TYPE.DANGER,
-                    title: 'Error',
-                    textBody: 'Sorry, Try again.',
-                    textBodyStyle: { fontFamily: '_regular', fontSize: 16 },
-                    titleStyle: { fontFamily: '_bold', fontSize: 20 },
-                    })
-            }
-            else if(res.data.status == '404'){
-                Toast.show({
-                    type: ALERT_TYPE.DANGER,
-                    title: 'Failed',
-                    textBody: 'Invalid OTP code.',
-                    textBodyStyle: { fontFamily: '_regular', fontSize: 16 },
-                    titleStyle: { fontFamily: '_bold', fontSize: 20 },
-                    })
-            }
-            else if(res.data.status == '500'){
-                Toast.show({
-                    type: ALERT_TYPE.DANGER,
-                    title: 'Sorry',
-                    textBody: 'Something went wrong!.',
-                    textBodyStyle: { fontFamily: '_regular', fontSize: 16 },
-                    titleStyle: { fontFamily: '_bold', fontSize: 20 },
-                    })
-            }
-             else {
-                Toast.show({
-                    type: ALERT_TYPE.DANGER,
-                    title: 'Error',
-                    textBody: 'Sorry, Something went wrong.',
-                    textBodyStyle: { fontFamily: '_regular', fontSize: 16 },
-                    titleStyle: { fontFamily: '_bold', fontSize: 20 },
-                    })
-                }
-        }
-        catch (error) {
-            console.log(error.message)
-        }
-        finally {
-            setBtnVerifyLoading(false)
-        }
-      };
 
   return (
     <SafeAreaView style={{ flex: 1, backgroundColor: colors.secondaryColor2, overflow: 'hidden',}}>
@@ -273,34 +97,33 @@ const DetailsPageScreen = () => {
 
             <View style={{marginBottom: 0}}>
                 <Text style={styles.mobileTitle}>Mobile Transfer</Text>
-                <Text style={styles.mobileMessage}>Transaction Details</Text>
+            <View style={{flexDirection: 'row', justifyContent:'space-between'}}>
+            <Text style={styles.mobileMessage}>Transaction Details</Text>
+            <Text style={[styles.mobileMessage, {marginRight: 15, color:colors.secondaryColor2, fontSize: 14}]}>{getDetail.transaction_status}</Text>
             </View>
+            </View>
+            
             {Platform.OS === 'ios' ? <DashedLine dashLength={5} dashGap={5} dashColor='#aaa' dashStyle={{ marginRight: 4.9, marginBottom: 8}} /> :
             <View style={{borderBottomWidth: 1, borderBottomColor: '#aaa', borderStyle: "dashed", paddingBottom: 5, marginHorizontal: 5, marginBottom: 8}} />
             }
-            
-
             
             <View style={{flexDirection: 'row', justifyContent:'space-between', marginLeft: 0, marginRight: 12, marginTop: 15}}>
                 <View>
                     <Text>Sender</Text>
                 </View>
                 <View>
-                    <Text>Thank for the job</Text>
+                    <Text>{getDetail.sender_name}</Text>
                 </View>
                 
             </View>
-            {Platform.OS ==='ios' ? <DashedLine dashLength={5} dashGap={5} dashColor='#aaa' dashStyle={{ marginRight: 4.9, marginBottom:8 }} />:
-            <View style={styles.divider}/>    
-            }
-            
-           
+            <DashedLine dashLength={5} dashGap={5} dashColor='#aaa' dashStyle={{ marginRight: 4.9, marginBottom: 8 }} />
+
             <View style={{flexDirection: 'row', justifyContent:'space-between', marginLeft: 0, marginRight: 12, marginTop: 15}}>
                 <View>
                     <Text>Receiver</Text>
                 </View>
                 <View>
-                    <Text>Thank for the job</Text>
+                    <Text>{getDetail.acct_name}</Text>
                 </View>
                 
             </View>
@@ -312,7 +135,20 @@ const DetailsPageScreen = () => {
                     <Text>Transfer Amount</Text>
                 </View>
                 <View>
-                    <Text>Thank for the job</Text>
+                    <Text>{getDetail.transac_nature == "Debit" ? "-" : "+" }
+                        <NumberValueFormat value={getDetail.amount}/>
+                        </Text>
+                </View>
+                
+            </View>
+            <DashedLine dashLength={5} dashGap={5} dashColor='#aaa' dashStyle={{ marginRight: 4.9, marginBottom: 8 }} />
+
+            <View style={{flexDirection: 'row', justifyContent:'space-between', marginLeft: 0, marginRight: 12, marginTop: 15}}>
+                <View>
+                    <Text>Nature</Text>
+                </View>
+                <View>
+                    <Text>{getDetail.transac_nature}</Text>
                 </View>
                 
             </View>
@@ -323,7 +159,7 @@ const DetailsPageScreen = () => {
                     <Text>Source Account</Text>
                 </View>
                 <View>
-                    <Text>Thank for the job</Text>
+                    <Text>{getDetail.sender_acct_number}</Text>
                 </View>
                 
             </View>
@@ -335,7 +171,7 @@ const DetailsPageScreen = () => {
                     <Text>Description</Text>
                 </View>
                 <View style={{flexShrink: 1}}>
-                    <Text style={{textAlign: 'justify',}}> It is a long established fact that a reader will be distracted by the readable content of a page when looking at its layout. The point of using Lorem Ipsum is that it has a more-or-less normal distribution of letters,</Text>
+                    <Text style={{textAlign: 'justify',}}> {getDetail.tran_desc}</Text>
                 </View>
                 
             </View>
@@ -346,7 +182,7 @@ const DetailsPageScreen = () => {
                     <Text>Ref ID</Text>
                 </View>
                 <View>
-                    <Text>Thank for the job</Text>
+                    <Text>{getDetail.tid}</Text>
                 </View>
                 
             </View>
@@ -358,7 +194,7 @@ const DetailsPageScreen = () => {
                     <Text>Date</Text>
                 </View>
                 <View>
-                    <Text>Thank for the job</Text>
+                    <Text>{moment(getDetail.createdOn).format("DD/MMMM/YYYY hh:mm:ss")}</Text>
                 </View>
                 
             </View>
@@ -419,8 +255,7 @@ mobileTitle:{
 },
 mobileMessage: {
     fontFamily:'_regular',
-    fontSize: 13,
-
+    fontSize: 11,
 },  
 
 divider:{

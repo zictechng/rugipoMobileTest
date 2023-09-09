@@ -3,27 +3,21 @@ import { LinearGradient } from 'expo-linear-gradient'
 import {
     BarChart,
   } from "react-native-chart-kit";
-  import { widthPercentageToDP as wp, 
-    heightPercentageToDP as hp } from 'react-native-responsive-screen';
-import { SafeAreaView, View, Text, StyleSheet, Image, Alert, Modal, ActivityIndicator,
-  TextInput, TouchableOpacity, StatusBar, Dimensions, Pressable, ImageBackground, FlatList, Platform} from 'react-native';
+import { SafeAreaView, View, Text, StyleSheet, ScrollView,Image, Alert, Modal, ActivityIndicator,
+  TouchableOpacity, StatusBar, Dimensions, Platform, RefreshControl} from 'react-native';
 import { UserContext } from '../components/UserContext';
 import { Ionicons, Entypo, SimpleLineIcons, FontAwesome, FontAwesome5} from '@expo/vector-icons'
-import FeatherIcon from 'react-native-vector-icons/Feather'
-import AsyncStorage from '@react-native-async-storage/async-storage';
 import { useNavigation } from '@react-navigation/native';
 import moment from "moment";
 import { gs, colors } from '../styles'
-import { ScrollView } from 'react-native-gesture-handler';
-import Icon from 'react-native-vector-icons/FontAwesome'
-
+//import { ScrollView } from 'react-native-gesture-handler';
 import RBSheet from 'react-native-raw-bottom-sheet'
 
 import CircularProgress, { CircularProgressBase } from 'react-native-circular-progress-indicator';
 import client from '../api/client';
-import Loader from '../components/Loader';
-import { NumericFormat } from 'react-number-format';
 import { NumberValueFormat } from '../components/FormatValue';
+import { Avatar, Badge, withBadge } from 'react-native-elements'
+
 
 const screenWidth = Dimensions.get("window").width;
 
@@ -62,7 +56,7 @@ const MyBarChart = () => {
 const HomeScreen = () => {
   const navigation = useNavigation();
 
-  const [loginState, setLoginState, isLoading, setIsLoading, myDetails, setMyDetails] = useContext(UserContext);
+  const [loginState, setLoginState, isLoading, setIsLoading, myDetails, setMyDetails, messageNotice, setMessageNotice] = useContext(UserContext);
   const [isModalVisible, setisModalVisible] = useState(false);
 
   const [chooseData, setchooseData] = useState();
@@ -71,62 +65,70 @@ const HomeScreen = () => {
   const [showModal, setshowModal] = useState(false);
   const [recentLoading, setRecentLoading] = useState(false);
 
-  const [myID, setMyID] = useState({});
+  const [notifications, setNotification] = useState({});
+  const [refreshing, setRefreshing] = useState(false);
+  const [countMessage, setCountMessage] = useState(false);
 
   const changeModalVisible = (bool) =>{
     setisModalVisible(bool);
   }
-
-  useEffect(() => {
-    (async()=>{
-      const my_details = await AsyncStorage.getItem("USER_LOCAL_INFO");
-      const currentUser = JSON.parse(my_details);
-      setMyID(currentUser);
-       //console.log('useEffect', currentUser)
-  })(); 
-  }, []);
-
-  const setData = (data) =>{
-    setchooseData(data);
-  };
-
-  const sheetLoan = useRef();
-   // ref
-   const sheetRef = useRef();
   
-   let actionSheet = useRef();
+    // refresh page functionality 
+    const onRefresh = useCallback(() => {
+      setRefreshing(true);
+      getMessageCount();
+      getTransaction();
+      getUserLatest();
+      setTimeout(() => {
+      setRefreshing(false);
+      }, 1000);
+    }, []);
    
-  //  useEffect(() =>{
-  //   setTimeout(async() =>{
-  //     setIsLoading(false);
-  //  }, 1000)
-     
-  // }, []);
+  const sheetLoan = useRef();
   
   const getTransaction = async() =>{
     try{
-      setRecentLoading(true);
       const recentTransaction = await client.get('/api/recent_transactions/'+myDetails._id)
-      // if(recentTransaction.data.msg =='200'){
-      //   setRecentTranData(recentTransaction)
-      // }
       setRecentTranData(recentTransaction.data)
       }catch (e){
       console.log(e);
     }
-    finally {
-      setRecentLoading(false);
-      }
   };
-// get user information from local storage here
-useEffect(() => {
-  getTransaction()
 
-  setTimeout(async() =>{
-   
-  }, 1000)
-  
-}, []);
+  const getUserLatest = async() =>{
+    try{
+      const userInfo = await client.get('/api/profileMobile/'+myDetails._id)
+      setMyDetails(userInfo.data.userData)
+      //console.log(' My Info Data  ', userInfo.data.userData);
+      }catch (e){
+      console.log(e);
+    }
+  };
+
+  const getMessageCount = async() =>{
+    try{
+      const res = await client.get('/api/user_messageCount/'+myDetails._id)
+      
+      let count = res.data.userMessage;
+      console.log('No Notification ', count)
+      if(count > 0){
+        setNotification(res.data)
+        setNotification(res.data.userMessage)
+        console.log('No Notification 2 ', res.data)
+      }
+      else if(res.data.status == '404') {
+        console.log('No Active Notification 404')
+         }
+      else{
+        console.log('Something went wrong')
+      }
+    }catch (e){
+      console.log(e);
+    }
+  };
+
+  // get user information from local storage here
+
 const props = {
   activeStrokeWidth: 20,
   inActiveStrokeWidth: 25,
@@ -142,8 +144,6 @@ const props = {
 
       <LinearGradient colors={[colors.secondaryColor2, colors.secondaryColor2]} start={[0,0]} end={[1,1]}
             style={{shadowColor: '#930D2F'}}>
-              
-
                 <View style={[gs.rowBetween, {marginTop: Platform.OS === "ios" ? 10 : 26, marginHorizontal: 10}]}>
                    {/* <View style = {styles.circleIconLeft}>
                         
@@ -158,10 +158,21 @@ const props = {
                     {/* <Text style = {styles.text}>{new Date().toString().slice(0,11)}</Text> */}
                    
                     <TouchableOpacity style = {styles.circleIconLeft}
-                    onPress={() =>{ Alert.alert('Notification Message')}}>
+                    onPress={() => navigation.navigate('message')}>
                      <Ionicons name="notifications-outline" color={colors.text} size={20}
                      />
+                     
                     </TouchableOpacity>
+                    {notifications > 0 ?
+                      <Badge status="warning"
+                      onPress={() => navigation.navigate('message')}
+                      containerStyle={{position: "absolute", top: 2, right: -10, marginRight: 10}}
+                      value={notifications} 
+                      badgeStyle={{backgroundColor: '#777'}}
+                      textStyle={{fontFamily: '_semiBold', fontSize: 12}}
+                      />
+                     :null
+                    }
                    
                 </View>
 
@@ -184,7 +195,10 @@ const props = {
             </LinearGradient>
 
             {/* body of the screen */}
-            <ScrollView style={{marginBottom: 50}}>
+            <ScrollView style={{marginBottom: 50}}
+              refreshControl={
+                <RefreshControl refreshing={refreshing} onRefresh={onRefresh} />
+              } >
               
               
             <View style={styles.middlePage}>
@@ -263,8 +277,7 @@ const props = {
                   <View style={{flexDirection: "row", justifyContent: 'space-between', alignItems:'center', marginHorizontal: 15, marginTop: 20, marginBottom: 10}}>
                   {recentTranData.length ? <>
                     
-                    <Text style={{color:"#aaa", fontSize: 15, fontFamily:'_regular'}} 
-                    onPress={() => navigation.navigate('detailsPage')}>Recent transaction</Text>
+                    <Text style={{color:"#aaa", fontSize: 15, fontFamily:'_regular'}}>Recent transaction</Text>
                     <TouchableOpacity
                       onPress={() => navigation.navigate('History')}>
                     <Text style={{color:"#000", fontSize: 15, fontFamily: '_regular'}}>View </Text>
@@ -293,14 +306,12 @@ const props = {
 
                         <View>
                           {recentTranData.map((item, index) => (
-                            
                             <TouchableOpacity style={styles.recentTransaction}
-                            onPress={() =>{
-                              Alert.alert("You click to View all transactions")
+                              onPress={() =>{
+                              navigation.navigate('detailsPage', {detail: Object.assign({}, item) })
                             }}  key={index} >
                           
-                            <View style={{flexDirection:'row', alignItems:'center'}}
-                             >
+                            <View style={{flexDirection:'row', alignItems:'center'}}>
                               
                               <View>
                               {item.transac_nature =='Debit'? <Ionicons name="ios-arrow-down-circle-sharp"
@@ -326,7 +337,7 @@ const props = {
                                 {/* date and navigation sign*/}
                                   <View style={{flexDirection:'row', alignItems:'center',
                                     justifyContent:'center'}}>
-                                    <Text style={{fontFamily:'_semiBold', fontSize:10, color:"#aaa"}}>{moment(item.creditOn).format("DD/mm/YYYY hh:mm:ss")}</Text>
+                                    <Text style={{fontFamily:'_semiBold', fontSize:10, color:"#aaa"}}>{moment(item.creditOn).format("DD/MM/YYYY hh:mm:ss")}</Text>
                                     <FontAwesome name="angle-right"
                                   size={25} color="#aaa" style={{marginLeft:10}} />
                                   </View>
@@ -337,50 +348,8 @@ const props = {
                             
                           ))}
                         </View>
-                            {/* <FlatList
-                              keyExtractor = {item => item._id}  
-                              data={recentTranData}
-                              renderItem = {({item}) => (
-                              <TouchableOpacity style={styles.recentTransaction}
-                              onPress={() =>{
-                                Alert.alert("You click to View all transactions")
-                              }}>
-                           
-                              <View style={{flexDirection:'row', alignItems:'center'}}>
-                                
-                                <View>
-                                {item.transac_nature =='Debit'? <Ionicons name="ios-arrow-down-circle-sharp"
-                                  size={30} color="#ea3372" marginLeft={8}/> : <Ionicons name="ios-arrow-up-circle-sharp"
-                                  size={30} color="#ea3372" marginLeft={8}/>}
-                                </View>
-                                  
-                                
-                                <View style={{flexDirection:'column',
-                                  justifyContent:'flex-start', marginLeft: 10}}>
-                                <Text style={{fontFamily:'_semiBold',
-                                    color:'#aaa', fontSize:13, marginTop: 5}}>{item.tran_type} | {item.transac_nature}</Text>
-                                  <Text style={{fontFamily:'_semiBold', fontSize:13, marginBottom: 5}}>{item.transac_nature =='Debit'? '-' : '+'}<NumberValueFormat value={item.amount} /></Text>
-                                </View>
-                              </View>
-
-                              
-                                <View style={{flexDirection:'column',
-                                  backgroundColor:'#fff', alignItems:'center',
-                                    justifyContent:'center'}}>
-                                  
-                                    <View style={{flexDirection:'row', alignItems:'center',
-                                      justifyContent:'center'}}>
-                                      <Text style={{fontFamily:'_semiBold', fontSize:10, color:"#aaa"}}>{item.creditOn}</Text>
-                                      <FontAwesome name="angle-right"
-                                    size={25} color="#aaa" style={{marginLeft:10}} />
-                                    </View>
-
-                              </View>
-                            </TouchableOpacity>)} 
-                            /> */}
-                           
-                        </View>
-                  
+                      </View>
+        
             </ScrollView>
               {/* This show a dash round line */}
                 {/* <View style={styles.placeholder}>
@@ -449,54 +418,11 @@ const props = {
                                 </View>
                               </TouchableOpacity>
                         </View>
-                    </RBSheet>
-
-                {/* Start transfer action sheet here
-                    <RBSheet
-                     ref={sheet}
-                      customStyles={{container: styles.sheet,
-                        // wrapper: {
-                        //   backgroundColor: "transparent"
-                        // },
-                        }}
-                      height={350}
-                      openDuration={250}
-                      dragFromTopOnly={true}
-                      closeOnDragDown={true}
-                      animationType="fade"  
-                    >
-                        <View style={styles.sheetContent}>
-                          <FeatherIcon name="shield" color="#F2688B" size={30} style={{alignSelf:'center'}}></FeatherIcon>
-                          <Text style={styles.sheetTitle}>Secure your account</Text>
-                          <Text style={styles.message}> enabling 2FA adds an extra layer to your security of your account by requiring you to enter a one-time code in addition to your password when you sign in.</Text>
-                        
-                          
-                          <TouchableOpacity onPress={() =>{
-
-                          }}>
-                            <View style={styles.btn}>
-                              <Text style={styles.btnText}>Confirm</Text>
-                            </View>
-                          </TouchableOpacity>
-
-                            
-                          <TouchableOpacity onPress={() =>{
-                              sheet.current.close();
-                              }}>
-                                <View style={[styles.btn, {marginTop: 5, backgroundColor:'transparent',
-                              borderColor:'transparent'}]}>
-                                  <Text style={[styles.btnText, {color:'#F2688B'}]}>Cancel</Text>
-                                </View>
-                              </TouchableOpacity>
-                        </View>
-                    </RBSheet>
-                 */}
-      </View>
-                {/* header of the screen */}
-            
+                  </RBSheet>
+        
                 
-                    
-     </SafeAreaView>
+          </View>
+    </SafeAreaView>
   );
 }
 
@@ -810,11 +736,7 @@ const styles = StyleSheet.create({
         borderColor: colors.secondaryColor1,
         borderWidth: 1,
       },
-      btnText:{
-        fontSize: 18,
-        fontWeight: "600",
-        color: "#fff",
-      },
+     
       placeholder:{
         flex: 1,
         height: 500,

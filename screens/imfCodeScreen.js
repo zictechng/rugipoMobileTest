@@ -18,8 +18,6 @@ import {
 import { LinearGradient } from "expo-linear-gradient";
 import moment from "moment";
 import { UserContext } from "../components/UserContext";
-import FeatherIcon from 'react-native-vector-icons/Feather';
-import Feather from 'react-native-vector-icons/Feather'
 import {
   Ionicons,
   
@@ -30,9 +28,13 @@ import AsyncStorage from '@react-native-async-storage/async-storage';
 import * as Animatable from 'react-native-animatable'
 import OTPInputView from '@twotalltotems/react-native-otp-input';
 import { ALERT_TYPE, Dialog, Toast } from 'react-native-alert-notification';
+import LoaderModal from '../components/loaderModal';
+import client from '../api/client';
 
-const ImfCodeScreen = () => {
+const ImfCodeScreen = ({route}) => {
   const navigation = useNavigation();
+  const imfPostData = route.params?.imfCodeData;
+  const imfCodeInfo1 = route.params?.imfInfo;
      // function to dismiss the keyboard when clicking out the input field
      dismissKeyboard = () => {
         Keyboard.dismiss();
@@ -53,91 +55,106 @@ const ImfCodeScreen = () => {
     const [copiedText, setCopiedText] = useState('');
     const [copiedTextOTP, setCopiedTextOtp] = useState('');
     const [enterCode, setEnterCode] = useState('');
+    const [btnVerifyLoading, setBtnVerifyLoading] = useState(false);
    
-    const sendMessage = () =>{
-        setLogBtnDisabled(true)
-        setIsLoginBtn(true)
-        console.log('Respond of Message ', selectedData + ' ' + data.reportMessage)
-    }
-
-    const  ConfirmCode = async () =>{
-        if(enterCode.length != 4){
+      // automatically call verify function once OTP code is entered
+    const  confirmCodeAuto = async (useCode) =>{
+      
+      if(useCode.length !== 4 || useCode === undefined) {
+        Toast.show({
+          type: ALERT_TYPE.DANGER,
+          title: 'Error',
+          textBody: 'IMF code required at least 4 characters.',
+          textBodyStyle: { fontFamily: '_regular', fontSize: 16 },
+          titleStyle: { fontFamily: '_bold', fontSize: 20 },
+          })
+         return;
+      }
+      const postAllData ={
+        imf_code: useCode,
+        tran_id: imfPostData.tran_id,
+        send_amt: imfPostData.send_amt,
+        createdBy: myDetails._id,
+      }
+      
+     setBtnVerifyLoading(true)
+     setTimeout(async() =>{
+      try{
+        const res = await client.post('/api/imfCode_confirmMobile', postAllData)
+        if(res.data.msg =='200'){
+          setEnterCode('')
+          navigation.replace('transferSuccessful')
+          //console.log(' Response ' ,res.data)
+        } else if(res.data.status == '401') {
             Toast.show({
                 type: ALERT_TYPE.DANGER,
-                title: 'Error!',
-                textBody: 'OTP code required 4 characters',
+                title: 'Failed',
+                textBody: 'Account not active',
                 textBodyStyle: { fontFamily: '_regular', fontSize: 16 },
                 titleStyle: { fontFamily: '_bold', fontSize: 20 },
                 })
-            return
+                setEnterCode('')
+              }
+        else if(res.data.status == '403'){
+            Toast.show({
+                type: ALERT_TYPE.DANGER,
+                title: 'Error',
+                textBody: 'Invalid IMF Code Enter.',
+                textBodyStyle: { fontFamily: '_regular', fontSize: 16 },
+                titleStyle: { fontFamily: '_bold', fontSize: 20 },
+                })
+                setEnterCode('')
         }
-        setBtnVerifyLoading(true)
-        //console.log('Auto Send Press', enterCode);
-        try{
-            const res = await client.post('/api/otp_verify', {
-                otp_code: enterCode,
-                user_email: userRegEmail,
-            })
-            if(res.data.msg =='200'){
-                Dialog.show({
-                    type: ALERT_TYPE.SUCCESS,
-                    textBodyStyle: { fontFamily: '_regular', fontSize: 16 },
-                    titleStyle: { fontFamily: '_bold', fontSize: 20 },
-                    title: 'Success',
-                    textBody: 'Account verified successfully',
-                    button: 'Okay',
-                   });
-                
-            navigation.navigate('Login');
-            } else if(res.data.status == '401') {
-                Toast.show({
-                    type: ALERT_TYPE.DANGER,
-                    title: 'Failed',
-                    textBody: 'No user found.',
-                    textBodyStyle: { fontFamily: '_regular', fontSize: 16 },
-                    titleStyle: { fontFamily: '_bold', fontSize: 20 },
-                    })
-                // Alert.alert("Login failed", "No user found",[
-                //     {text: "Okay"}
-                // ]);
+        else if(res.data.status == '404'){
+            Toast.show({
+                type: ALERT_TYPE.DANGER,
+                title: 'Error',
+                textBody: 'IMF code require.',
+                textBodyStyle: { fontFamily: '_regular', fontSize: 16 },
+                titleStyle: { fontFamily: '_bold', fontSize: 20 },
+                })
+                setEnterCode('')
+        }
+        else if(res.data.status == '402'){
+          Toast.show({
+              type: ALERT_TYPE.DANGER,
+              title: 'Error',
+              textBody: 'No account found.',
+              textBodyStyle: { fontFamily: '_regular', fontSize: 16 },
+              titleStyle: { fontFamily: '_bold', fontSize: 20 },
+              })
+              setEnterCode('')
+      }
+        else if(res.data.status == '500'){
+            Toast.show({
+                type: ALERT_TYPE.DANGER,
+                title: 'Sorry',
+                textBody: 'Error occurred! try again.',
+                textBodyStyle: { fontFamily: '_regular', fontSize: 16 },
+                titleStyle: { fontFamily: '_bold', fontSize: 20 },
+                })
+                setEnterCode('')
+        }
+        else if(res.data.status == '501'){
+          Toast.show({
+              type: ALERT_TYPE.DANGER,
+              title: 'Sorry',
+              textBody: 'Insufficient balance.',
+              textBodyStyle: { fontFamily: '_regular', fontSize: 16 },
+              titleStyle: { fontFamily: '_bold', fontSize: 20 },
+              })
+              setEnterCode('')
+        }
+         else {
+            Toast.show({
+                type: ALERT_TYPE.DANGER,
+                title: 'Error',
+                textBody: 'Sorry, Something went wrong.',
+                textBodyStyle: { fontFamily: '_regular', fontSize: 16 },
+                titleStyle: { fontFamily: '_bold', fontSize: 20 },
+                })
+                setEnterCode('')
             }
-            else if(res.data.status == '403'){
-                Toast.show({
-                    type: ALERT_TYPE.DANGER,
-                    title: 'Error',
-                    textBody: 'Sorry, Try again.',
-                    textBodyStyle: { fontFamily: '_regular', fontSize: 16 },
-                    titleStyle: { fontFamily: '_bold', fontSize: 20 },
-                    })
-               
-            }
-            else if(res.data.status == '404'){
-                Toast.show({
-                    type: ALERT_TYPE.DANGER,
-                    title: 'Failed',
-                    textBody: 'Invalid OTP code.',
-                    textBodyStyle: { fontFamily: '_regular', fontSize: 16 },
-                    titleStyle: { fontFamily: '_bold', fontSize: 20 },
-                    })
-            }
-            else if(res.data.status == '500'){
-                Toast.show({
-                    type: ALERT_TYPE.DANGER,
-                    title: 'Sorry',
-                    textBody: 'Something went wrong!.',
-                    textBodyStyle: { fontFamily: '_regular', fontSize: 16 },
-                    titleStyle: { fontFamily: '_bold', fontSize: 20 },
-                    })
-            }
-             else {
-                Toast.show({
-                    type: ALERT_TYPE.DANGER,
-                    title: 'Error',
-                    textBody: 'Sorry, Something went wrong.',
-                    textBodyStyle: { fontFamily: '_regular', fontSize: 16 },
-                    titleStyle: { fontFamily: '_bold', fontSize: 20 },
-                    })
-                }
         }
         catch (error) {
             console.log(error.message)
@@ -145,84 +162,23 @@ const ImfCodeScreen = () => {
         finally {
             setBtnVerifyLoading(false)
         }
-      };
+     }, 2000)
+     
+    };
 
-      // automatically call verify function once OTP code is entered
-      const  confirmCodeAuto = async (useCode, useEmail) =>{
-       setBtnVerifyLoading(true)
-        try{
-            const res = await client.post('/api/otp_verify', {
-                otp_code: useCode,
-                user_email: useEmail,
-            })
-            if(res.data.msg =='200'){
-                Dialog.show({
-                    type: ALERT_TYPE.SUCCESS,
-                    textBodyStyle: { fontFamily: '_regular', fontSize: 16 },
-                    titleStyle: { fontFamily: '_bold', fontSize: 20 },
-                    title: 'Success',
-                    textBody: 'Account verified successfully',
-                    button: 'Okay',
-                   });
-                
-            navigation.navigate('Login');
-            } else if(res.data.status == '401') {
-                Toast.show({
-                    type: ALERT_TYPE.DANGER,
-                    title: 'Failed',
-                    textBody: 'No user found.',
-                    textBodyStyle: { fontFamily: '_regular', fontSize: 16 },
-                    titleStyle: { fontFamily: '_bold', fontSize: 20 },
-                    })
-                // Alert.alert("Login failed", "No user found",[
-                //     {text: "Okay"}
-                // ]);
-            }
-            else if(res.data.status == '403'){
-                Toast.show({
-                    type: ALERT_TYPE.DANGER,
-                    title: 'Error',
-                    textBody: 'Sorry, Try again.',
-                    textBodyStyle: { fontFamily: '_regular', fontSize: 16 },
-                    titleStyle: { fontFamily: '_bold', fontSize: 20 },
-                    })
-            }
-            else if(res.data.status == '404'){
-                Toast.show({
-                    type: ALERT_TYPE.DANGER,
-                    title: 'Failed',
-                    textBody: 'Invalid OTP code.',
-                    textBodyStyle: { fontFamily: '_regular', fontSize: 16 },
-                    titleStyle: { fontFamily: '_bold', fontSize: 20 },
-                    })
-            }
-            else if(res.data.status == '500'){
-                Toast.show({
-                    type: ALERT_TYPE.DANGER,
-                    title: 'Sorry',
-                    textBody: 'Something went wrong!.',
-                    textBodyStyle: { fontFamily: '_regular', fontSize: 16 },
-                    titleStyle: { fontFamily: '_bold', fontSize: 20 },
-                    })
-            }
-             else {
-                Toast.show({
-                    type: ALERT_TYPE.DANGER,
-                    title: 'Error',
-                    textBody: 'Sorry, Something went wrong.',
-                    textBodyStyle: { fontFamily: '_regular', fontSize: 16 },
-                    titleStyle: { fontFamily: '_bold', fontSize: 20 },
-                    })
-                }
-        }
-        catch (error) {
-            console.log(error.message)
-        }
-        finally {
-            setBtnVerifyLoading(false)
-        }
-      };
-
+      if(btnVerifyLoading){
+        return (
+         <Animatable.View 
+            animation='slideInUp'
+            style={[styles.modalBackground, {backgroundColor: colors.secondaryColor2}]}>
+            <LoaderModal />
+            <TouchableOpacity
+              style={{justifyContent: 'center', alignContent: 'center'}}>
+                <Text style={{fontFamily: '_semiBold', fontSize: 20, marginBottom: 10, color:'#aaa'}}>Please, Wait</Text>
+              </TouchableOpacity>
+          </Animatable.View>
+         ) 
+      }
   return (
     <SafeAreaView style={{ flex: 1, backgroundColor: colors.secondaryColor2}}>
         <StatusBar backgroundColor={colors.secondaryColor2} style="light" />
@@ -266,7 +222,6 @@ const ImfCodeScreen = () => {
                 
          <Animatable.View style={[styles.rowWrapper, {marginBottom: 8} ]}
             animation="fadeInUpBig" >
-
             <View>
                     <View style={[styles.action, {borderBottomWidth:0, marginBottom: 30, marginRight: 20}]}>
                     {/* <Text style={[styles.text_footer, {marginTop: 8, marginRight: 8}]}>Reason</Text> */}
@@ -287,21 +242,13 @@ const ImfCodeScreen = () => {
                             //borderBottomColor: "#aaa",
                         }}
                         keyboardType={'number-pad'}
-                        // codeInputFieldStyle={[styles.underlineStyleBase,  {borderColor: "#2ab12f",
-                        // color: "#aaa"}]}
-                        // codeInputHighlightStyle={styles.underlineStyleHighLighted}
-
-                        autofillFromClipboard={true}
+                         autofillFromClipboard={true}
                         returnKeyType={'done'}
-                        
-                        //onCodeChanged = {code => { setCopiedText({code})}}
                         onCodeChanged = {code => { setEnterCode(`${code}`)}}
-                        
                         onCodeFilled={
                             (code) =>{
                                 setEnterCode(`${code}`);
-                                setCopiedText(`${code}`)
-                                confirmCodeAuto(`${code}`, userRegEmail)
+                               confirmCodeAuto(`${code}`)
                              }
                         }
                     />
@@ -314,7 +261,7 @@ const ImfCodeScreen = () => {
                      
                     <View style={[styles.button, {marginTop: 20}]}>
                         <TouchableOpacity  style={[styles.signIn, logBtnDisabled? styles.signInDisable: '']}
-                            onPress={() => navigation.navigate('transferSuccessful')}
+                            onPress={() => confirmCodeAuto(enterCode)}
                             disabled={logBtnDisabled}
                         > 
                         <LinearGradient
@@ -342,7 +289,12 @@ const styles = StyleSheet.create({
   container: {
     paddingVertical: 24,
   },
-
+  modalBackground:{
+    flex:1,
+    alignItems: 'center',
+    flexDirection: 'column',
+    justifyContent: 'center',
+  },
   centeredView:{
     flex: 1,
     justifyContent: 'center',

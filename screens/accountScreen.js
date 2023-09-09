@@ -22,14 +22,8 @@ import moment from "moment";
 import { StatusBar } from "expo-status-bar";
 import { UserContext } from "../components/UserContext";
 import {
-  Ionicons,
-  Entypo,
-  SimpleLineIcons,
-  FontAwesome,
-  FontAwesome5,
+  Ionicons
 } from "@expo/vector-icons";
-import FeatherIcon from "react-native-vector-icons/Feather";
-import AsyncStorage from "@react-native-async-storage/async-storage";
 import { NumberValueFormat } from "../components/FormatValue";
 import { gs, colors } from "../styles";
 // import { SafeAreaView } from "react-native-safe-area-context";
@@ -37,6 +31,7 @@ import client from "../api/client";
 
 let stopFetchMore = true;
 const ListFooterComponent = () => (
+  <View style={{ justifyContent: "center", alignItems: "center", marginBottom: 30 }}>
   <Text
     style={{
       fontSize: 16,
@@ -48,6 +43,7 @@ const ListFooterComponent = () => (
     <ActivityIndicator size="large" color={colors.secondaryColor1} />
     
   </Text>
+  </View>
 );
 const AccountScreen = ({ navigation }) => {
   const [
@@ -78,7 +74,7 @@ const AccountScreen = ({ navigation }) => {
     setLoadingMore(true);
     try {
       const res = await client.get(
-        `api/all_statement/${myDetails._id}?page=${currentPage}`
+        `api/all_statementMobile/${myDetails._id}?page=${currentPage}`
       );
       if (
         !Array.isArray(res.data) ||
@@ -105,7 +101,7 @@ const AccountScreen = ({ navigation }) => {
     try {
       setLoadingMore(true);
       const res = await client.get(
-        `api/all_statement/${myDetails._id}?page=${currentPage + 1}`
+        `api/all_statementMobile/${myDetails._id}?page=${currentPage + 1}`
       );
 
       if (
@@ -151,8 +147,10 @@ const AccountScreen = ({ navigation }) => {
   // };
 
   // flat list data here
-  const recentTranDataInfo = ({ item }) => (
-    <TouchableOpacity style={styles.recentTransaction}>
+  const recentTranDataInfo = ({ item, index }) => (
+    <TouchableOpacity style={styles.recentTransaction}
+    onPress={() =>{ navigation.navigate('detailsPage', {detail: Object.assign({}, item) })
+  }}  key={index} >
          <View
             style={{
               flexDirection: "row",
@@ -245,6 +243,35 @@ const AccountScreen = ({ navigation }) => {
       {/* This show a dash round line */}
       <View style={styles.placeholder}>
         <View style={styles.placeholderInset}>
+        <View style={{marginTop: 8}}></View>
+        <FlatList
+              keyExtractor={(item) => item._id}
+              data={transactions}
+              renderItem={recentTranDataInfo}
+              onEndReached={loadMoreRecord}
+              onEndReachedThreshold={0.5} // Adjust this threshold as needed
+              onScrollBeginDrag={() => {
+                stopFetchMore = false;
+              }}
+              ListFooterComponent={() =>
+                loadingMore ? <ListFooterComponent />:
+
+                <View style={{ justifyContent: "center", alignItems: "center", marginBottom: 30 }}>
+                {transactions.length < 1 && noMoreRecord ? <Text
+                      style={{
+                        fontFamily: "_regular",
+                        fontSize: 16,
+                        color: "#777",
+                        flexShrink: 1,
+                      }}
+                    >
+                      No more statements
+                    </Text>
+                    : null
+                }
+              </View>    
+              }
+            />
           <View
             style={{
               flex: 1,
@@ -297,34 +324,7 @@ const AccountScreen = ({ navigation }) => {
               marginBottom: 60,
             }}
           >
-            <FlatList
-              keyExtractor={(item) => item._id}
-              data={transactions}
-              renderItem={recentTranDataInfo}
-              onEndReached={loadMoreRecord}
-              onEndReachedThreshold={0.5} // Adjust this threshold as needed
-              onScrollBeginDrag={() => {
-                stopFetchMore = false;
-              }}
-              ListFooterComponent={() =>
-                loadingMore ? <ListFooterComponent />:
-
-                <View style={{ justifyContent: "center", alignItems: "center", marginBottom: 30 }}>
-                {transactions.length && noMoreRecord ? <Text
-                      style={{
-                        fontFamily: "_regular",
-                        fontSize: 16,
-                        color: "#777",
-                        flexShrink: 1,
-                      }}
-                    >
-                      No more statements
-                    </Text>
-                    : null
-                }
-              </View>    
-              }
-            />
+            
           </View>
         </View>
       </View>

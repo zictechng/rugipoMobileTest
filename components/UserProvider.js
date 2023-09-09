@@ -9,13 +9,16 @@ const UserProvider = ({ children }) => {
     const [userOtpCode, setUserOtpCode] = useState({});
     const [userRegCode, setUserRegCode] = useState({});
     const [userRegEmail, setUserRegEmail] = useState({});
+    const [userRecentData, setUserRecentData] = useState([]);
+    const [userRegId, setUserRegId] = useState({});
+    const [messageNotice, setMessageNotice] = useState(false);
   
     // const updateState = (newValue) => {
     //   setMyState(newValue);
     // };
   
     return (
-      <UserContext.Provider value={[ loginState, setLoginState, isLoading, setIsLoading, myDetails, setMyDetails, userRegCode, setUserRegCode, userRegEmail, setUserRegEmail]}>
+      <UserContext.Provider value={[ loginState, setLoginState, isLoading, setIsLoading, myDetails, setMyDetails, userRegCode, setUserRegCode, userRegEmail, setUserRegEmail, messageNotice, setMessageNotice, userRegId, setUserRegId]}>
         {children}
       </UserContext.Provider>
     );

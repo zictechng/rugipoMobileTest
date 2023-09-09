@@ -51,7 +51,7 @@ return (
                         </TouchableOpacity>    */}
 
                         <TouchableOpacity
-                            onPress={() => navigation.replace('BottomTab',
+                            onPress={() => navigation.navigate('BottomTab',
                                   {
                                     gestureEnabled: true,
                                     withAnimation: true,

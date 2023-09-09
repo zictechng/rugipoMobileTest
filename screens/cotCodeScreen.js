@@ -18,8 +18,6 @@ import {
 import { LinearGradient } from "expo-linear-gradient";
 import moment from "moment";
 import { UserContext } from "../components/UserContext";
-import FeatherIcon from 'react-native-vector-icons/Feather';
-import Feather from 'react-native-vector-icons/Feather'
 import {
   Ionicons,
   
@@ -30,9 +28,14 @@ import AsyncStorage from '@react-native-async-storage/async-storage';
 import * as Animatable from 'react-native-animatable'
 import OTPInputView from '@twotalltotems/react-native-otp-input';
 import { ALERT_TYPE, Dialog, Toast } from 'react-native-alert-notification';
+import client from '../api/client';
+import LoaderModal from '../components/loaderModal';
 
-const CotCodeScreen = () => {
+const CotCodeScreen = ({route}) => {
   const navigation = useNavigation();
+  const cotCodeGot = route.params?.cotData;
+  const cotCodeInfo1 = route.params?.cotInfo;
+
      // function to dismiss the keyboard when clicking out the input field
      dismissKeyboard = () => {
         Keyboard.dismiss();
@@ -40,86 +43,83 @@ const CotCodeScreen = () => {
 
   const [loginState, setLoginState, isLoading, setIsLoading, myDetails, setMyDetails, myMethod ] = useContext(UserContext);
 
-  const [data, setData] = React.useState({
-    reportSubject: '',
-    reportMessage: '',
-    check_subjectInputChange: false,
-    check_messageInputChange: false,
-});
-
 
     const [isloginBtn, setIsLoginBtn] = useState(false);
     const [logBtnDisabled, setLogBtnDisabled] = useState(false);
     const [copiedText, setCopiedText] = useState('');
     const [copiedTextOTP, setCopiedTextOtp] = useState('');
     const [enterCode, setEnterCode] = useState('');
-   
-    const sendMessage = () =>{
-        setLogBtnDisabled(true)
-        setIsLoginBtn(true)
-        console.log('Respond of Message ', selectedData + ' ' + data.reportMessage)
-    }
 
-    const  ConfirmCode = async () =>{
-        if(enterCode.length != 4){
-            Toast.show({
-                type: ALERT_TYPE.DANGER,
-                title: 'Error!',
-                textBody: 'OTP code required 4 characters',
-                textBodyStyle: { fontFamily: '_regular', fontSize: 16 },
-                titleStyle: { fontFamily: '_bold', fontSize: 20 },
-                })
-            return
-        }
+    const [btnVerifyLoading, setBtnVerifyLoading] = useState(false);
+
+    const  ConfirmCOTCode = async (useCode) =>{
+      console.log('Code Post', useCode);
+      if(useCode.length !== 4 || useCode.length == '') {
+        Toast.show({
+          type: ALERT_TYPE.DANGER,
+          title: 'Error',
+          textBody: 'COT code required at least 4 characters.',
+          textBodyStyle: { fontFamily: '_regular', fontSize: 16 },
+          titleStyle: { fontFamily: '_bold', fontSize: 20 },
+          })
+         return;
+      }
+        const postAllData ={
+          cot_code: useCode,
+          tran_id: cotCodeGot.tid_record,
+          createdBy: myDetails._id,
+          holder_name: cotCodeInfo1.localAccount_name,
+          acct_number: cotCodeInfo1.localAccount_number,
+          bank_name: cotCodeInfo1.localBank_name,
+          swift_code: cotCodeInfo1.localAccount_routing,
+          send_amt: cotCodeInfo1.localAmount,
+      }
+        
         setBtnVerifyLoading(true)
         //console.log('Auto Send Press', enterCode);
-        try{
-            const res = await client.post('/api/otp_verify', {
-                otp_code: enterCode,
-                user_email: userRegEmail,
-            })
+        setTimeout(async() =>{
+          try{
+            const res = await client.post('/api/cot_confirmMobile', postAllData)
             if(res.data.msg =='200'){
-                Dialog.show({
-                    type: ALERT_TYPE.SUCCESS,
-                    textBodyStyle: { fontFamily: '_regular', fontSize: 16 },
-                    titleStyle: { fontFamily: '_bold', fontSize: 20 },
-                    title: 'Success',
-                    textBody: 'Account verified successfully',
-                    button: 'Okay',
-                   });
-                
-            navigation.navigate('Login');
+              setEnterCode(' ')
+              navigation.replace('taxCode', {taxCodeData: postAllData, taxInfo: cotCodeInfo1})
+  
             } else if(res.data.status == '401') {
                 Toast.show({
                     type: ALERT_TYPE.DANGER,
                     title: 'Failed',
-                    textBody: 'No user found.',
+                    textBody: 'Account not active',
                     textBodyStyle: { fontFamily: '_regular', fontSize: 16 },
                     titleStyle: { fontFamily: '_bold', fontSize: 20 },
                     })
-                // Alert.alert("Login failed", "No user found",[
-                //     {text: "Okay"}
-                // ]);
-            }
+                  }
             else if(res.data.status == '403'){
                 Toast.show({
                     type: ALERT_TYPE.DANGER,
                     title: 'Error',
-                    textBody: 'Sorry, Try again.',
+                    textBody: 'Invalid COT Code Enter.',
                     textBodyStyle: { fontFamily: '_regular', fontSize: 16 },
                     titleStyle: { fontFamily: '_bold', fontSize: 20 },
                     })
-               
             }
             else if(res.data.status == '404'){
                 Toast.show({
                     type: ALERT_TYPE.DANGER,
-                    title: 'Failed',
-                    textBody: 'Invalid OTP code.',
+                    title: 'Error',
+                    textBody: 'COT code require.',
                     textBodyStyle: { fontFamily: '_regular', fontSize: 16 },
                     titleStyle: { fontFamily: '_bold', fontSize: 20 },
                     })
             }
+            else if(res.data.status == '404'){
+              Toast.show({
+                  type: ALERT_TYPE.DANGER,
+                  title: 'Error',
+                  textBody: 'No account found.',
+                  textBodyStyle: { fontFamily: '_regular', fontSize: 16 },
+                  titleStyle: { fontFamily: '_bold', fontSize: 20 },
+                  })
+          }
             else if(res.data.status == '500'){
                 Toast.show({
                     type: ALERT_TYPE.DANGER,
@@ -145,83 +145,122 @@ const CotCodeScreen = () => {
         finally {
             setBtnVerifyLoading(false)
         }
+         }, 2000)
       };
 
       // automatically call verify function once OTP code is entered
-      const  confirmCodeAuto = async (useCode, useEmail) =>{
-       setBtnVerifyLoading(true)
-        try{
-            const res = await client.post('/api/otp_verify', {
-                otp_code: useCode,
-                user_email: useEmail,
+      const  confirmCodeAuto = async (useCode) =>{
+        
+        if(useCode.length !== 4 || useCode === undefined || useCode.length === '') {
+          Toast.show({
+            type: ALERT_TYPE.DANGER,
+            title: 'Error',
+            textBody: 'COT code required at least 4 characters.',
+            textBodyStyle: { fontFamily: '_regular', fontSize: 16 },
+            titleStyle: { fontFamily: '_bold', fontSize: 20 },
             })
-            if(res.data.msg =='200'){
-                Dialog.show({
-                    type: ALERT_TYPE.SUCCESS,
-                    textBodyStyle: { fontFamily: '_regular', fontSize: 16 },
-                    titleStyle: { fontFamily: '_bold', fontSize: 20 },
-                    title: 'Success',
-                    textBody: 'Account verified successfully',
-                    button: 'Okay',
-                   });
-                
-            navigation.navigate('Login');
-            } else if(res.data.status == '401') {
-                Toast.show({
-                    type: ALERT_TYPE.DANGER,
-                    title: 'Failed',
-                    textBody: 'No user found.',
-                    textBodyStyle: { fontFamily: '_regular', fontSize: 16 },
-                    titleStyle: { fontFamily: '_bold', fontSize: 20 },
-                    })
-                // Alert.alert("Login failed", "No user found",[
-                //     {text: "Okay"}
-                // ]);
-            }
-            else if(res.data.status == '403'){
-                Toast.show({
-                    type: ALERT_TYPE.DANGER,
-                    title: 'Error',
-                    textBody: 'Sorry, Try again.',
-                    textBodyStyle: { fontFamily: '_regular', fontSize: 16 },
-                    titleStyle: { fontFamily: '_bold', fontSize: 20 },
-                    })
-            }
-            else if(res.data.status == '404'){
-                Toast.show({
-                    type: ALERT_TYPE.DANGER,
-                    title: 'Failed',
-                    textBody: 'Invalid OTP code.',
-                    textBodyStyle: { fontFamily: '_regular', fontSize: 16 },
-                    titleStyle: { fontFamily: '_bold', fontSize: 20 },
-                    })
-            }
-            else if(res.data.status == '500'){
-                Toast.show({
-                    type: ALERT_TYPE.DANGER,
-                    title: 'Sorry',
-                    textBody: 'Something went wrong!.',
-                    textBodyStyle: { fontFamily: '_regular', fontSize: 16 },
-                    titleStyle: { fontFamily: '_bold', fontSize: 20 },
-                    })
-            }
-             else {
-                Toast.show({
-                    type: ALERT_TYPE.DANGER,
-                    title: 'Error',
-                    textBody: 'Sorry, Something went wrong.',
-                    textBodyStyle: { fontFamily: '_regular', fontSize: 16 },
-                    titleStyle: { fontFamily: '_bold', fontSize: 20 },
-                    })
+           return;
+        }
+        const postAllData ={
+          cot_code: useCode,
+          tran_id: cotCodeGot.tid_record,
+          createdBy: myDetails._id,
+          holder_name: cotCodeInfo1.localAccount_name,
+          acct_number: cotCodeInfo1.localAccount_number,
+          bank_name: cotCodeInfo1.localBank_name,
+          swift_code: cotCodeInfo1.localAccount_routing,
+          send_amt: cotCodeInfo1.localAmount,
+        }
+        
+       setBtnVerifyLoading(true)
+
+       setTimeout(async() =>{
+        try{
+          const res = await client.post('/api/cot_confirmMobile', postAllData)
+          //console.log(' Respond ', res.data.message)
+          if(res.data.msg =='200'){
+              
+            navigation.replace('taxCode', {taxCodeData: postAllData, taxInfo: cotCodeInfo1})
+
+          } else if(res.data.status == '401') {
+              Toast.show({
+                  type: ALERT_TYPE.DANGER,
+                  title: 'Failed',
+                  textBody: 'Account not active',
+                  textBodyStyle: { fontFamily: '_regular', fontSize: 16 },
+                  titleStyle: { fontFamily: '_bold', fontSize: 20 },
+                  })
                 }
+          else if(res.data.status == '403'){
+              Toast.show({
+                  type: ALERT_TYPE.DANGER,
+                  title: 'Error',
+                  textBody: 'Invalid COT Code Enter.',
+                  textBodyStyle: { fontFamily: '_regular', fontSize: 16 },
+                  titleStyle: { fontFamily: '_bold', fontSize: 20 },
+                  })
+          }
+          else if(res.data.status == '404'){
+              Toast.show({
+                  type: ALERT_TYPE.DANGER,
+                  title: 'Error',
+                  textBody: 'COT code require.',
+                  textBodyStyle: { fontFamily: '_regular', fontSize: 16 },
+                  titleStyle: { fontFamily: '_bold', fontSize: 20 },
+                  })
+          }
+          else if(res.data.status == '404'){
+            Toast.show({
+                type: ALERT_TYPE.DANGER,
+                title: 'Error',
+                textBody: 'No account found.',
+                textBodyStyle: { fontFamily: '_regular', fontSize: 16 },
+                titleStyle: { fontFamily: '_bold', fontSize: 20 },
+                })
         }
-        catch (error) {
-            console.log(error.message)
-        }
-        finally {
-            setBtnVerifyLoading(false)
-        }
+          else if(res.data.status == '500'){
+              Toast.show({
+                  type: ALERT_TYPE.DANGER,
+                  title: 'Sorry',
+                  textBody: 'Something went wrong!.',
+                  textBodyStyle: { fontFamily: '_regular', fontSize: 16 },
+                  titleStyle: { fontFamily: '_bold', fontSize: 20 },
+                  })
+          }
+           else {
+              Toast.show({
+                  type: ALERT_TYPE.DANGER,
+                  title: 'Error',
+                  textBody: 'Sorry, Something went wrong.',
+                  textBodyStyle: { fontFamily: '_regular', fontSize: 16 },
+                  titleStyle: { fontFamily: '_bold', fontSize: 20 },
+                  })
+              }
+      }
+      catch (error) {
+          console.log(error.message)
+      }
+      finally {
+          setBtnVerifyLoading(false)
+      }
+       }, 2000)
+       
       };
+
+      if(btnVerifyLoading){
+        return (
+         <Animatable.View 
+            animation='slideInUp'
+            style={[styles.modalBackground, {backgroundColor: colors.secondaryColor2}]}>
+            <LoaderModal />
+            <TouchableOpacity
+              onPress={() => closeBottomSheet()}
+              style={{justifyContent: 'center', alignContent: 'center'}}>
+                <Text style={{fontFamily: '_semiBold', fontSize: 20, marginBottom: 10, color:'#aaa'}}>Please, Wait</Text>
+              </TouchableOpacity>
+          </Animatable.View>
+         ) 
+      }
 
   return (
     <SafeAreaView style={{ flex: 1, backgroundColor: colors.secondaryColor2}}>
@@ -287,21 +326,14 @@ const CotCodeScreen = () => {
                             //borderBottomColor: "#aaa",
                         }}
                         keyboardType={'number-pad'}
-                        // codeInputFieldStyle={[styles.underlineStyleBase,  {borderColor: "#2ab12f",
-                        // color: "#aaa"}]}
-                        // codeInputHighlightStyle={styles.underlineStyleHighLighted}
-
-                        autofillFromClipboard={true}
+                         autofillFromClipboard={true}
                         returnKeyType={'done'}
-                        
                         //onCodeChanged = {code => { setCopiedText({code})}}
                         onCodeChanged = {code => { setEnterCode(`${code}`)}}
-                        
                         onCodeFilled={
                             (code) =>{
                                 setEnterCode(`${code}`);
-                                setCopiedText(`${code}`)
-                                confirmCodeAuto(`${code}`, userRegEmail)
+                                confirmCodeAuto(`${code}`)
                              }
                         }
                     />
@@ -314,7 +346,7 @@ const CotCodeScreen = () => {
                      
                     <View style={[styles.button, {marginTop: 20}]}>
                         <TouchableOpacity  style={[styles.signIn, logBtnDisabled? styles.signInDisable: '']}
-                            onPress={() => navigation.navigate('taxCode')}
+                            onPress={() => ConfirmCOTCode(enterCode)}
                             disabled={logBtnDisabled}
                         > 
                         <LinearGradient
@@ -342,7 +374,12 @@ const styles = StyleSheet.create({
   container: {
     paddingVertical: 24,
   },
-
+  modalBackground:{
+    flex:1,
+    alignItems: 'center',
+    flexDirection: 'column',
+    justifyContent: 'center',
+  },
   centeredView:{
     flex: 1,
     justifyContent: 'center',

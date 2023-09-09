@@ -64,7 +64,7 @@ const navigation = useNavigation();
     setTimeout(async() =>{
     try {
           const res = await AsyncStorage.removeItem('USER_TOKEN');
-         
+          const clearLogout = await AsyncStorage.removeItem('LOGIN_ID');
           if(res === undefined || res === null)
           {
           navigation.replace('Login');
@@ -89,10 +89,10 @@ const navigation = useNavigation();
       [
         {
           text: 'Cancel',
-          onPress: () => console.log('Cancel Pressed'),
+          onPress: () => (''),
           style: 'cancel',
         },
-        {text: 'OK', onPress: () => console.log('OK Pressed'),
+        {text: 'OK', onPress: () => (''),
         style: 'ok',
         },
       ],
@@ -217,14 +217,12 @@ const navigation = useNavigation();
           <StatusBar backgroundColor={colors.secondaryColor2} barStyle="light-content" />
             <View style={{ flex: 1, backgroundColor: '#F7F7F7', }}>
 
-
          {/* header of the screen */}
       <LinearGradient
         colors={[colors.secondaryColor2, colors.secondaryColor2]}
         start={[0, 0]}
         end={[1, 1]}
-        style={{ elevation: 30, shadowColor: '#930D2F'}}
-      >
+        style={{ elevation: 30, shadowColor: '#930D2F'}}>
         <View style={[gs.rowBetween, {marginTop: Platform.OS === "ios" ? 18 : 30, marginHorizontal: 10, justifyContent: 'center' }]}>
           <TouchableOpacity style={styles.circleIconLeft1}>
             <Text

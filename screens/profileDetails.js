@@ -17,12 +17,6 @@ import { UserContext } from "../components/UserContext";
 import FeatherIcon from 'react-native-vector-icons/Feather';
 import {
   Ionicons,
-  Entypo,
-  SimpleLineIcons,
-  FontAwesome,
-  FontAwesome5,
-  MaterialCommunityIcons,
-  MaterialIcons
 } from "@expo/vector-icons";
 import { gs, colors } from "../styles";
 import { useNavigation } from '@react-navigation/native';

@@ -23,6 +23,7 @@ import CotCodeScreen from '../screens/cotCodeScreen';
 import TaxCodeScreen from '../screens/taxCodeScreen';
 import ImfCodeScreen from '../screens/imfCodeScreen';
 import DetailsPageScreen from '../screens/detailsPageScreen';
+import MessageScreen from '../screens/messageScreen';
 
 // import other screens/page here
 
@@ -31,12 +32,6 @@ const Stack = createStackNavigator();
 const MainRootNavigation = ({navigation}) =>{
 
     const [loginState, setLoginState, isLoading, setIsLoading, myDetails, setMyDetails] = useContext(UserContext);
-
-    const [userLogToken, setUserLogToken] = useState(null);
-    const [appLoading, setAppLoading] = useState(true);
-    
-    const [userData, setUserData]= useState({});
-    const [userInfoData, setUserInfoData]= useState(null);
 
      // This will make scree slide from left to right / right to slide
      const horizontalAnimation = {
@@ -179,6 +174,15 @@ const MainRootNavigation = ({navigation}) =>{
                   name='detailsPage'
                   options={horizontalAnimation}
                   component={DetailsPageScreen}>
+                  </Stack.Screen>
+
+                  <Stack.Screen 
+                  name='message'
+                  options={{
+                    headerShown: false,
+                    presentation: 'slide',
+                    }}
+                  component={MessageScreen}>
                   </Stack.Screen>
 
                   <Stack.Screen 

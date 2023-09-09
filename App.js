@@ -18,7 +18,9 @@ export default function App() {
   const { fontsLoaded } = useCustomFonts();
 
   const [userData, setUserData] = useState({});
+  
   //"@react-navigation/bottom-tabs": "^5.11.15",
+  // below is for v6
   //"@react-navigation/bottom-tabs": "^6.5.8",
 //   screenOptions={{
 //     showLabel: false,
@@ -40,22 +42,24 @@ export default function App() {
 //     ],
 //     //showIcon: true,
 // }}>
-  // get user information from local storage here
-  _getUserLocalInfo = async () => {
-    try {
-      const UserInfo = await AsyncStorage.getItem("USER_LOCAL_INFO");
-      if (UserInfo !== null) {
-        setUserData(UserInfo);
-      }
-    } catch (error) {
-      // Error retrieving data
-      //console.log("Local error here ", error.message);
-    }
-  };
 
-  useEffect(() => {
-    _getUserLocalInfo();
-  }, []);
+  // get user information from local storage here
+
+  // _getUserLocalInfo = async () => {
+  //   try {
+  //     const UserInfo = await AsyncStorage.getItem("USER_LOCAL_INFO");
+  //     if (UserInfo !== null) {
+  //       setUserData(UserInfo);
+  //     }
+  //   } catch (error) {
+  //     // Error retrieving data
+  //     //console.log("Local error here ", error.message);
+  //   }
+  // };
+
+  // useEffect(() => {
+  //   _getUserLocalInfo();
+  // }, []);
 
   //console.log("Local User Info from App ", userData);
 

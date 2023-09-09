@@ -47,7 +47,8 @@ const PasswordResetSCreen = () => {
   //     try {
   //       const value = await AsyncStorage.getItem('USER_LOCAL_INFO'); // Replace 'yourKey' with the key you used to store the value.
   //       if (value !== null) {
-  //         setUserID(value);
+  //         const currentUserDetails = JSON.parse(value);
+  //         setUserID(currentUserDetails);
   //        } else {
   //         console.log('Value not found in AsyncStorage');
   //       }
@@ -57,7 +58,9 @@ const PasswordResetSCreen = () => {
   //   };
   // useEffect(() => {
   //   getValueFromStorage();
-  // }, [userID]);
+  // }, []);
+
+  //console.log(" My deatial ", userID.username, )
 
     const [data, setData] = React.useState({
       previous_password: '',

@@ -38,6 +38,7 @@ import client from "../api/client";
 
 let stopFetchMore = true;
 const ListFooterComponent = () => (
+  <View style={{ justifyContent: "center", alignItems: "center", marginBottom: 30 }}>
   <Text
     style={{
       fontSize: 16,
@@ -49,6 +50,7 @@ const ListFooterComponent = () => (
     <ActivityIndicator size="large" color={colors.secondaryColor1} />
     
   </Text>
+  </View>
 );
 const HistoryScreen = () => {
   
@@ -78,7 +80,7 @@ const HistoryScreen = () => {
     setLoadingMore(true);
     try {
       const res = await client.get(
-        `api/all_history/${myDetails._id}?page=${currentPage}`
+        `api/all_historyMobile/${myDetails._id}?page=${currentPage}`
       );
       if (
         !Array.isArray(res.data) ||
@@ -105,7 +107,7 @@ const HistoryScreen = () => {
     try {
       setLoadingMore(true);
       const res = await client.get(
-        `api/all_history/${myDetails._id}?page=${currentPage + 1}`
+        `api/all_historyMobile/${myDetails._id}?page=${currentPage + 1}`
       );
 
       if (
@@ -129,17 +131,14 @@ const HistoryScreen = () => {
     }
   };
 
-  
   useEffect(() => {
     setData();
   }, []);
 
-
   // flat list data here
   const recentTranDataInfo = ({ item , index }) => (
     <TouchableOpacity style={styles.recentTransaction}
-        onPress={() =>{
-          
+        onPress={() =>{ navigation.navigate('detailsPage', {detail: Object.assign({}, item) })
         }}  key={index} >
       
         <View style={{flexDirection:'row', alignItems:'center'}}>
@@ -177,7 +176,6 @@ const HistoryScreen = () => {
     </TouchableOpacity>
   );
 
-
   return (
     <SafeAreaView style={{ flex: 1, backgroundColor: colors.secondaryColor2}}>
         
@@ -210,13 +208,36 @@ const HistoryScreen = () => {
         {/* This show a dash round line */}
           <View style={styles.placeholder}>
             <View style={styles.placeholderInset}>
-                  <View
-                    style={{
-                      flex: 1,
-                      justifyContent: "center",
-                      alignItems: "center",
-                    }}
-                  >
+            <View style={{marginTop: 8}}></View>
+            <FlatList
+              keyExtractor={(item, idx) => idx}
+              data={transactions}
+              renderItem={recentTranDataInfo}
+              onEndReached={loadMoreRecord}
+              onEndReachedThreshold={0.5} // Adjust this threshold as needed
+              onScrollBeginDrag={() => {
+                stopFetchMore = false;
+              }}
+              ListFooterComponent={() =>
+                loadingMore ? <ListFooterComponent />:
+
+                <View style={{ justifyContent: "center", alignItems: "center", marginBottom: 30 }}>
+                {transactions.length < 1 && noMoreRecord ? <Text
+                      style={{
+                        fontFamily: "_regular",
+                        fontSize: 16,
+                        color: "#777",
+                        flexShrink: 1,
+                      }}
+                    >
+                      No more history
+                    </Text>
+                    : null
+                }
+              </View>    
+              }
+            />
+                  <View style={{ flex: 1, justifyContent: "center",alignItems: "center",}}>
                   {!loadingMore && transactions.length < 1 ?
                  <View style={{marginHorizontal: 20}}>
                 
@@ -251,34 +272,7 @@ const HistoryScreen = () => {
               marginBottom: 60,
             }}
           >
-            <FlatList
-              keyExtractor={(item, idx) => idx}
-              data={transactions}
-              renderItem={recentTranDataInfo}
-              onEndReached={loadMoreRecord}
-              onEndReachedThreshold={0.5} // Adjust this threshold as needed
-              onScrollBeginDrag={() => {
-                stopFetchMore = false;
-              }}
-              ListFooterComponent={() =>
-                loadingMore ? <ListFooterComponent />:
-
-                <View style={{ justifyContent: "center", alignItems: "center", marginBottom: 30 }}>
-                {transactions.length && noMoreRecord ? <Text
-                      style={{
-                        fontFamily: "_regular",
-                        fontSize: 16,
-                        color: "#777",
-                        flexShrink: 1,
-                      }}
-                    >
-                      No more history
-                    </Text>
-                    : null
-                }
-              </View>    
-              }
-            />
+            
           </View>
               </View>
           </View>

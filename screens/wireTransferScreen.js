@@ -17,16 +17,13 @@ import {
 import { LinearGradient } from "expo-linear-gradient";
 import moment from "moment";
 import { UserContext } from "../components/UserContext";
-import FeatherIcon from 'react-native-vector-icons/Feather';
-import Feather from 'react-native-vector-icons/Feather'
-import {
-  Ionicons,
-  
-} from "@expo/vector-icons";
+import {Ionicons,} from "@expo/vector-icons";
 import { gs, colors } from "../styles";
 import { useNavigation } from '@react-navigation/native';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import * as Animatable from 'react-native-animatable'
+import { MaskedTextInput } from 'react-native-mask-text';
+import { ALERT_TYPE, Dialog, Toast } from 'react-native-alert-notification';
 
 const WireTransferScreen = () => {
   const navigation = useNavigation();
@@ -35,28 +32,46 @@ const WireTransferScreen = () => {
         Keyboard.dismiss();
       };
 
-  const [loginState, setLoginState, isLoading, setIsLoading, myDetails, setMyDetails, myMethod ] = useContext(UserContext);
-
-  const [data, setData] = React.useState({
-    reportSubject: '',
-    reportMessage: '',
-    check_subjectInputChange: false,
-    check_messageInputChange: false,
-});
-
-const [complainMessage, setComplainMessage] = useState({})
+    const [loginState, setLoginState, isLoading, setIsLoading, myDetails, setMyDetails, myMethod ] = useContext(UserContext);
 
     const [userData, setUserData]= useState('');
     const [isMyLoading, setIsMyLoading] = useState(false);
     const [isloginBtn, setIsLoginBtn] = useState(false);
     const [logBtnDisabled, setLogBtnDisabled] = useState(false);
 
-   
-    const sendMessage = () =>{
-        setLogBtnDisabled(true)
-        setIsLoginBtn(true)
-        console.log('Respond of Message ', selectedData + ' ' + data.reportMessage)
-    }
+    const [data, setData] = React.useState({
+      localAccount_name: '',
+      localAccount_number: '',
+      localAccount_routing: '',
+      localAmount: '',
+      localBank_Address: '',
+      localBank_name: '',
+     });
+
+    const handleInputChange = (name, val) => {
+      setData({
+        ...data,
+        [name]: val,
+      });
+    };
+
+    
+    const wireTransferFund = () =>{
+      //console.log('Wire transfer ', data )
+      // Remove commas from the number
+      if(data.localAccount_name === '' || data.localBank_name === '' || data.localAccount_number === '' || data.localAmount ==='' || data.localAccount_routing ===''){
+        Toast.show({
+          type: ALERT_TYPE.DANGER,
+          title: 'Error',
+          textBody: 'Some required fields are missing.',
+          textBodyStyle: { fontFamily: '_regular', fontSize: 16 },
+          titleStyle: { fontFamily: '_bold', fontSize: 20 },
+          })
+        return;
+      }
+      const numberWithoutCommas = data.localAmount.replace(/,/g, '');
+      navigation.navigate('confirmWireTransfer', {sendData : data})
+     }
 
   return (
     <SafeAreaView style={{ flex: 1, backgroundColor: colors.secondaryColor2}}>
@@ -112,8 +127,8 @@ const [complainMessage, setComplainMessage] = useState({})
                             placeholder="Customer Bank Name"
                             style={styles.textInput}
                             autoCapitalize="none"
-                            onChangeText={(val) => (val)}
-                            value={data.reportMessage}
+                            onChangeText={(val) => handleInputChange('localBank_name', val)}
+                            value={data.localBank_name}
                             onEndEditing={(e) => (e.nativeEvent.text)}
                             //onChangeText={(text) => setComplainMessage({text})}
                             //value={complainMessage.text}
@@ -129,11 +144,9 @@ const [complainMessage, setComplainMessage] = useState({})
                             placeholder="Account Name"
                             style={styles.textInput}
                             autoCapitalize="none"
-                            onChangeText={(val) => (val)}
-                            value={data.reportMessage}
+                            onChangeText={(val) => handleInputChange('localAccount_name', val)}
+                            value={data.localAccount_name}
                             onEndEditing={(e) => (e.nativeEvent.text)}
-                            //onChangeText={(text) => setComplainMessage({text})}
-                            //value={complainMessage.text}
                             />
                         </View>
                     
@@ -146,14 +159,13 @@ const [complainMessage, setComplainMessage] = useState({})
                             placeholder="Account Number"
                             style={styles.textInput}
                             autoCapitalize="none"
-                            onChangeText={(val) => (val)}
-                            value={data.reportMessage}
+                            onChangeText={(val) => handleInputChange('localAccount_number', val)}
+                            value={data.localAccount_number}
                             onEndEditing={(e) => (e.nativeEvent.text)}
-                            //onChangeText={(text) => setComplainMessage({text})}
-                            //value={complainMessage.text}
-                            />
+                            keyboardType="numeric"
+                            maxLength={10}
+                          />
                         </View>
-                    
                     </View>
 
                     <View style={[styles.textAreaContainer, {marginBottom: 30}]} >
@@ -163,12 +175,10 @@ const [complainMessage, setComplainMessage] = useState({})
                             placeholder="Bank swift code/ Routing Number"
                             style={styles.textInput}
                             autoCapitalize="none"
-                            onChangeText={(val) => (val)}
-                            value={data.reportMessage}
+                            onChangeText={(val) => handleInputChange('localAccount_routing', val)}
+                            value={data.localAccount_routing}
                             onEndEditing={(e) => (e.nativeEvent.text)}
-                            //onChangeText={(text) => setComplainMessage({text})}
-                            //value={complainMessage.text}
-                            />
+                           />
                         </View>
                     
                     </View>
@@ -176,18 +186,34 @@ const [complainMessage, setComplainMessage] = useState({})
                     <View style={[styles.textAreaContainer, {marginBottom: 30}]} >
                 
                         <View style={[styles.action, {borderBottomWidth: 0, marginRight: 10, flexDirection: 'row'}]}>
-                            <TextInput 
+                            {/* <TextInput 
                             placeholder="Amount"
                             style={styles.textInput}
                             autoCapitalize="none"
-                            onChangeText={(val) => (val)}
-                            value={data.reportMessage}
+                            onChangeText={(val) => handleInputChange('localAmount', val)}
+                            value={data.localAmount}
                             onEndEditing={(e) => (e.nativeEvent.text)}
-                            //onChangeText={(text) => setComplainMessage({text})}
-                            //value={complainMessage.text}
-                            />
+                           />
                            
-                           <Text style={{color: '#aaa', position:'relative'}}> {'\u20A6'}</Text>
+                           <Text style={{color: '#aaa', position:'relative'}}> {'\u20A6'}</Text> */}
+                        <MaskedTextInput
+                          type="currency"
+                          options={{
+                          //prefix: myDetails.currency_type,
+                          decimalSeparator: '.',
+                          groupSeparator: ',',
+                          precision: 2,
+                        }}
+                        textAlignVertical="top"
+                        style={styles.textInput}
+                        onChangeText={(val) => handleInputChange('localAmount', val)}
+                        
+                        onEndEditing={(e) => (e.nativeEvent.text)}
+                        keyboardType="numeric"
+                        placeholder='Enter Amount'
+                        placeholderTextColor="#aaa"
+                      />
+                      <Text style={{color: '#aaa', position:'relative'}}> {'\u20A6'}</Text>
                         </View>
                     
                     </View>
@@ -202,12 +228,10 @@ const [complainMessage, setComplainMessage] = useState({})
                             multiline={true}
                             numberOfLines={5}
                             textAlignVertical="top"
-                            onChangeText={(val) => (val)}
-                            value={data.reportMessage}
+                            onChangeText={(val) => handleInputChange('localBank_Address', val)}
+                            value={data.localBank_Address}
                             onEndEditing={(e) => (e.nativeEvent.text)}
-                            //onChangeText={(text) => setComplainMessage({text})}
-                            //value={complainMessage.text}
-                            />
+                           />
                         </View>
                      </View>
                      {/* Show this if user did not enter correct details */}
@@ -218,9 +242,8 @@ const [complainMessage, setComplainMessage] = useState({})
                      
                     <View style={[styles.button, {marginTop: 20}]}>
                         <TouchableOpacity  style={[styles.signIn, logBtnDisabled? styles.signInDisable: '']}
-                            onPress={() => navigation.navigate('confirmWireTransfer')}
-                            disabled={logBtnDisabled}
-                        > 
+                            onPress={() => wireTransferFund()}
+                            disabled={logBtnDisabled}> 
                         <LinearGradient
                         colors={[colors.secondaryColor1, colors.secondaryColor1]}
                         style={styles.signIn}

@@ -1,31 +1,19 @@
-import React, {useContext, useState, useCallback, useMemo, useRef, useEffect} from 'react';
+import React, {} from 'react';
 import { StyleSheet, View, Text, Modal, ActivityIndicator, Image, TouchableOpacity} from 'react-native';
 import { gs, colors } from '../styles';
 
-
-const TransferSuccessful = () => {
-
-    const [showModal, setshowModal] = useState(false);
-
+const LoaderModal = () => {
 
 return (
-    <View style={[styles.modalBackground, {backgroundColor: colors.secondaryColor2}]}>
-        <View>
-
-            <View style={styles.ActivityIndicatorWraper}>
-                <ActivityIndicator size='large' color={colors.secondaryColor1} marginTop={8} />
+    <View style={styles.modalBackground}>
+        <View style={styles.ActivityIndicatorWraper}>
+               <ActivityIndicator size='large' color={colors.secondaryColor1} marginTop={8} />
                 <Text style={{fontSize:13, alignItems:'center', justifyContent:'center', fontFamily: '_regular'}}>Processing...</Text>
              </View>
-
-        </View>
-
-        
-    
+            
     </View>
   );
 }
-
-
 
 const styles = StyleSheet.create({
     modalBackground:{
@@ -33,8 +21,8 @@ const styles = StyleSheet.create({
         alignItems: 'center',
         flexDirection: 'column',
         justifyContent: 'center',
-        backgroundColor: '#000',
-    },
+        backgroundColor: colors.secondaryColor2
+      },
     ActivityIndicatorWraper:{
         backgroundColor:'#fff',
         height: 70,
@@ -55,4 +43,4 @@ const styles = StyleSheet.create({
 });
 
 
-export default TransferSuccessful;
+export default LoaderModal;
