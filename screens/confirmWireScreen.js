@@ -27,6 +27,7 @@ import * as Animatable from 'react-native-animatable';
 import RBSheet from 'react-native-raw-bottom-sheet';
 import OTPInputView from '@twotalltotems/react-native-otp-input';
 import LoaderModal from '../components/loaderModal';
+import NetInfo from "@react-native-community/netinfo";
 
 const ConfirmWireScreen = ({route}) => {
   const navigation = useNavigation();
@@ -42,6 +43,9 @@ const ConfirmWireScreen = ({route}) => {
     const [enterCode, setEnterCode] = useState('');
     const [actionLoading, setActionLoading] = useState(false);
     const [isModalVisible, setModalVisible] = useState(false);
+      // check if device is connected to network
+      const [isConnected, setIsConnected] = useState(null);
+      const [connectionState, setConnectionState] = useState(false);
     
     const receivedData = {postData};
 
@@ -86,6 +90,26 @@ const ConfirmWireScreen = ({route}) => {
         return randomString;
       }
 
+      useEffect(() => {
+        // Subscribe to network state changes
+        const unsubscribe = NetInfo.addEventListener(state => {
+          setIsConnected(state.isConnected);
+          if(state.isConnected === true) {
+            setConnectionState(false);
+            console.log("Connected ", isConnected);
+          }
+          else if(state.isConnected === false) {
+            setConnectionState(true);
+            console.log("No connection ", isConnected)
+          }
+        });
+    
+        // Cleanup the subscription when the component unmounts
+        return () => {
+          unsubscribe();
+        };
+      }, [isConnected]);
+
       // automatically call verify function once pin code is entered
      
       const  confirmCodeAuto = async (useCode, useEmail) =>{
@@ -112,6 +136,17 @@ const ConfirmWireScreen = ({route}) => {
           })
          return;
       }
+      if(connectionState === true){
+        //alert('Please connect')
+        Toast.show({
+            type: ALERT_TYPE.DANGER,
+            title: 'No Internet Connection',
+            textBody: 'Sorry, your device is not connected to internet! Please, connect to wifi or mobile data to continue',
+            titleStyle: {fontFamily: '_semiBold', fontSize: 18},
+            textBodyStyle: {fontFamily: '_regular', fontSize: 14,},
+            })
+         return
+    }
       setTimeout(async() =>{
        try{
          const res = await client.post('/api/confirm_pinWireMobile', getData)

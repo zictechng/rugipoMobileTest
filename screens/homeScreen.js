@@ -17,6 +17,9 @@ import CircularProgress, { CircularProgressBase } from 'react-native-circular-pr
 import client from '../api/client';
 import { NumberValueFormat } from '../components/FormatValue';
 import { Avatar, Badge, withBadge } from 'react-native-elements'
+import NetInfo from "@react-native-community/netinfo";
+import NetWorkConnectionCheck from "../components/NetWorkConnectionCheck"
+import { ALERT_TYPE, Dialog, Toast } from 'react-native-alert-notification';
 
 
 const screenWidth = Dimensions.get("window").width;
@@ -68,6 +71,33 @@ const HomeScreen = () => {
   const [notifications, setNotification] = useState({});
   const [refreshing, setRefreshing] = useState(false);
   const [countMessage, setCountMessage] = useState(false);
+
+  // check if device is connected to network
+  const [isConnected, setIsConnected] = useState(null);
+  const [networkConnected, setNetworkConnected] = useState(null);
+
+  const unsubscribe = NetInfo.addEventListener(state => {
+    if(state.isConnected === false){
+      Toast.show({
+        type: ALERT_TYPE.WARNING,
+        title: 'Network Error',
+        textBody: 'Please connect to wifi or mobile data to continue',
+        titleStyle: {fontFamily: '_semiBold', fontSize: 15},
+        textBodyStyle: {fontFamily: '_regular', fontSize: 13,},
+        })
+    }
+    else if(state.isConnected === true){
+     // console.log('Internet Connected')
+    }
+  });
+
+  useEffect(() => {
+    unsubscribe()
+  }, [])
+
+  // if(isConnected === false) {
+    
+  // }
 
   const changeModalVisible = (bool) =>{
     setisModalVisible(bool);
@@ -138,7 +168,7 @@ const props = {
 };
 
   return (
-    <SafeAreaView style={{ flex: 1, backgroundColor: colors.secondaryColor2}}>
+    <SafeAreaView keyboardDismissMode='interactive' style={{ flex: 1, backgroundColor: colors.secondaryColor2}}>
         <StatusBar backgroundColor={colors.secondaryColor2} style="light" />
       <View style={{ flex: 1, backgroundColor: '#F7F7F7', }}>
 
@@ -200,6 +230,7 @@ const props = {
                 <RefreshControl refreshing={refreshing} onRefresh={onRefresh} />
               } >
               
+              <NetWorkConnectionCheck />
               
             <View style={styles.middlePage}>
                       {/* chat graph here */}

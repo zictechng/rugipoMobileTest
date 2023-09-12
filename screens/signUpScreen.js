@@ -3,7 +3,8 @@ import { StatusBar } from 'expo-status-bar';
 import {
     Alert, StyleSheet, Text, TextInput, TouchableWithoutFeedback, Keyboard, View, Image, ScrollView, Dimensions,
     Button, TouchableOpacity,
-    Platform
+    Platform,
+    InputAccessoryView
 } from 'react-native';
 import { useNavigation } from '@react-navigation/native';
 import { UserContext } from '../components/UserContext';
@@ -17,10 +18,11 @@ import { ALERT_TYPE, Dialog, Toast } from 'react-native-alert-notification';
 import client from '../api/client';
 import { gs, colors } from '../styles';
 import Loader from '../components/Loader';
+import NetInfo from '@react-native-community/netinfo'
 
 
 const SignUpScreen = ({ navigation }) => {
-
+    const inputAccessoryViewID = 'uniqueID';
     // function to dismiss the keyboard when clicking out the input field
     dismissKeyboard = () => {
         Keyboard.dismiss();
@@ -43,6 +45,9 @@ const SignUpScreen = ({ navigation }) => {
     });
 
     const [btnRegLoading, setBtnRegLoading] = useState(false);
+      // check if device is connected to network
+      const [isConnected, setIsConnected] = useState(null);
+      const [connectionState, setConnectionState] = useState(false);
 
     const [loginState, setLoginState, 
         isLoading, setIsLoading, 
@@ -145,6 +150,27 @@ const SignUpScreen = ({ navigation }) => {
         })
     }
 
+    useEffect(() => {
+        // Subscribe to network state changes
+        const unsubscribe = NetInfo.addEventListener(state => {
+          setIsConnected(state.isConnected);
+          if(state.isConnected === true) {
+            setConnectionState(false);
+            console.log("Connected ", isConnected);
+          }
+          else if(state.isConnected === false) {
+            setConnectionState(true);
+            console.log("No connection ", isConnected)
+          }
+        });
+    
+        // Cleanup the subscription when the component unmounts
+        return () => {
+          unsubscribe();
+        };
+      }, [isConnected]);
+
+
     // check if email input is valid email format
     const isValidEmail = (email) => {
         // Regular expression pattern for validating email
@@ -202,7 +228,18 @@ const SignUpScreen = ({ navigation }) => {
             });
             return
         }
-
+        if(connectionState === true){
+            //alert('Please connect')
+            Toast.show({
+                type: ALERT_TYPE.DANGER,
+                title: 'No Internet Connection',
+                textBody: 'Sorry, your device is not connected to internet! Please, connect to wifi or mobile data to continue',
+                titleStyle: {fontFamily: '_semiBold', fontSize: 18},
+                textBodyStyle: {fontFamily: '_regular', fontSize: 14,},
+                })
+             return
+        }
+        
         try {
             //console.log('Signup Data ', newData);
             setBtnRegLoading(true);
@@ -288,7 +325,7 @@ const SignUpScreen = ({ navigation }) => {
 
     return (
 
-        <TouchableWithoutFeedback onPress={dismissKeyboard}>
+        <TouchableWithoutFeedback onPress={dismissKeyboard} keyboardDismissMode='interactive'>
             <View style={styles.container}>
                 <StatusBar backgroundColor={colors.secondaryColor2} style="light" />
 
@@ -315,7 +352,7 @@ const SignUpScreen = ({ navigation }) => {
                                 onChangeText={(val) =>
                                     nameTextInputChange(val)
                                 }
-
+                                inputAccessoryViewID={inputAccessoryViewID}
                             // onChangeText={(val) => nameTextInputChange(val); setData({...data, first_name: val})}
                             />
                             {/* now use iteration to determine the display of the icon */}
@@ -348,6 +385,7 @@ const SignUpScreen = ({ navigation }) => {
                                 onChangeText={(val) =>
                                     phoneTextInputChange(val)}
                                 keyboardType="numeric"
+                                inputAccessoryViewID={inputAccessoryViewID}
                             />
                             {/* now use iteration to determine the display of the icon */}
                             {data.check_phoneTextInputChange ?

@@ -6,7 +6,7 @@ import {
   AlertNotificationRoot,
   Toast,
 } from "react-native-alert-notification";
-import { StyleSheet, Text, View } from "react-native";
+import { Alert, StyleSheet, Text, View } from "react-native";
 import { LogBox } from "react-native";
 import UserProvider from "./components/UserProvider";
 import AsyncStorage from "@react-native-async-storage/async-storage";
@@ -14,10 +14,14 @@ import { NavigationContainer } from "@react-navigation/native";
 import MainRootNavigation from "./navigation/mainRootNavigation";
 import { ActionSheetProvider } from '@expo/react-native-action-sheet';
 //LogBox.ignoreAllLogs(); // this will suppress errors not to be showing to users in the app 
+
+
 export default function App() {
   const { fontsLoaded } = useCustomFonts();
 
   const [userData, setUserData] = useState({});
+
+  
   
   //"@react-navigation/bottom-tabs": "^5.11.15",
   // below is for v6

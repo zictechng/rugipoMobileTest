@@ -9,7 +9,6 @@ const TransferSuccessful = () => {
 
     const [showModal, setshowModal] = useState(false);
 
-
 return (
     <SafeAreaView style={[styles.modalBackground, {backgroundColor: colors.secondaryColor2}]}>
         <StatusBar backgroundColor={colors.secondaryColor2} barStyle="light-content" />

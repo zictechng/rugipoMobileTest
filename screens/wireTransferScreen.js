@@ -10,6 +10,7 @@ import {
   TouchableOpacity,
   StatusBar,
   TextInput, 
+  InputAccessoryView,
   Keyboard,
   ActivityIndicator,
   Platform
@@ -31,7 +32,8 @@ const WireTransferScreen = () => {
      dismissKeyboard = () => {
         Keyboard.dismiss();
       };
-
+    const inputAccessoryViewID = 'uniqueID';
+    
     const [loginState, setLoginState, isLoading, setIsLoading, myDetails, setMyDetails, myMethod ] = useContext(UserContext);
 
     const [userData, setUserData]= useState('');
@@ -74,7 +76,7 @@ const WireTransferScreen = () => {
      }
 
   return (
-    <SafeAreaView style={{ flex: 1, backgroundColor: colors.secondaryColor2}}>
+    <SafeAreaView keyboardDismissMode='interactive' style={{ flex: 1, backgroundColor: colors.secondaryColor2}}>
         <StatusBar backgroundColor={colors.secondaryColor2} style="light" />
         <View style={{ flex: 1, backgroundColor: '#F7F7F7', }}>
 
@@ -130,8 +132,7 @@ const WireTransferScreen = () => {
                             onChangeText={(val) => handleInputChange('localBank_name', val)}
                             value={data.localBank_name}
                             onEndEditing={(e) => (e.nativeEvent.text)}
-                            //onChangeText={(text) => setComplainMessage({text})}
-                            //value={complainMessage.text}
+                            inputAccessoryViewID={inputAccessoryViewID}
                             />
                         </View>
                     

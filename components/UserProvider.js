@@ -1,5 +1,6 @@
-import React, { useState } from 'react';
+import React, {useState, useEffect} from 'react';
 import { UserContext } from './UserContext';
+import NetInfo from '@react-native-community/netinfo';
 
 
 const UserProvider = ({ children }) => {

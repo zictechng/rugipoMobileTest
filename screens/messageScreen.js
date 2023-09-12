@@ -27,7 +27,7 @@ import { useNavigation } from '@react-navigation/native';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import * as Animatable from 'react-native-animatable'
 import client from "../api/client";
-import { NumberValueFormat } from "../components/FormatValue";
+import NetInfo from "@react-native-community/netinfo";
 
 const MessageScreen = ({route}) => {
   const navigation = useNavigation();
@@ -46,6 +46,10 @@ const MessageScreen = ({route}) => {
   const [loadingMore, setLoadingMore] = useState(false);
   const [noRecordFound, setnoRecordFound] = useState(false);
 
+  // check if device is connected to network
+  const [isConnected, setIsConnected] = useState(null);
+  const [connectionState, setConnectionState] = useState(false);
+
   const [currentPage, setCurrentPage] = useState(1);
   // get user account details here
 
@@ -53,7 +57,38 @@ const MessageScreen = ({route}) => {
     getMessageData();
   }, []);
 
+  useEffect(() => {
+    // Subscribe to network state changes
+    const unsubscribe = NetInfo.addEventListener(state => {
+      setIsConnected(state.isConnected);
+      if(state.isConnected === true) {
+        setConnectionState(false);
+        console.log("Connected ", isConnected);
+      }
+      else if(state.isConnected === false) {
+        setConnectionState(true);
+        console.log("No connection ", isConnected)
+      }
+    });
+
+    // Cleanup the subscription when the component unmounts
+    return () => {
+      unsubscribe();
+    };
+  }, [isConnected]);
+
   const getMessageData = async () => {
+    if(connectionState === true){
+      //alert('Please connect')
+      Toast.show({
+          type: ALERT_TYPE.DANGER,
+          title: 'No Internet Connection',
+          textBody: 'Sorry, your device is not connected to internet! Please, connect to wifi or mobile data to continue',
+          titleStyle: {fontFamily: '_semiBold', fontSize: 18},
+          textBodyStyle: {fontFamily: '_regular', fontSize: 14,},
+          })
+       return
+  }
         setRecordLoading(true);
     try {
       const res = await client.get(`api/user_notificationMobile/${myDetails._id}?page=${currentPage}`
@@ -79,7 +114,19 @@ const MessageScreen = ({route}) => {
   };
 
   const loadMoreRecord = async () => {
+    if(connectionState === true){
+      //alert('Please connect')
+      Toast.show({
+          type: ALERT_TYPE.DANGER,
+          title: 'No Internet Connection',
+          textBody: 'Sorry, your device is not connected to internet! Please, connect to wifi or mobile data to continue',
+          titleStyle: {fontFamily: '_semiBold', fontSize: 18},
+          textBodyStyle: {fontFamily: '_regular', fontSize: 14,},
+          })
+       return
+  }
     if (loadingMore || allDataFetched) return;
+
 
     setCurrentPage(currentPage + 1);
     try {

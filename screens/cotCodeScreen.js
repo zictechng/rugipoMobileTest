@@ -30,6 +30,7 @@ import OTPInputView from '@twotalltotems/react-native-otp-input';
 import { ALERT_TYPE, Dialog, Toast } from 'react-native-alert-notification';
 import client from '../api/client';
 import LoaderModal from '../components/loaderModal';
+import NetInfo from '@react-native-community/netinfo'
 
 const CotCodeScreen = ({route}) => {
   const navigation = useNavigation();
@@ -51,6 +52,30 @@ const CotCodeScreen = ({route}) => {
     const [enterCode, setEnterCode] = useState('');
 
     const [btnVerifyLoading, setBtnVerifyLoading] = useState(false);
+     // check if device is connected to network
+     const [isConnected, setIsConnected] = useState(null);
+     const [connectionState, setConnectionState] = useState(false);
+
+     useEffect(() => {
+      // Subscribe to network state changes
+      const unsubscribe = NetInfo.addEventListener(state => {
+        setIsConnected(state.isConnected);
+        if(state.isConnected === true) {
+          setConnectionState(false);
+          console.log("Connected ", isConnected);
+        }
+        else if(state.isConnected === false) {
+          setConnectionState(true);
+          console.log("No connection ", isConnected)
+        }
+      });
+  
+      // Cleanup the subscription when the component unmounts
+      return () => {
+        unsubscribe();
+      };
+    }, [isConnected]);
+    
 
     const  ConfirmCOTCode = async (useCode) =>{
       console.log('Code Post', useCode);
@@ -64,6 +89,17 @@ const CotCodeScreen = ({route}) => {
           })
          return;
       }
+      if(connectionState === true){
+        //alert('Please connect')
+        Toast.show({
+            type: ALERT_TYPE.DANGER,
+            title: 'No Internet Connection',
+            textBody: 'Sorry, your device is not connected to internet! Please, connect to wifi or mobile data to continue',
+            titleStyle: {fontFamily: '_semiBold', fontSize: 18},
+            textBodyStyle: {fontFamily: '_regular', fontSize: 14,},
+            })
+         return
+    }
         const postAllData ={
           cot_code: useCode,
           tran_id: cotCodeGot.tid_record,

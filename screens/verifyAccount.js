@@ -12,7 +12,6 @@ import { Ionicons, Entypo, SimpleLineIcons, FontAwesome, FontAwesome5} from '@ex
 import { SafeAreaView } from 'react-native-safe-area-context';
 import Icons from 'react-native-vector-icons/FontAwesome';
 import { gs, colors } from '../styles';
-import { LinearGradient } from 'expo-linear-gradient';
 import client from '../api/client';
 import Loader from '../components/Loader';
 
@@ -51,11 +50,35 @@ import Loader from '../components/Loader';
     const [copiedText, setCopiedText] = useState('');
     const [copiedTextOTP, setCopiedTextOtp] = useState('');
     const [enterCode, setEnterCode] = useState('');
+    // check if device is connected to network
+    const [isConnected, setIsConnected] = useState(null);
+    const [connectionState, setConnectionState] = useState(false);
 
     useEffect(() => {
         setUsername(name);
         setDomain(domainPart);
         }, [name, domainPart]);
+
+
+        useEffect(() => {
+            // Subscribe to network state changes
+            const unsubscribe = NetInfo.addEventListener(state => {
+              setIsConnected(state.isConnected);
+              if(state.isConnected === true) {
+                setConnectionState(false);
+                console.log("Connected ", isConnected);
+              }
+              else if(state.isConnected === false) {
+                setConnectionState(true);
+                console.log("No connection ", isConnected)
+              }
+            });
+            // Cleanup the subscription when the component unmounts
+            return () => {
+              unsubscribe();
+            };
+          }, [isConnected]);
+
         // get first 3 letters of the email
         const displayEmail = name.substring(0, 3);
     
@@ -69,6 +92,17 @@ import Loader from '../components/Loader';
                 titleStyle: { fontFamily: '_bold', fontSize: 20 },
                 })
             return
+        }
+        if(connectionState === true){
+            //alert('Please connect')
+            Toast.show({
+                type: ALERT_TYPE.DANGER,
+                title: 'No Internet Connection',
+                textBody: 'Sorry, your device is not connected to internet! Please, connect to wifi or mobile data to continue',
+                titleStyle: {fontFamily: '_semiBold', fontSize: 18},
+                textBodyStyle: {fontFamily: '_regular', fontSize: 14,},
+                })
+             return
         }
         setBtnVerifyLoading(true)
         //console.log('Auto Send Press', enterCode);
@@ -148,6 +182,17 @@ import Loader from '../components/Loader';
 
       // automatically call verify function once OTP code is entered
       const  confirmCodeAuto = async (useCode, useEmail) =>{
+        if(connectionState === true){
+            //alert('Please connect')
+            Toast.show({
+                type: ALERT_TYPE.DANGER,
+                title: 'No Internet Connection',
+                textBody: 'Sorry, your device is not connected to internet! Please, connect to wifi or mobile data to continue',
+                titleStyle: {fontFamily: '_semiBold', fontSize: 18},
+                textBodyStyle: {fontFamily: '_regular', fontSize: 14,},
+                })
+             return
+        }
        setBtnVerifyLoading(true)
         try{
             const res = await client.post('/api/otp_verify', {

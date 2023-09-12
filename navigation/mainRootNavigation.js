@@ -178,10 +178,7 @@ const MainRootNavigation = ({navigation}) =>{
 
                   <Stack.Screen 
                   name='message'
-                  options={{
-                    headerShown: false,
-                    presentation: 'slide',
-                    }}
+                  options={horizontalAnimation}
                   component={MessageScreen}>
                   </Stack.Screen>
 

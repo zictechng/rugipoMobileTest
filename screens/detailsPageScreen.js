@@ -26,6 +26,11 @@ import AsyncStorage from '@react-native-async-storage/async-storage';
 import * as Animatable from 'react-native-animatable'
 import DashedLine from 'react-native-dashed-line';
 import { NumberValueFormat } from '../components/FormatValue';
+import { captureRef } from 'react-native-view-shot';
+import { ALERT_TYPE, Dialog, Toast } from 'react-native-alert-notification';
+import * as Sharing from 'expo-sharing';
+import * as MediaLibrary from 'expo-media-library';
+import * as FileSystem from 'expo-file-system';
 
 const DetailsPageScreen = ({route}) => {
   const navigation = useNavigation();
@@ -37,13 +42,88 @@ const DetailsPageScreen = ({route}) => {
       };
 
   const [loginState, setLoginState, isLoading, setIsLoading, myDetails, setMyDetails, myMethod ] = useContext(UserContext);
+ 
+  const receiptRef = useRef(null);
 
-  const [data, setData] = React.useState({
-    reportSubject: '',
-    reportMessage: '',
-    check_subjectInputChange: false,
-    check_messageInputChange: false,
-});
+
+  const confirmDownLoad = () =>{
+    return (
+      Alert.alert(
+        title='Confirm !',
+        message='Are you sure you want to download this file?',
+        [
+          {
+            text: 'Cancel',
+            onPress: () => (''),
+            style: 'cancel',
+          },
+          {text: 'Yes', onPress: () => captureReceiptImage(),
+          style: 'ok',
+          },
+        ],
+          {cancelable : true}
+        )
+      )
+    }
+    const captureReceiptImage = async () => {
+      try {
+        const result = await captureRef(receiptRef, {
+          format: 'jpg', // You can change the format to 'jpg' or 'webm' if needed.
+          quality: 0.9,
+          });
+        // check if file exists before sending
+      
+      if(result){
+         // call save function here and pass the image url.
+        savePicture(result);
+
+        Toast.show({
+          type: ALERT_TYPE.SUCCESS,
+          title: 'Success',
+          textBody: 'File saved successfully',
+          titleStyle: {fontFamily: '_semiBold', fontSize: 15},
+          textBodyStyle: {fontFamily: '_regular', fontSize: 13,},
+          })
+      }
+      else {
+        console.log('No file to download ');
+      }
+        
+    } catch (error) {
+        console.error('Error capturing view:', error);
+      }
+      
+   };
+
+   // function to download files
+   const savePicture = async (uri) => {
+    const asset = await MediaLibrary.saveToLibraryAsync(uri);
+    //console.log("Saved asset:", asset);
+    // You can now use 'asset' to access details about the saved image.
+  };
+
+   // sharing files via social links
+   const shareImage = async() =>{
+    try {
+      const uri = await captureRef(receiptRef,{
+        format: 'jpg', // You can change the format to 'jpg' or 'webm' if needed.
+        quality: 0.9,
+      })
+      //console.log("Capture successful ", uri);
+      const fileExists = await FileSystem.getInfoAsync(uri);
+      // check if file exists before sending
+      
+      if(fileExists){
+        const resultShare = await Sharing.shareAsync(uri)
+        }
+      else {
+        console.log('No file to share ');
+      }
+     
+    } catch (error) {
+      console.log("Error capturing view:", error);
+    }
+   }
 
   return (
     <SafeAreaView style={{ flex: 1, backgroundColor: colors.secondaryColor2, overflow: 'hidden',}}>
@@ -86,12 +166,12 @@ const DetailsPageScreen = ({route}) => {
         </View>
                 
         
-         <Animatable.View style={[styles.rowWrapper, {marginBottom: 8,} ]}
+         <Animatable.View ref={receiptRef} style={[styles.rowWrapper, {marginBottom: 8,} ]}
             animation="fadeInUpBig" >
 
             <View style={[gs.rowBetween, {marginTop: Platform.OS === "ios" ? 10 : 26, justifyContent:'flex-end',
                 marginRight: 20}]}>
-                  <Image alt="" source={require('../assets/bank.png')} style={styles.profileAvatar} />
+                  <Image alt="" source={require('../assets/RAF_LOGO.png')} style={styles.profileAvatar} />
                  
             </View>
 
@@ -201,22 +281,31 @@ const DetailsPageScreen = ({route}) => {
             <DashedLine dashLength={5} dashGap={5} dashColor='#aaa' dashStyle={{ marginRight: 4.9, marginBottom: 12 }} />
             
            </Animatable.View>
+           <View style={{marginTop: 20, marginBottom: 20, justifyContent: 'center', alignItems:'center', marginHorizontal: 10}}>
+            {/* {snapshotImage && <Text>File saved successful</Text>} */}
+            {/* {snapshotImage && 
+            <Image
+            source={{ uri: snapshotImage }}
+            style={{ width: "100%", height: 550 }} resizeMode='contain' // Set the desired image dimensions
+          />} */}
+         
+           </View>
           </ScrollView>
           <View style={styles.bottomButtonRow}>
                   <View style={{flexDirection: 'column', justifyContent:'center', alignItems:'center'}}>
-                  <TouchableOpacity onPress={() => Alert.alert('Successfully Shared')}> 
+                  <TouchableOpacity onPress={shareImage}> 
                         <Ionicons name='share-social-sharp' size={23} color={colors.secondaryColor1} />
-                       
+                        <Text style={styles.shareText}>Share</Text>
                     </TouchableOpacity>
-                    <Text style={styles.shareText}>Share</Text>
+                    
                   </View>
 
                     <View style={{flexDirection: 'column', justifyContent:'center', alignItems:'center'}}>
-                         <TouchableOpacity onPress={() => Alert.alert('Successfully Downloaded')}>
+                         <TouchableOpacity onPress={confirmDownLoad}>
                             <Ionicons name='cloud-download-outline' size={23} color={colors.secondaryColor1}/>
-                         
-                        </TouchableOpacity>
-                        <Text style={styles.shareText}>Download</Text>
+                            <Text style={styles.shareText}>Download</Text>
+                         </TouchableOpacity>
+                        
                   </View>
            </View>
         

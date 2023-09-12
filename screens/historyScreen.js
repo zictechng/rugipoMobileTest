@@ -35,6 +35,7 @@ import { NumberValueFormat } from "../components/FormatValue";
 import { gs, colors } from "../styles";
 // import { SafeAreaView } from "react-native-safe-area-context";
 import client from "../api/client";
+import NetInfo from '@react-native-community/netinfo'
 
 let stopFetchMore = true;
 const ListFooterComponent = () => (
@@ -74,10 +75,25 @@ const HistoryScreen = () => {
   const [loadingMore, setLoadingMore] = useState(false);
 
   const [currentPage, setCurrentPage] = useState(1);
+  // check if device is connected to network
+  const [isConnected, setIsConnected] = useState(null);
+  const [connectionState, setConnectionState] = useState(false);
 
   const setData = async () => {
     //setRecordLoading(true);
+    if(connectionState === true){
+      //alert('Please connect')
+      Toast.show({
+          type: ALERT_TYPE.DANGER,
+          title: 'No Internet Connection',
+          textBody: 'Sorry, your device is not connected to internet! Please, connect to wifi or mobile data to continue',
+          titleStyle: {fontFamily: '_semiBold', fontSize: 18},
+          textBodyStyle: {fontFamily: '_regular', fontSize: 14,},
+          })
+       return
+    }
     setLoadingMore(true);
+
     try {
       const res = await client.get(
         `api/all_historyMobile/${myDetails._id}?page=${currentPage}`
@@ -100,8 +116,39 @@ const HistoryScreen = () => {
     }
   };
 
+  useEffect(() => {
+    // Subscribe to network state changes
+    const unsubscribe = NetInfo.addEventListener(state => {
+      setIsConnected(state.isConnected);
+      if(state.isConnected === true) {
+        setConnectionState(false);
+        console.log("Connected ", isConnected);
+      }
+      else if(state.isConnected === false) {
+        setConnectionState(true);
+        console.log("No connection ", isConnected)
+      }
+    });
+
+    // Cleanup the subscription when the component unmounts
+    return () => {
+      unsubscribe();
+    };
+  }, [isConnected]);
+
   const loadMoreRecord = async () => {
     if (loadingMore || allDataFetched) return;
+    if(connectionState === true){
+      //alert('Please connect')
+      Toast.show({
+          type: ALERT_TYPE.DANGER,
+          title: 'No Internet Connection',
+          textBody: 'Sorry, your device is not connected to internet! Please, connect to wifi or mobile data to continue',
+          titleStyle: {fontFamily: '_semiBold', fontSize: 18},
+          textBodyStyle: {fontFamily: '_regular', fontSize: 14,},
+          })
+       return
+  }
 
     setCurrentPage(currentPage + 1);
     try {

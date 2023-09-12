@@ -134,7 +134,7 @@ const LocalTransferScreen = () => {
      }
 
   return (
-    <SafeAreaView style={{ flex: 1, backgroundColor: colors.secondaryColor2}}>
+    <SafeAreaView keyboardDismissMode='interactive' style={{ flex: 1, backgroundColor: colors.secondaryColor2}}>
         <StatusBar backgroundColor={colors.secondaryColor2} barStyle="light-content" />
         <View style={{ flex: 1, backgroundColor: '#F7F7F7', }}>
 

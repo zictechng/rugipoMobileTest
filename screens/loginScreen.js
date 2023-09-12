@@ -1,6 +1,6 @@
 import React , {useContext, useEffect, useState} from 'react';
 import {  Alert, ActivityIndicator, StyleSheet, Text, TextInput, TouchableWithoutFeedback, Keyboard, View, Image, ImageBackground, Dimensions,
-    Button, TouchableOpacity,
+    Button, TouchableOpacity, Modal,
 Platform } from 'react-native';
 
 import { UserContext } from '../components/UserContext';
@@ -18,7 +18,9 @@ import client from '../api/client';
 
 import { setDataInLocalStorage } from '../components/localData';
 import { gs, colors } from '../styles';
-import Loader from '../components/Loader';
+import NetInfo from "@react-native-community/netinfo";
+import {useNetInfo} from "@react-native-community/netinfo";
+
 
 const LoginScreen = ({navigation}) => {
 
@@ -26,6 +28,7 @@ const LoginScreen = ({navigation}) => {
      dismissKeyboard = () => {
         Keyboard.dismiss();
       };
+    
 
     const [data, setData] = React.useState({
         username: '',
@@ -37,13 +40,18 @@ const LoginScreen = ({navigation}) => {
         isValidPassword: true,
     });
     
-    const [loginState, setLoginState, isLoading, setIsLoading, userRegCode, setUserRegCode, messageNotice, setMessageNotice,] = useContext(UserContext);
+    const [loginState, setLoginState, isLoading, setIsLoading, userRegCode, setUserRegCode] = useContext(UserContext);
 
     const [userData, setUserData]= useState('');
     const [isMyLoading, setIsMyLoading] = useState(false);
     const [isloginBtn, setIsLoginBtn] = useState(false);
     const [logBtnDisabled, setLogBtnDisabled] = useState(false);
-    
+     // check if device is connected to network
+    const [isConnected, setIsConnected] = useState(null);
+   
+    const [connectionState, setConnectionState] = useState(false);
+
+    const netInfo = useNetInfo();
 
     // get user information from local storage here
   _getUserLocalInfo = async () => {
@@ -108,6 +116,26 @@ const LoginScreen = ({navigation}) => {
         })
     }
 
+    useEffect(() => {
+        // Subscribe to network state changes
+        const unsubscribe = NetInfo.addEventListener(state => {
+          setIsConnected(state.isConnected);
+          if(state.isConnected === true) {
+            setConnectionState(false);
+            console.log("Connected ", isConnected);
+          }
+          else if(state.isConnected === false) {
+            setConnectionState(true);
+            console.log("No connection ", isConnected)
+          }
+        });
+    
+        // Cleanup the subscription when the component unmounts
+        return () => {
+          unsubscribe();
+        };
+      }, [isConnected]);
+
     // function to check if input username is empty
     // method one
     const handleValidUser = (val) =>{
@@ -126,7 +154,17 @@ const LoginScreen = ({navigation}) => {
     }
 
     const loginAction = async () =>{
-        
+        if(connectionState === true){
+            //alert('Please connect')
+            Toast.show({
+                type: ALERT_TYPE.DANGER,
+                title: 'No Internet Connection',
+                textBody: 'Sorry, your device is not connected to internet! Please, connect to wifi or mobile data to continue',
+                titleStyle: {fontFamily: '_semiBold', fontSize: 18},
+                textBodyStyle: {fontFamily: '_regular', fontSize: 14,},
+                })
+             return
+        }
         if(data.username.length == 0 || data.password.length == 0){
             Toast.show({
                 type: ALERT_TYPE.DANGER,
@@ -217,6 +255,87 @@ const LoginScreen = ({navigation}) => {
             }
     }
 
+    // NetInfo.fetch().then(state => {
+    //     if (state.isConnected && state.isInternetReachable) {
+    //         setIsConnected(true);
+    //     } else {
+    //         setIsConnected(false);
+    //         alert("Not connected")
+    //     }
+    // });
+    //   useEffect(() => {
+    //     const unsubscribe = NetInfo.addEventListener(state => {
+    //         if (state.isConnected && state.isInternetReachable) {
+    //             setIsConnected(true);
+    //         } else {
+    //             setIsConnected(false);
+    //             alert("Not connected")
+    //         }
+    //     });
+    //     if (isConnected) {
+    //         console.log('Internet connected ', isConnected);
+    //     } else {
+    //         unsubscribe();
+    //         console.log('No internet connection ', isConnected);
+    //     }
+    // }, [isConnected]);
+
+
+    // NetInfo.fetch().then(state => {
+    //     //console.log('Connection type', state.type);
+    //     //console.log('Is connected?', state.isConnected);
+    //     setIsConnected(state.isConnected);
+    //   });
+
+      const cancelModal = () => {
+        setConnectionState(false)
+      }
+
+     
+
+    //   const getNetInfo = () => {
+    //     // To get the network state once
+    //     NetInfo.fetch().then((state) => {
+    //       alert(
+    //         `Connection type: ${state.type}
+    //         Is connected?: ${state.isConnected}
+    //         IP Address: ${state.details.ipAddress}`
+    //       );
+    //     });
+    //   };
+     
+    const netWorkStatus = () =>{
+        return (
+            <Modal transparent={true} animationType={'none'} visible={connectionState}>
+                <View style={styles.modalBackground}>
+                
+                    <View style={styles.ActivityIndicatorWraper}>
+                        <View style={{backgroundColor: colors.secondaryColor2, 
+                        borderTopEndRadius: 10, 
+                        borderTopStartRadius:10, 
+                        height: 40,
+                        width: '100%',
+                        marginTop : -50, justifyContent: 'center', alignItems: 'center'}}>
+                        <Text style={[styles.text, {fontSize: 20, color:'#fff'}]}>No connection</Text>
+                        </View>
+                        <View style={{marginTop: 10}}></View>
+                        <Feather name='wifi-off' size={30} color='#aaa' />
+                        <Text style={{fontSize:14, alignItems:'center', justifyContent:'center', fontFamily: '_regular', color:'#777'}}>Please, connect to internet connection.</Text>
+                        <View style={{marginBottom: 0, marginTop: 20}}>
+
+                        <TouchableOpacity onPress={() => cancelModal()} >
+                            <Text style={{fontFamily: '_semiBold', fontSize: 18, color:colors.secondaryColor2}}>Okay</Text>
+                        </TouchableOpacity>
+
+                        </View>
+                    </View>
+        
+                </View>
+            
+            </Modal>
+          );
+    }
+     //console.log('Connected to', isConnected)
   return (
     
     <TouchableWithoutFeedback onPress={dismissKeyboard}>
@@ -229,14 +348,20 @@ const LoginScreen = ({navigation}) => {
             
                 {userData != '' ? <Text style={styles.text_header}>Welcome,<Text style={{fontSize: 25}}> { userData.surname}</Text></Text>:
                 <Text style={styles.text_header}>Welcome</Text>}
-                <Text style={styles.text_header_section}>Login to access your account.</Text>
-                {/* <Text style={styles.text_header_section} onPress={() =>navigation.navigate('Verify')}>Verify...</Text> */}
+                <Text style={styles.text_header_section}>Login to access your account.
+                
+                {/* <Button title="Get more detailed NetInfo" onPress={getNetInfo} /> */}
+                </Text>
+              
+                {/* Check if network is active in the device */}
+                {/* <NetWorkConnectionCheck /> */}
+                
             </View>
     
     <Animatable.View 
     animation='fadeInUpBig'
     style={styles.footer}>
-    <ScrollView showsVerticalScrollIndicator={false}>
+    <ScrollView showsVerticalScrollIndicator={false} keyboardDismissMode='interactive'>
     <Text style={styles.text_footer}>Username</Text>
         <View style={styles.action}>
             <FontAwesome 
@@ -347,8 +472,6 @@ const LoginScreen = ({navigation}) => {
    
     </View>
     </TouchableWithoutFeedback>
-    
-    
    
   );
 }
@@ -362,6 +485,26 @@ const styles = StyleSheet.create({
        backgroundColor: colors.secondaryColor2,
       },
       
+      modalBackground:{
+        flex:1,
+        alignItems: 'center',
+        flexDirection: 'column',
+        justifyContent: 'center',
+        backgroundColor: '#00000040',
+    },
+    ActivityIndicatorWraper:{
+        backgroundColor:'#fff',
+        height: 160,
+        width: '80%',
+        alignItems: 'center',
+        justifyContent: 'center',
+        borderRadius: 10,
+        display: 'flex',
+        alignItems: 'center',
+        //justifyContent: 'space-around',
+        justifyContent: 'center',
+    },
+
     disabledStyle: {
     opacity: 1.9,
     },

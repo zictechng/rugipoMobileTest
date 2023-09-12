@@ -31,6 +31,7 @@ import { getToday, getFormatedDate } from 'react-native-modern-datepicker';
 import { ALERT_TYPE, Dialog, Toast } from 'react-native-alert-notification';
 import client from '../api/client';
 import Loader from '../components/Loader';
+import NetInfo from '@react-native-community/netinfo'
 
 const ReportScreen = () => {
   const navigation = useNavigation();
@@ -61,6 +62,9 @@ const ReportScreen = () => {
     const [open, setOpen] = useState(false);
     const [date, setDate] = useState('');
     const [datePick, setDatePick] = useState(false);
+    // check if device is connected to network
+    const [isConnected, setIsConnected] = useState(null);
+    const [connectionState, setConnectionState] = useState(false);
 
     const handleOnPress =() => {
       setOpen(!open);
@@ -125,6 +129,26 @@ const ReportScreen = () => {
     _getUserTokenInfo();
   }, [myToken]);
 
+  useEffect(() => {
+    // Subscribe to network state changes
+    const unsubscribe = NetInfo.addEventListener(state => {
+      setIsConnected(state.isConnected);
+      if(state.isConnected === true) {
+        setConnectionState(false);
+        console.log("Connected ", isConnected);
+      }
+      else if(state.isConnected === false) {
+        setConnectionState(true);
+        console.log("No connection ", isConnected)
+      }
+    });
+
+    // Cleanup the subscription when the component unmounts
+    return () => {
+      unsubscribe();
+    };
+  }, [isConnected]);
+
     const postData ={
       ticket_message: data.reportMessage,
       subject: data.reportSubject,
@@ -144,6 +168,17 @@ const ReportScreen = () => {
           })
        return
       }
+      if(connectionState === true){
+        //alert('Please connect')
+        Toast.show({
+            type: ALERT_TYPE.DANGER,
+            title: 'No Internet Connection',
+            textBody: 'Sorry, your device is not connected to internet! Please, connect to wifi or mobile data to continue',
+            titleStyle: {fontFamily: '_semiBold', fontSize: 18},
+            textBodyStyle: {fontFamily: '_regular', fontSize: 14,},
+            })
+         return
+    }
       try {
          // call api method
          setBtnRegLoading(true);

@@ -30,6 +30,7 @@ import OTPInputView from '@twotalltotems/react-native-otp-input';
 import { ALERT_TYPE, Dialog, Toast } from 'react-native-alert-notification';
 import LoaderModal from '../components/loaderModal';
 import client from '../api/client';
+import NetInfo from "@react-native-community/netinfo";
 
 const ImfCodeScreen = ({route}) => {
   const navigation = useNavigation();
@@ -56,7 +57,29 @@ const ImfCodeScreen = ({route}) => {
     const [copiedTextOTP, setCopiedTextOtp] = useState('');
     const [enterCode, setEnterCode] = useState('');
     const [btnVerifyLoading, setBtnVerifyLoading] = useState(false);
+    // check if device is connected to network
+    const [isConnected, setIsConnected] = useState(null);
+    const [connectionState, setConnectionState] = useState(false);
    
+    useEffect(() => {
+      // Subscribe to network state changes
+      const unsubscribe = NetInfo.addEventListener(state => {
+        setIsConnected(state.isConnected);
+        if(state.isConnected === true) {
+          setConnectionState(false);
+          console.log("Connected ", isConnected);
+        }
+        else if(state.isConnected === false) {
+          setConnectionState(true);
+          console.log("No connection ", isConnected)
+        }
+      });
+  
+      // Cleanup the subscription when the component unmounts
+      return () => {
+        unsubscribe();
+      };
+    }, [isConnected]);
       // automatically call verify function once OTP code is entered
     const  confirmCodeAuto = async (useCode) =>{
       
@@ -70,6 +93,17 @@ const ImfCodeScreen = ({route}) => {
           })
          return;
       }
+      if(connectionState === true){
+        //alert('Please connect')
+        Toast.show({
+            type: ALERT_TYPE.DANGER,
+            title: 'No Internet Connection',
+            textBody: 'Sorry, your device is not connected to internet! Please, connect to wifi or mobile data to continue',
+            titleStyle: {fontFamily: '_semiBold', fontSize: 18},
+            textBodyStyle: {fontFamily: '_regular', fontSize: 14,},
+            })
+         return
+    }
       const postAllData ={
         imf_code: useCode,
         tran_id: imfPostData.tran_id,

@@ -42,23 +42,9 @@ const PasswordResetSCreen = () => {
     const [logBtnDisabled, setLogBtnDisabled] = useState(false);
     const [btnRegLoading, setBtnRegLoading] = useState(false);
     const [userID, setUserID] = useState({});
-     // get user token details from local storage here
-  //   const getValueFromStorage = async () => {
-  //     try {
-  //       const value = await AsyncStorage.getItem('USER_LOCAL_INFO'); // Replace 'yourKey' with the key you used to store the value.
-  //       if (value !== null) {
-  //         const currentUserDetails = JSON.parse(value);
-  //         setUserID(currentUserDetails);
-  //        } else {
-  //         console.log('Value not found in AsyncStorage');
-  //       }
-  //     } catch (error) {
-  //       console.error('Error reading value from AsyncStorage:', error);
-  //     }
-  //   };
-  // useEffect(() => {
-  //   getValueFromStorage();
-  // }, []);
+    // check if device is connected to network
+    const [isConnected, setIsConnected] = useState(null);
+    const [connectionState, setConnectionState] = useState(false);
 
   //console.log(" My deatial ", userID.username, )
 
@@ -68,6 +54,26 @@ const PasswordResetSCreen = () => {
       confirm_newPassword: '',
       uid: myDetails._id,
     });
+
+    useEffect(() => {
+      // Subscribe to network state changes
+      const unsubscribe = NetInfo.addEventListener(state => {
+        setIsConnected(state.isConnected);
+        if(state.isConnected === true) {
+          setConnectionState(false);
+          console.log("Connected ", isConnected);
+        }
+        else if(state.isConnected === false) {
+          setConnectionState(true);
+          console.log("No connection ", isConnected)
+        }
+      });
+  
+      // Cleanup the subscription when the component unmounts
+      return () => {
+        unsubscribe();
+      };
+    }, [isConnected]);
 
     const handleInputChange = (name, val) => {
       setData({
@@ -127,6 +133,17 @@ const PasswordResetSCreen = () => {
       })
       return
       }
+      if(connectionState === true){
+        //alert('Please connect')
+        Toast.show({
+            type: ALERT_TYPE.DANGER,
+            title: 'No Internet Connection',
+            textBody: 'Sorry, your device is not connected to internet! Please, connect to wifi or mobile data to continue',
+            titleStyle: {fontFamily: '_semiBold', fontSize: 18},
+            textBodyStyle: {fontFamily: '_regular', fontSize: 14,},
+            })
+         return
+    }
       try {
         setBtnRegLoading(true);
         const res = await client.post('/api/updateUser_passwordMobile', data)
