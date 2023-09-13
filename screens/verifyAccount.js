@@ -8,10 +8,11 @@ import { View, Text, TextInput, StyleSheet, KeyboardAvoidingView, Platform, Touc
 import { useNavigation } from '@react-navigation/native';
 import { UserContext } from '../components/UserContext';
 import { ALERT_TYPE, Dialog, Toast } from 'react-native-alert-notification';
-import { Ionicons, Entypo, SimpleLineIcons, FontAwesome, FontAwesome5} from '@expo/vector-icons'
+import { Ionicons, MaterialIcons} from '@expo/vector-icons'
 import { SafeAreaView } from 'react-native-safe-area-context';
 import Icons from 'react-native-vector-icons/FontAwesome';
 import { gs, colors } from '../styles';
+import NetInfo from '@react-native-community/netinfo'
 import client from '../api/client';
 import Loader from '../components/Loader';
 
@@ -28,25 +29,6 @@ import Loader from '../components/Loader';
     const [btnVerifyLoading, setBtnVerifyLoading] = useState(false);
 
     const [name, domainPart] = userRegEmail.split('@');
-
-    // Option/Method two variables here
-    const pin1Ref = useRef(null)
-    const pin2Ref = useRef(null)
-    const pin3Ref = useRef(null)
-    const pin4Ref = useRef(null)
-    
-    const [pin1, setPin1] = useState("");
-    const [pin2, setPin2] = useState("");
-    const [pin3, setPin3] = useState("");
-    const [pin4, setPin4] = useState("");
-
-    // const [data, setState] = useState({
-    //     pin1: "",
-    //     pin2: "",
-    //     pin3: "",
-    //     pin4: ""
-    //   })
-
     const [copiedText, setCopiedText] = useState('');
     const [copiedTextOTP, setCopiedTextOtp] = useState('');
     const [enterCode, setEnterCode] = useState('');
@@ -66,7 +48,7 @@ import Loader from '../components/Loader';
               setIsConnected(state.isConnected);
               if(state.isConnected === true) {
                 setConnectionState(false);
-                console.log("Connected ", isConnected);
+                //console.log("Connected ", isConnected);
               }
               else if(state.isConnected === false) {
                 setConnectionState(true);
@@ -309,14 +291,14 @@ import Loader from '../components/Loader';
                     Verification
                 </Text> */}
             
-
-                <Text style={{fontSize: 25, color: "#222", marginTop: 50, fontFamily: '_bold'}}>Verify Account</Text>
-                
+            <MaterialIcons name='mark-email-unread' size={40} color={colors.secondaryColor2} />
+                <Text style={{fontSize: 25, color: "#222", marginTop: 30, fontFamily: '_bold'}}>Verify Account</Text>
+                   
                 {btnVerifyLoading ? <Loader loading={btnVerifyLoading} textInfo={'Verifying wait...'} style={{fontSize: 25, fontFamily: '_regular'}} /> : ''}
 
-                <Text style={{fontSize: 14, color: "#aaa", fontFamily: '_regular'}}>Enter the code sent to your phone/email to verify your account</Text>
+                <Text style={{fontSize: 13, color: "#aaa", fontFamily: '_regular', marginHorizontal: 20}}>Enter the code sent to your phone/email to verify your account</Text>
                 <Text style={{fontSize: 16, color: "#111", marginTop: 12, fontFamily: '_semiBold'}}>
-                <Text style={{fontSize: 14, color: "#aaa", fontFamily: '_regular'}}>We send OTP code to </Text>
+                <Text style={{fontSize: 13, color: "#aaa", fontFamily: '_regular'}}>We send OTP code to </Text>
                     { displayEmail }{'......'}{ '@' }{ domain }
                  </Text>
 
@@ -383,11 +365,11 @@ import Loader from '../components/Loader';
                         flexDirection: "row", 
                         justifyContent:"center",
                         paddingTop: 20}}>
-                    <Text style={{fontFamily: '_regular', fontSize: 17, color:'#aaa'}}>Wrong Number/Email ?</Text>
+                    <Text style={{fontFamily: '_regular', fontSize: 14, color:'#aaa'}}>Wrong Number/Email ?</Text>
 
                     <TouchableOpacity
                         onPress={() => navigation.goBack()}>
-                        <Text style={{fontSize: 18, color: colors.secondaryColor2, fontFamily: '_semiBold'}}> Edit</Text>
+                        <Text style={{fontSize: 14, color: colors.secondaryColor2, fontFamily: '_semiBold'}}> Edit</Text>
                     </TouchableOpacity>
                     </View>
                  </View>

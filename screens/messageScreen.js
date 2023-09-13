@@ -63,7 +63,7 @@ const MessageScreen = ({route}) => {
       setIsConnected(state.isConnected);
       if(state.isConnected === true) {
         setConnectionState(false);
-        console.log("Connected ", isConnected);
+        //console.log("Connected ", isConnected);
       }
       else if(state.isConnected === false) {
         setConnectionState(true);

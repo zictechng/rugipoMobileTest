@@ -300,7 +300,7 @@ const AccountScreen = ({ navigation }) => {
                         flexShrink: 1,
                       }}
                     >
-                      There is no recent account statement at the moment
+                      No account statement
                     </Text>
                     <View
                       style={{ justifyContent: "center", alignItems: "center" }}

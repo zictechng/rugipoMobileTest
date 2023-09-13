@@ -122,7 +122,7 @@ const LoginScreen = ({navigation}) => {
           setIsConnected(state.isConnected);
           if(state.isConnected === true) {
             setConnectionState(false);
-            console.log("Connected ", isConnected);
+            //console.log("Connected ", isConnected);
           }
           else if(state.isConnected === false) {
             setConnectionState(true);
@@ -346,7 +346,7 @@ const LoginScreen = ({navigation}) => {
             
             <View style={styles.header}>
             
-                {userData != '' ? <Text style={styles.text_header}>Welcome,<Text style={{fontSize: 25}}> { userData.surname}</Text></Text>:
+                {userData != '' ? <Text style={styles.text_header}>Welcome,<Text style={{fontSize: 20}}> { userData.first_name}</Text></Text>:
                 <Text style={styles.text_header}>Welcome</Text>}
                 <Text style={styles.text_header_section}>Login to access your account.
                 
@@ -525,7 +525,7 @@ const styles = StyleSheet.create({
     text_header: {
         color: '#fff',
         fontFamily: '_semiBold',
-        fontSize: 30
+        fontSize: 20
     },
     text_header_section: {
         color: '#cccac6',

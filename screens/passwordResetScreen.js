@@ -26,6 +26,7 @@ import { useNavigation } from '@react-navigation/native';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import * as Animatable from 'react-native-animatable';
 import { ALERT_TYPE, Dialog, Toast } from 'react-native-alert-notification';
+import NetInfo from "@react-native-community/netinfo";
 import client from '../api/client';
 import Loader from '../components/Loader';
 
@@ -61,7 +62,7 @@ const PasswordResetSCreen = () => {
         setIsConnected(state.isConnected);
         if(state.isConnected === true) {
           setConnectionState(false);
-          console.log("Connected ", isConnected);
+          //console.log("Connected ", isConnected);
         }
         else if(state.isConnected === false) {
           setConnectionState(true);

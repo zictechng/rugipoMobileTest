@@ -1,4 +1,4 @@
-import React, { useState, useContext } from "react";
+import React, { useState, useContext, useEffect } from "react";
 import { StatusBar } from 'expo-status-bar';
 import {
     Alert, StyleSheet, Text, TextInput, TouchableWithoutFeedback, Keyboard, View, Image, ScrollView, Dimensions,
@@ -10,7 +10,6 @@ import { useNavigation } from '@react-navigation/native';
 import { UserContext } from '../components/UserContext';
 import * as Animatable from 'react-native-animatable';
 import { LinearGradient } from 'expo-linear-gradient';
-import MaterialIcons from 'react-native-vector-icons/MaterialIcons';
 import FontAwesome from 'react-native-vector-icons/FontAwesome';
 import Feather from 'react-native-vector-icons/Feather';
 import { ALERT_TYPE, Dialog, Toast } from 'react-native-alert-notification';
@@ -35,9 +34,11 @@ const SignUpScreen = ({ navigation }) => {
         first_name: '',
         phone: '',
         username: '',
+        surname: '',
         check_textInputChange: false,
         check_textUsernameInputChange: false,
         check_nameTextInputChange: false,
+        check_surnameTextInputChange: false,
         check_phoneTextInputChange: false,
         secureTextEntry: true,
         confirm_secureTextEntry: true,
@@ -101,6 +102,22 @@ const SignUpScreen = ({ navigation }) => {
         }
     }
 
+    const surnameTextInputChange = (val) => {
+        if (val.length > 0) {
+            setData({
+                ...data,
+                surname: val,
+                check_surnameTextInputChange: true
+            });
+        } else {
+            setData({
+                ...data,
+                surname: val,
+                check_surnameTextInputChange: false
+            });
+        }
+    }
+
     // phone icon showing
     const phoneTextInputChange = (val) => {
         if (val.length > 0) {
@@ -156,7 +173,7 @@ const SignUpScreen = ({ navigation }) => {
           setIsConnected(state.isConnected);
           if(state.isConnected === true) {
             setConnectionState(false);
-            console.log("Connected ", isConnected);
+            //console.log("Connected ", isConnected);
           }
           else if(state.isConnected === false) {
             setConnectionState(true);
@@ -189,14 +206,19 @@ const SignUpScreen = ({ navigation }) => {
     const signUp = async () => {
         const newData = {
             first_name: data.first_name,
+            surname: data.surname,
             email: data.email,
             phone: data.phone,
             password: data.password,
         }
-        if (data.first_name.length == 0 || data.email.length == 0 || data.phone.length == 0 || data.username.length == 0) {
-            Alert.alert("Error!", "Required fields are missing", [
-                { text: "Okay" }
-            ]);
+        if (data.first_name.length == 0 || data.email.length == 0 || data.phone.length == 0 || data.username.length == 0 || data.surname.length == 0) {
+           Toast.show({
+                type: ALERT_TYPE.DANGER,
+                title: 'Error',
+                textBody: 'Required fields are missing',
+                textBodyStyle: { fontFamily: '_regular', fontSize: 14 },
+                titleStyle: { fontFamily: '_bold', fontSize: 18 },
+            })
             return
         }
 
@@ -205,6 +227,8 @@ const SignUpScreen = ({ navigation }) => {
                 type: ALERT_TYPE.DANGER,
                 title: 'Error',
                 textBody: 'Password do not match',
+                textBodyStyle: { fontFamily: '_regular', fontSize: 14 },
+                titleStyle: { fontFamily: '_bold', fontSize: 18 },
             });
             return
         }
@@ -248,7 +272,8 @@ const SignUpScreen = ({ navigation }) => {
                 email: data.email,
                 phone: data.phone,
                 password: data.password,
-                username: data.username
+                username: data.username,
+                surname: data.surname
             })
             // .then(res => {
             // console.log('result from backend ', res)
@@ -263,6 +288,7 @@ const SignUpScreen = ({ navigation }) => {
                     first_name: '',
                     phone: '',
                     username: '',
+                    surname:'',
                     check_textInputChange: false,
                     check_textUsernameInputChange: false,
                     check_nameTextInputChange: false,
@@ -276,8 +302,8 @@ const SignUpScreen = ({ navigation }) => {
                     type: ALERT_TYPE.DANGER,
                     title: 'Error',
                     textBody: 'All fields required',
-                    textBodyStyle: { fontFamily: '_regular', fontSize: 16 },
-                    titleStyle: { fontFamily: '_bold', fontSize: 20 },
+                    textBodyStyle: { fontFamily: '_regular', fontSize: 14 },
+                    titleStyle: { fontFamily: '_bold', fontSize: 18 },
                 })
             }
             else if (res.data.status == '409') {
@@ -285,8 +311,8 @@ const SignUpScreen = ({ navigation }) => {
                     type: ALERT_TYPE.DANGER,
                     title: 'Error',
                     textBody: 'Username already taken',
-                    textBodyStyle: { fontFamily: '_regular', fontSize: 16 },
-                    titleStyle: { fontFamily: '_bold', fontSize: 20 },
+                    textBodyStyle: { fontFamily: '_regular', fontSize: 14 },
+                    titleStyle: { fontFamily: '_bold', fontSize: 18 },
                 });
                 //    Alert.alert("Error!", "Username already taken",[
                 //     {text: "Okay"}
@@ -296,9 +322,9 @@ const SignUpScreen = ({ navigation }) => {
                 Toast.show({
                     type: ALERT_TYPE.DANGER,
                     title: 'Failed',
-                    titleStyle: { fontFamily: '_bold', fontSize: 20 },
+                    titleStyle: { fontFamily: '_bold', fontSize: 18 },
                     textBody: 'Invalid user details',
-                    textBodyStyle: { fontFamily: '_regular', fontSize: 16 },
+                    textBodyStyle: { fontFamily: '_regular', fontSize: 14 },
 
                 })
             }
@@ -306,9 +332,9 @@ const SignUpScreen = ({ navigation }) => {
                 Toast.show({
                     type: ALERT_TYPE.DANGER,
                     title: 'Error',
-                    titleStyle: { fontFamily: '_bold', fontSize: 20 },
+                    titleStyle: { fontFamily: '_bold', fontSize: 18 },
                     textBody: 'Sorry, Something went wrong',
-                    textBodyStyle: { fontFamily: '_regular', fontSize: 16 },
+                    textBodyStyle: { fontFamily: '_regular', fontSize: 14 },
 
                 })
             }
@@ -337,7 +363,7 @@ const SignUpScreen = ({ navigation }) => {
                     animation='fadeInUpBig'
                     style={styles.footer}>
                     <ScrollView showsVerticalScrollIndicator={false}>
-                        <Text style={styles.text_footer}>Full Name</Text>
+                        <Text style={styles.text_footer}>First Name</Text>
                         <View style={styles.action}>
                             <FontAwesome
                                 name="user-o"
@@ -345,7 +371,7 @@ const SignUpScreen = ({ navigation }) => {
                                 size={20}
                             />
                             <TextInput
-                                placeholder="Enter Full Name"
+                                placeholder="Enter First Name"
                                 style={styles.textInput}
                                 autoCapitalize="none"
                                 value={data.first_name}
@@ -357,6 +383,39 @@ const SignUpScreen = ({ navigation }) => {
                             />
                             {/* now use iteration to determine the display of the icon */}
                             {data.check_nameTextInputChange ?
+                                <Animatable.View
+                                    animation="bounce"
+                                >
+                                    <Feather
+                                        name="user"
+                                        color="green"
+                                        size={15}
+                                    />
+
+                                </Animatable.View>
+                                : null}
+                        </View>
+
+                        <Text style={styles.text_footer}>Surname</Text>
+                        <View style={styles.action}>
+                            <FontAwesome
+                                name="user-o"
+                                color="#05375a"
+                                size={20}
+                            />
+                            <TextInput
+                                placeholder="Enter Surname"
+                                style={styles.textInput}
+                                autoCapitalize="none"
+                                value={data.surname}
+                                onChangeText={(val) =>
+                                    surnameTextInputChange(val)
+                                }
+                                inputAccessoryViewID={inputAccessoryViewID}
+                            // onChangeText={(val) => nameTextInputChange(val); setData({...data, first_name: val})}
+                            />
+                            {/* now use iteration to determine the display of the icon */}
+                            {data.check_surnameTextInputChange ?
                                 <Animatable.View
                                     animation="bounce"
                                 >
@@ -601,7 +660,7 @@ const styles = StyleSheet.create({
     text_header: {
         color: '#fff',
         fontFamily: '_bold',
-        fontSize: 30
+        fontSize: 20
     },
     text_footer: {
         color: colors.textColor1,

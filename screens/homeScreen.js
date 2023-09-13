@@ -80,7 +80,7 @@ const HomeScreen = () => {
     if(state.isConnected === false){
       Toast.show({
         type: ALERT_TYPE.WARNING,
-        title: 'Network Error',
+        title: 'No Internet Connection',
         textBody: 'Please connect to wifi or mobile data to continue',
         titleStyle: {fontFamily: '_semiBold', fontSize: 15},
         textBodyStyle: {fontFamily: '_regular', fontSize: 13,},
@@ -140,11 +140,11 @@ const HomeScreen = () => {
       const res = await client.get('/api/user_messageCount/'+myDetails._id)
       
       let count = res.data.userMessage;
-      console.log('No Notification ', count)
+      //console.log('No Notification ', count)
       if(count > 0){
         setNotification(res.data)
         setNotification(res.data.userMessage)
-        console.log('No Notification 2 ', res.data)
+       // console.log('No Notification 2 ', res.data)
       }
       else if(res.data.status == '404') {
         console.log('No Active Notification 404')
@@ -153,7 +153,7 @@ const HomeScreen = () => {
         console.log('Something went wrong')
       }
     }catch (e){
-      console.log(e);
+      console.log('  Active Notification ',e);
     }
   };
 
@@ -182,7 +182,7 @@ const props = {
                         <Text style={[styles.titleSend, {color: "#BFB9B5"}]}>Rugipo Finance</Text>
                     </View> */}
                     <View style={styles.nameView}>
-                    <Text style={styles.nameTitle}>Hi <Text style={{fontSize: 23, fontFamily:"_semiBold"}}>{myDetails.surname +','}</Text></Text>
+                    <Text style={styles.nameTitle}>Hi <Text style={{fontSize: 18, fontFamily:"_semiBold"}}>{myDetails.first_name +','}</Text></Text>
                     </View>
 
                     {/* <Text style = {styles.text}>{new Date().toString().slice(0,11)}</Text> */}
@@ -579,7 +579,7 @@ const styles = StyleSheet.create({
         textAlign: "center",
     },
     nameTitle:{
-        fontSize: 20,
+        fontSize: 18,
         fontFamily: '_regular',
         color: "#fff",
         marginBottom: 6,
@@ -679,6 +679,7 @@ const styles = StyleSheet.create({
         backgroundColor: '#B8950A',
         alignItems: "center",
         justifyContent: "center",
+        marginRight: 8,
      },
      circleText:{
         fontSize: 18,
