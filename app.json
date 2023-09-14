@@ -1,7 +1,7 @@
 {
   "expo": {
     "name": "Rugipo Alumni",
-    "slug": "rugipo-finance.",
+    "slug": "rugipo_alumni",
     "description": "Rugipo Finance application help our members to get connected and have access to easy loan for their business on the go",
     "version": "1.0.0",
     "orientation": "portrait",
@@ -11,41 +11,43 @@
       "image": "./assets/splash_image2.png",
       "resizeMode": "cover",
       "backgroundColor": "#A78808"
-    },
+     },
     "assetBundlePatterns": [
       "**/*"
     ],
     "ios": {
       "supportsTablet": true,
+      "bundleIdentifier": "com.zictech.rugipoalumni",
+      "buildNumber": "1.0.0",
       "infoPlist": {
         "NSCameraUsageDescription": "We need access to your camera",
-        "NSPhotoLibraryUsageDescription": "We need access to your photo library"
+        "NSPhotoLibraryUsageDescription": "Allow $(PRODUCT_NAME) to access your photos.",
+        "NSPhotoLibraryAddUsageDescription": "Allow $(PRODUCT_NAME) to save photos."
       }
     },
     "android": {
-      "package": "zictech.rugipofinance",
+      "package": "com.zictech.rugipoakumni",
       "versionCode": 1,
       "adaptiveIcon": {
         "foregroundImage": "./assets/adaptive-icon_image.png",
         "backgroundColor": "#A78808"
       },
-
-      "permissions": 
-        ["CAMERA", "READ_EXTERNAL_STORAGE", "WRITE_EXTERNAL_STORAGE"]  
+      "permissions": [
+        "CAMERA",
+        "READ_EXTERNAL_STORAGE",
+        "WRITE_EXTERNAL_STORAGE",
+        "android.permission.READ_EXTERNAL_STORAGE",
+        "android.permission.WRITE_EXTERNAL_STORAGE",
+        "android.permission.ACCESS_MEDIA_LOCATION"
+      ]
     },
     "web": {
       "favicon": "./assets/favicon.png"
     },
-    
-    "plugins": [
-      [
-        "expo-media-library",
-        {
-          "photosPermission": "Allow $(PRODUCT_NAME) to access your photos.",
-          "savePhotosPermission": "Allow $(PRODUCT_NAME) to save photos.",
-          "isAccessMediaLocationEnabled": true
-        }
-      ]
-    ]
+    "extra": {
+      "eas": {
+        "projectId": "96589842-0e23-4b70-a82d-350bd035d91b"
+      }
+    }
   }
 }

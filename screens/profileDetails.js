@@ -91,7 +91,7 @@ const ProfileDetailsScreen = () => {
             style={styles.profileAvatar}
           />
 
-          <Text style={styles.profileName}>{myDetails.surname}</Text>
+          <Text style={styles.profileName}>{myDetails.first_name}</Text>
 
           <Text style={styles.profileEmail}>tag ID: {myDetails.username} </Text> 
           <TouchableOpacity
