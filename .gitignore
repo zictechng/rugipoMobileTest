@@ -11,6 +11,7 @@ npm-debug.*
 web-build/
 .env
 ./build
+credentials.json
 
 # macOS
 .DS_Store

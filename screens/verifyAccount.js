@@ -62,7 +62,7 @@ import Loader from '../components/Loader';
           }, [isConnected]);
 
         // get first 3 letters of the email
-        const displayEmail = name.substring(0, 3);
+        const displayEmail = name.substring(0, 5);
     
       const  ConfirmCode = async () =>{
         if(enterCode.length != 4){
@@ -296,7 +296,7 @@ import Loader from '../components/Loader';
                    
                 {btnVerifyLoading ? <Loader loading={btnVerifyLoading} textInfo={'Verifying wait...'} style={{fontSize: 25, fontFamily: '_regular'}} /> : ''}
 
-                <Text style={{fontSize: 13, color: "#aaa", fontFamily: '_regular', marginHorizontal: 20}}>Enter the code sent to your phone/email to verify your account</Text>
+                <Text style={{fontSize: 13, color: "#aaa", fontFamily: '_regular', marginHorizontal: 20}}>Enter the code sent to your registered email to verify your account. If OTP not found, remember to check spam box</Text>
                 <Text style={{fontSize: 16, color: "#111", marginTop: 12, fontFamily: '_semiBold'}}>
                 <Text style={{fontSize: 13, color: "#aaa", fontFamily: '_regular'}}>We send OTP code to </Text>
                     { displayEmail }{'......'}{ '@' }{ domain }
