@@ -22,7 +22,6 @@ import {
   Ionicons} from "@expo/vector-icons";
 import { gs, colors } from "../styles";
 import { useNavigation } from '@react-navigation/native';
-import AsyncStorage from '@react-native-async-storage/async-storage';
 import * as Animatable from 'react-native-animatable'
 import DashedLine from 'react-native-dashed-line';
 import { NumberValueFormat } from '../components/FormatValue';
