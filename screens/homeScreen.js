@@ -29,7 +29,7 @@ const MyBarChart = () => {
       <>
         <BarChart
           data={{
-            labels: ['January', 'February', 'March', 'April', 'May', 'June'],
+            labels: ['Jan ', ' Feb', 'Mar', 'Apr', 'May', 'Jun ' ],
             datasets: [
               {
                 data: [500, 1500, 2500, 3500, 4500, 5500],
