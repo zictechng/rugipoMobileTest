@@ -223,7 +223,7 @@ const navigation = useNavigation();
         start={[0, 0]}
         end={[1, 1]}
         style={{ elevation: 30, shadowColor: '#930D2F'}}>
-        <View style={[gs.rowBetween, {marginTop: Platform.OS === "ios" ? 18 : 30, marginHorizontal: 10, justifyContent: 'center' }]}>
+        <View style={[gs.rowBetween, {marginTop: Platform.OS === "ios" ? 15 : 45, marginBottom:Platform.OS === "ios" ? 6 : '', marginHorizontal: 10, justifyContent: 'center' }]}>
           <TouchableOpacity style={styles.circleIconLeft1}>
             <Text
               style={{ fontSize: 22, fontFamily: "_semiBold", color: "#fff" }}>

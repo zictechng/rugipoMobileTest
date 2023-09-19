@@ -610,19 +610,15 @@ const SignUpScreen = ({ navigation }) => {
                                 </LinearGradient>
                             </TouchableOpacity>
 
-
-                            <TouchableOpacity
-                                onPress={() => navigation.navigate('Login')}
-                                style={[styles.signIn, {
-                                    borderColor: colors.secondaryColor1,
-                                    borderWidth: 1,
-                                    marginTop: 20
-                                }]}
-                            >
+                            <View style={{flexDirection:'row', paddingVertical: 15, marginBottom: 40}}>
                                 <Text style={[styles.textSign, {
-                                    color: colors.secondaryColor2,
-                                }]}>Sign In</Text>
-                            </TouchableOpacity>
+                                        color: colors.blackColor1,
+                                    }]}>I have an account! </Text>
+                                <Text style={[styles.textSign, {
+                                        color: colors.secondaryColor2,
+                                    }]}  onPress={() => navigation.navigate('Login')}>Sign In</Text>
+                            </View>
+                            
                         </View>
                     </ScrollView>
 

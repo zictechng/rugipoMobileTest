@@ -85,8 +85,8 @@ const WireTransferScreen = () => {
         colors={[colors.secondaryColor2, colors.secondaryColor2]}
         start={[0, 0]}
         end={[1, 1]}
-        style={{ elevation: 30, shadowColor: '#930D2F'}}>
-        <View style={[gs.rowBetween, { marginTop: Platform.OS === "ios" ? 18 : 26, marginHorizontal: 10 }]}>
+        style={{ elevation: 30, shadowColor: '#000'}}>
+        <View style={[gs.rowBetween, { marginTop: Platform.OS === "ios" ? 15 : 26, marginBottom:Platform.OS === "ios" ? 6 : '', marginHorizontal: 10 }]}>
           <TouchableOpacity
             style={styles.circleIconLeft}
             onPress={() => navigation.goBack()}>

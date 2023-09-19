@@ -174,7 +174,7 @@ const props = {
 
       <LinearGradient colors={[colors.secondaryColor2, colors.secondaryColor2]} start={[0,0]} end={[1,1]}
             style={{shadowColor: '#930D2F'}}>
-                <View style={[gs.rowBetween, {marginTop: Platform.OS === "ios" ? 10 : 26, marginHorizontal: 10}]}>
+                <View style={[gs.rowBetween, {marginTop: Platform.OS === "ios" ? 20 : 30, marginHorizontal: 10}]}>
                    {/* <View style = {styles.circleIconLeft}>
                         
                     </View> */}

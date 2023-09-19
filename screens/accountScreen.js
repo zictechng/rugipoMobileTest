@@ -225,15 +225,12 @@ const AccountScreen = ({ navigation }) => {
         end={[1, 1]}
         style={{ elevation: 30, shadowColor: '#930D2F'}}
       >
-        <View style={[gs.rowBetween, { marginTop: Platform.OS === "ios" ? 18 : 30 , marginHorizontal: 10, justifyContent: 'center' }]}>
-         
-          <TouchableOpacity style={styles.circleIconLeft1}>
+        <View style={[gs.rowBetween, { marginTop: Platform.OS === "ios" ? 15 : 45, marginBottom:Platform.OS === "ios" ? 6 : '',  marginHorizontal: 10, justifyContent: 'center' }]}>
             <Text
-              style={{ fontSize: 22, fontFamily: "_semiBold", color: "#fff" }}
-            >
+              style={{ fontSize: 22, fontFamily: "_semiBold", color: "#fff" }}>
               Account Statements
             </Text>
-          </TouchableOpacity>
+         
           <View style={styles.nameView}></View>
 
           {/* <Text style = {styles.text}>{new Date().toString().slice(0,11)}</Text> */}

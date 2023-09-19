@@ -43,13 +43,14 @@ const ReferralScreen = () => {
       <StatusBar backgroundColor={colors.secondaryColor2} style="light" />
         <View style={{ flex: 1, backgroundColor: '#F7F7F7', }}>
          {/* header of the screen */}
-      <LinearGradient
-        colors={[colors.secondaryColor2, colors.secondaryColor2]}
-        start={[0, 0]}
-        end={[1, 1]}
-        style={{ elevation: 30, shadowColor: '#930D2F'}}>
-        <View style={[gs.rowBetween, { marginTop: Platform.OS === "ios" ? 18 : 26, marginHorizontal: 10 }]}>
-          <TouchableOpacity
+
+         <LinearGradient
+            colors={[colors.secondaryColor2, colors.secondaryColor2]}
+            start={[0, 0]}
+            end={[1, 1]}
+            style={{ elevation: 30, shadowColor: '#930D2F'}}>
+            <View style={[gs.rowBetween, { marginTop: Platform.OS === "ios" ? 15 : 30, marginBottom:Platform.OS === "ios" ? 6 : '', marginHorizontal: 10 }]}>
+            <TouchableOpacity
             style={styles.circleIconLeft}
             onPress={() => navigation.goBack()}>
             <Ionicons name="arrow-back" color={colors.text} size={20} />
@@ -58,7 +59,7 @@ const ReferralScreen = () => {
           <TouchableOpacity style={styles.circleIconLeft1}>
             <Text
               style={{ fontSize: 22, fontFamily: "_semiBold", color: "#fff" }}>
-              Referrals
+              Referral
             </Text>
           </TouchableOpacity>
           <View style={styles.nameView}></View>

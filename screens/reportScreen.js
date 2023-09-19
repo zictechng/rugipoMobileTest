@@ -260,7 +260,7 @@ const ReportScreen = () => {
         start={[0, 0]}
         end={[1, 1]}
         style={{ elevation: 30, shadowColor: '#930D2F'}}>
-        <View style={[gs.rowBetween, { marginTop: Platform.OS === "ios" ? 18 : 26, marginHorizontal: 10 }]}>
+        <View style={[gs.rowBetween, { marginTop: Platform.OS === "ios" ? 15 : 30, marginBottom:Platform.OS === "ios" ? 6 : '', marginHorizontal: 10 }]}>
           <TouchableOpacity
             style={styles.circleIconLeft}
             onPress={() => navigation.goBack()}>
@@ -363,6 +363,7 @@ const ReportScreen = () => {
                       textSecondaryColor: colors.textColor1,
                       //borderColor: 'rgba(122, 146, 165, 0.1)',
                     }}
+                    style={{ borderRadius: 10, fontFamily: '_regular', fontSize: 10 }}
                   />
 
                 <TouchableOpacity style={styles.action}
@@ -425,14 +426,14 @@ const styles = StyleSheet.create({
     flex: 1,
     justifyContent: 'center',
     alignItems: 'center',
-    marginTop: 22,
+    marginTop: 20,
   },
   modalView:{
     margin: 20,
     backgroundColor: 'white',
     borderRadius: 20,
     width: '90%',
-    padding: 35,
+    padding: 10,
     alignItems: 'center',
     shadowColor: '#000',
     shadowOffset:{

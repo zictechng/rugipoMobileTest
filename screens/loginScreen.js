@@ -194,8 +194,7 @@ const LoginScreen = ({navigation}) => {
                  setDataInLocalStorage('USER_TOKEN', JSON.stringify(res.data.token))
                  setLoginState(res.data.token)
                  AsyncStorage.setItem('LOGIN_ID', JSON.stringify(res.data.userData._id))
-               
-
+                 
                 setIsMyLoading(false);
                 setLogBtnDisabled(false);
                 setIsLoginBtn(false)

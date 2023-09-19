@@ -37,8 +37,8 @@ const CustomTabBarButton = ({children, onPress}) =>(
         onPress={onPress}
     >
         <View style={{
-            width: 60,
-            height: 60,
+            width: 43,
+            height: 43,
             borderRadius: 35,
             backgroundColor: colors.secondaryColor1
         }}>
@@ -177,7 +177,7 @@ const BottomTab = () => {
                 elevation: 0,
                 backgroundColor: '#ffffff',
                 borderRadius: 15,
-                height: 70,
+                height: 55,
                 ...styles.shadow
             }
             }}
@@ -203,7 +203,7 @@ const BottomTab = () => {
                         /> */}
                         <Text 
                         style={{color: focused ? colors.secondaryColor2 : '#748c94', 
-                        fontSize: 12, 
+                        fontSize: 10, 
                         marginBottom: 15}}>
                         Home
                         </Text>
@@ -226,12 +226,12 @@ const BottomTab = () => {
                         /> */}
                         <Ionicons
                             name="contract-outline"
-                            size={25}
+                            size={23}
                             color={focused ? colors.secondaryColor2 : '#748c94'}
                         />
                         <Text 
                         style={{color: focused ? colors.secondaryColor2 : '#748c94', 
-                        fontSize: 12, 
+                        fontSize: 10, 
                         marginBottom: 15}}>
                         Statements
                         </Text>
@@ -283,12 +283,12 @@ const BottomTab = () => {
                         /> */}
                         <Ionicons
                             name="bar-chart-outline"
-                            size={25}
+                            size={23}
                             color={focused ? colors.secondaryColor2 : '#748c94'}
                         />
                         <Text 
                         style={{color: focused ? colors.secondaryColor2 : '#748c94', 
-                        fontSize: 12, 
+                        fontSize: 10, 
                         marginBottom: 15}}>
                         History
                         </Text>
@@ -308,13 +308,13 @@ const BottomTab = () => {
                             }}
                         /> */}
                         <Ionicons
-                            name="stats-chart-outline"
-                            size={25}
+                            name="person-outline"
+                            size={23}
                             color={focused ? colors.secondaryColor2 : '#748c94'}
                         />
                         <Text 
                         style={{color: focused ? colors.secondaryColor2 : '#748c94', 
-                        fontSize: 12, 
+                        fontSize: 10, 
                         marginBottom: 15}}>
                         Account
                         </Text>
