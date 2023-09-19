@@ -94,11 +94,25 @@ const DetailsPageScreen = ({route}) => {
       
    };
 
-   // function to download files
+   // function to save files
    const savePicture = async (uri) => {
-    const asset = await MediaLibrary.saveToLibraryAsync(uri);
-    //console.log("Saved asset:", asset);
-    // You can now use 'asset' to access details about the saved image.
+    const permissions = await MediaLibrary.getPermissionsAsync();
+    console.log(permissions);
+    //console.log("Saved asset:", result);
+    const perm = await MediaLibrary.requestPermissionsAsync(permissions.MEDIA_LIBRARY);
+    if (perm.status != 'granted') {
+      Toast.show({
+        type: ALERT_TYPE.WARNING,
+        title: 'Error',
+        textBody: 'Permission denied! Accepted permissions to save the file',
+        titleStyle: {fontFamily: '_semiBold', fontSize: 15},
+        textBodyStyle: {fontFamily: '_regular', fontSize: 13,},
+        })
+      return;
+    }
+
+    let asset = await MediaLibrary.saveToLibraryAsync(uri);
+     //console.log("Saved asset:", asset);
   };
 
    // sharing files via social links

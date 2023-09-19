@@ -232,7 +232,7 @@ const BottomTab = () => {
                         <Text 
                         style={{color: focused ? colors.secondaryColor2 : '#748c94', 
                         fontSize: 10, 
-                        marginBottom: 15}}>
+                        marginBottom: 16}}>
                         Statements
                         </Text>
                     </View>
@@ -289,7 +289,7 @@ const BottomTab = () => {
                         <Text 
                         style={{color: focused ? colors.secondaryColor2 : '#748c94', 
                         fontSize: 10, 
-                        marginBottom: 15}}>
+                        marginBottom: 16}}>
                         History
                         </Text>
                     </View>
@@ -315,7 +315,7 @@ const BottomTab = () => {
                         <Text 
                         style={{color: focused ? colors.secondaryColor2 : '#748c94', 
                         fontSize: 10, 
-                        marginBottom: 15}}>
+                        marginBottom: 16}}>
                         Account
                         </Text>
                     </View>
