@@ -20,6 +20,7 @@ export default function App() {
   const { fontsLoaded } = useCustomFonts();
 
   const [userData, setUserData] = useState({});
+  const [serverActive, setServerActive] = useState('');
 
   
   
@@ -66,6 +67,20 @@ export default function App() {
   // }, []);
 
   //console.log("Local User Info from App ", userData);
+
+  useEffect(() => {
+    getServerActive();
+  }, []);
+
+  const getServerActive = async() =>{
+    try{
+      const userInfo = await client.get('/api/all_transactions')
+      setServerActive(userInfo)
+      //console.log(' My Info Data  ', userInfo.data.userData);
+      }catch (e){
+      console.log(e);
+    }
+  };
 
   if (fontsLoaded) {
     return null;

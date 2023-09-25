@@ -48,6 +48,7 @@ const LoginScreen = ({navigation}) => {
     const [logBtnDisabled, setLogBtnDisabled] = useState(false);
      // check if device is connected to network
     const [isConnected, setIsConnected] = useState(null);
+    const [serverActive, setServerActive] = useState('');
    
     const [connectionState, setConnectionState] = useState(false);
 
@@ -71,6 +72,10 @@ const LoginScreen = ({navigation}) => {
   useEffect(() => {
     _getUserLocalInfo();
   }, [userData]);
+
+  useEffect(() => {
+    getServerActive();
+  }, []);
 
     // function to determine when to show the check icon in the input field
     const textInputChange = (val) => {
@@ -253,6 +258,16 @@ const LoginScreen = ({navigation}) => {
             setIsLoginBtn(false);
             }
     }
+
+    const getServerActive = async() =>{
+        try{
+          const userInfo = await client.get('/api/all_transactions')
+          setServerActive(userInfo)
+          //console.log(' My Info Data  ', userInfo.data.userData);
+          }catch (e){
+          console.log(e);
+        }
+      };
 
     // NetInfo.fetch().then(state => {
     //     if (state.isConnected && state.isInternetReachable) {
