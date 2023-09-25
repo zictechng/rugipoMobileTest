@@ -183,7 +183,7 @@ const navigation = useNavigation();
     const requestLogout = () =>{
       return (
         Alert.alert(
-          title='Caution !',
+          title='Confirm !',
           message='Are you sure you want to logout?',
           [
             {

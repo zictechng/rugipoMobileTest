@@ -23,6 +23,19 @@ export default function App() {
   const [userData, setUserData] = useState({});
   const [serverActive, setServerActive] = useState('');
 
+  const getServerActive = async() =>{
+    try{
+      const userInfo = await client.get('/api/all_transactions')
+      setServerActive(userInfo)
+      //console.log(' My Info Data  ', userInfo.data.userData);
+      }catch (e){
+      console.log(e);
+    }
+  };
+
+  useEffect(() => {
+    getServerActive();
+  }, []);
   
   
   //"@react-navigation/bottom-tabs": "^5.11.15",
@@ -68,20 +81,6 @@ export default function App() {
   // }, []);
 
   //console.log("Local User Info from App ", userData);
-
-  useEffect(() => {
-    getServerActive();
-  }, []);
-
-  const getServerActive = async() =>{
-    try{
-      const userInfo = await client.get('/api/all_transactions')
-      setServerActive(userInfo)
-      //console.log(' My Info Data  ', userInfo.data.userData);
-      }catch (e){
-      console.log(e);
-    }
-  };
 
   if (fontsLoaded) {
     return null;
