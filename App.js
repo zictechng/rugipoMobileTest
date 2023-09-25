@@ -13,6 +13,7 @@ import AsyncStorage from "@react-native-async-storage/async-storage";
 import { NavigationContainer } from "@react-navigation/native";
 import MainRootNavigation from "./navigation/mainRootNavigation";
 import { ActionSheetProvider } from '@expo/react-native-action-sheet';
+import client from './api/client';
 //LogBox.ignoreAllLogs(); // this will suppress errors not to be showing to users in the app 
 
 
