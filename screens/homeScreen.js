@@ -3,6 +3,7 @@ import { LinearGradient } from 'expo-linear-gradient'
 import {
     BarChart,
   } from "react-native-chart-kit";
+
 import { SafeAreaView, View, Text, StyleSheet, ScrollView,Image, Alert, Modal, ActivityIndicator,
   TouchableOpacity, StatusBar, Dimensions, Platform, RefreshControl} from 'react-native';
 import { UserContext } from '../components/UserContext';
@@ -10,9 +11,7 @@ import { Ionicons, Entypo, SimpleLineIcons, FontAwesome, FontAwesome5} from '@ex
 import { useNavigation } from '@react-navigation/native';
 import moment from "moment";
 import { gs, colors } from '../styles'
-//import { ScrollView } from 'react-native-gesture-handler';
 import RBSheet from 'react-native-raw-bottom-sheet'
-
 import CircularProgress, { CircularProgressBase } from 'react-native-circular-progress-indicator';
 import client from '../api/client';
 import { NumberValueFormat } from '../components/FormatValue';
@@ -29,7 +28,7 @@ const MyBarChart = () => {
       <>
         <BarChart
           data={{
-            labels: ['Jan ', ' Feb', 'Mar', 'Apr', 'May', 'Jun ' ],
+            labels: ['Jan', ' Feb', 'Mar', 'Apr', 'May', 'Jun ' ],
             datasets: [
               {
                 data: [500, 1500, 2500, 3500, 4500, 5500],
@@ -38,7 +37,7 @@ const MyBarChart = () => {
           }}
           width={Dimensions.get('window').width -40}
           height={220}
-          yAxisLabel={'\u20A6'}
+          yAxisLabel={ ' \u20A6'}
           chartConfig={{
             backgroundColor: '#fff',
             backgroundGradientFrom: '#fff',
@@ -223,7 +222,6 @@ const props = {
                     <Text style={styles.balanceSubTitle}>Current Balance</Text>
                 </View>
             </LinearGradient>
-
             {/* body of the screen */}
             <ScrollView style={{marginBottom: 50}}
               refreshControl={
@@ -232,9 +230,8 @@ const props = {
               
               <NetWorkConnectionCheck />
               
-            <View style={styles.middlePage}>
+                    <View style={styles.middlePage}>
                       {/* chat graph here */}
-                      
                       <Text style={styles.chatHeader}>Transaction Overview</Text>
                       <MyBarChart />
                     </View>
